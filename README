@@ -1,0 +1,11 @@
+This is a clone of spec-builder using yaml as the metadata format and templates
+to generate spec files and debian package data in the future.
+It uses two python libraries:
+ - PyYAML (For parsing YAML)
+ - python-cheetah (For templating)
+
+To test, compile the templates by running 
+
+    make
+
+and run the script with one of the example yaml files as the argument.

@@ -1,0 +1,40 @@
+Name: gawk
+Version: 3.1.6
+Release: 1
+LocaleName: gawk
+Group: Applications/Text
+Summary: The GNU version of the awk text processing utility
+License: GPLv3
+URL: http://www.gnu.org/software/gawk/gawk.html
+Description: |
+    The gawk package contains the GNU version of awk, a text processing
+    utility. Awk interprets a special-purpose programming language to do
+    quick and easy text pattern matching and reformatting jobs.
+
+    Install the gawk package if you need a text processing utility. Gawk is
+    considered to be a standard Linux tool for processing text.
+Sources:
+    - ftp://ftp.gnu.org/gnu/gawk/gawk-%{version}.tar.bz2
+Requires: 
+    - /bin/mktemp
+ConfigOptions:
+    - bindir=/bin
+Patches:
+    - gawk-3.1.3-getpgrp_void.patch
+Documents: 
+    - COPYING
+    - README 
+    - FUTURES
+    - LIMITATIONS
+    - NEWS
+    - README_d/README.multibyte
+    - README_d/README.tests 
+    - POSIX.STD
+Files: |
+    /bin/*
+    /usr/libexec/awk
+    /usr/share/awk
+    /usr/share/man/man1/*
+    /usr/share/info/gawk.info*
+    /usr/share/info/gawkinet.info*
+    

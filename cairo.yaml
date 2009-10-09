@@ -1,0 +1,53 @@
+Name: cairo
+Version: 1.8.6
+Release: 1
+Summary: Something
+Documents: 
+    - AUTHORS
+    - BIBLIOGRAPHY
+    - BUGS
+    - ChangeLog
+    - COPYING
+    - COPYING-LGPL-2.1
+    - COPYING-MPL-1.1
+    - NEWS
+    - PORTING_GUIDE
+    - README
+Group: System Environment/Libraries
+Description: A vector graphics library
+License: LGPLv2 or MPLv1.1
+URL: http://www.cairographics.org
+LocaleName: cairo-0.10
+Sources: 
+    - http://cairographics.org/releases/%{name}-%{version}.tar.gz
+BuildRequires:
+    PkgConfig: 
+    - xrender 
+    - x11 
+    - libpng 
+    - libxml-2.0 
+    - pixman-1 
+    - freetype2 
+    - fontconfig
+ConfigOptions: 
+    - enable-warnings 
+    - enable-xlib 
+    - enable-freetype 
+    - enable-ps 
+    - enable-pdf 
+    - enable-svg 
+    - disable-gtk-doc
+
+Files: |
+    %{_libdir}/libcairo*.so.* 
+
+SubPackages:
+    devel:
+        Group: Development/Libraries
+        Summary: Something
+        Description: Development components for the cairo library
+        Files: |
+            %{_includedir}/*
+            %{_libdir}/libcairo*.so
+            %{_libdir}/pkgconfig/*
+            %{_datadir}/gtk-doc/html/cairo
