@@ -33,7 +33,7 @@ Requires:   $req
 #end for
 #end if
 ## Requires(post) etc.
-#if $extra.Info
+#if $extra.has_key("Info") and $extra.Info
 Requires(post):  /sbin/install-info
 Requires(postun):  /sbin/install-info
 #end if
@@ -72,20 +72,24 @@ Development files for %{name}
 #end for
 #end if
 
-#if $metadata.has_key("SubPackages")
-#for $sp in $metadata.SubPackages.keys()
-%package $sp
-Summary: $metadata.SubPackages[$sp].Summary
-Group: $metadata.SubPackages[$sp].Group
-#if $metadata.SubPackages[$sp].has_key("Requires")
-#for $req in $metadata.SubPackages[$sp].Requires
+#if $metadata.has_key("sp")
+#for $sp in $metadata.sp
+%package $sp.Name
+Summary: $sp.Summary
+#if $sp.has_key("Group")
+Group: $sp.Group
+#else
+Group: ${metadata.Group}
+#end if
+#if $sp.has_key("Requires")
+#for $req in $sp.Requires
 Requires: $req
 #end for
 #end if
-#if $sp == "devel"
 Requires: %{name} = %{version}-%{version}
-#end if
 #end for
+%description $sp.Name
+$sp.Description
 #end if
 
 %prep

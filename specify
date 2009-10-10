@@ -1,11 +1,8 @@
 #!/usr/bin/python
 
+import  spectacle 
 import yaml,  sys
-import re
-import os
-from spec import spec
-from dsc import dsc
-
+import re, os
 
 class RPMWriter():
     def __init__(self,  filename):
@@ -18,7 +15,13 @@ class RPMWriter():
         print yaml.dump(yaml.load(self.stream))
     def parse(self):
         self.metadata = yaml.load(self.stream)
-    def parse_files(self, files):
+        self.metadata["sp"] = []
+        if self.metadata.has_key("SubPackages"):
+            for sp in self.metadata["SubPackages"]:
+                self.metadata["sp"].append(self.metadata[sp])
+        print self.metadata["sp"]
+        
+    def parse_files(self, files = {}):
         self.extra = {
                 'PreUn': [],
                 'Desktop': False,
@@ -52,7 +55,7 @@ class RPMWriter():
                     self.extra['Schemas'].append(l)
 
 
-    def parse_existing(selfs, file):
+    def parse_existing(self, file = None):
         sin = re.compile("^# >> ([^\s]+) (.*)")
         sout = re.compile("^# << ([^\s]+) (.*)")
         recording = []
@@ -93,15 +96,17 @@ class RPMWriter():
             self.parse_files(usercontent['files'])
             self.extra['content'] = usercontent
             nameSpace = {'metadata': self.metadata, 'extra': self.extra }
-            t = spec(searchList=[nameSpace])
+            t = spectacle.spec(searchList=[nameSpace])
             a = str(t)
             file = open(specfile, "w")
             file.write(a)
             file.close()           
         else:
             print "Creating new spec file: %s" %specfile
+            self.parse_files()
+            self.extra['content'] = {}
             nameSpace = {'metadata': self.metadata, 'extra': self.extra }
-            t = spec(searchList=[nameSpace])
+            t = spectacle.spec(searchList=[nameSpace])
             a = str(t)
             file = open(specfile, "w")
             file.write(a)
@@ -118,3 +123,4 @@ if __name__ == '__main__':
         rpm.parse()
         rpm.process()
         print rpm.extra
+        print rpm.metadata
