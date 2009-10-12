@@ -1,51 +1,51 @@
-# ex: set tabstop=1 expandtab:
 Name: xfce4-session
-Version: 20090115
+Summary: Xfce session manager
+Version: 4.6.1
 Release: 1
 Group: User Interface/Desktops
-LocaleName: metacity
-Summary: Metacity window manager
 License: GPLv2+
-URL: http://www.moblin.org
+URL: http://www.xfce.org/
 Description: |
-    Metacity is a simple window manager that integrates nicely with
-    GNOME 2.
-Configure: autogen
-ConfigOptions:
-    - with-clutter
-    - disable-xinerama
+    xfce4-session is the session manager for the Xfce desktop environment.    
+Patches:
+    - xfce4-session-4.4.2-hide-tips.patch
+    - xfce4-session-4.5.99.1-splash.patch
+    - xfce4-session-logout.patch
 Sources:
-    - metacity-%{version}.tar.bz2
+    - http://www.xfce.org/archive/xfce-%{version}/src/xfce4-session-%{version}.tar.bz2
+    - xfce4-autostart-editor.png
+
 Requires:
-    - startup-notification
-    - GConf2
-    - dbus-x11
+    - libxfcegui4 >= %{version}
+    - xorg-x11-server-utils
+    
+PkgBR:
+    - libxfcegui4-devel >= %{version}
+    - gettext
+    - intltool
+    - imake
+    - xorg-x11-server-utils
+    - GConf2-devel
+    - libwnck-devel
+PkgConfigBR:
+    - xt
+    - dbus-1
+    - libstartup-notification-1.0
+    - libglade-2.0
+
 AutoSubPackages:
     - devel
-PkgBR:
-    - desktop-file-utils
-    - intltool
-    - libtool
-    - automake
-    - autoconf
-    - gettext
-    - gnome-common
-PkgConfigBR:
-    - clutter-0.8
-    - clutter-glx-0.8
-    - clutter-x11-0.8
-    - gl
-    - fontconfig
-    - x11
-    - xdamage
-    - pango
-    - libstartup-notification-1.0
-    - xproto
-    - xext
-    - gtk+-2.0
-    - gconf-2.0
-    - libglade-2.0
-    - xrandr
-    - xrender
-    - xcursor
-    - sm
+SubPackages:
+    - Name: engines
+      Summary: Additional engines for xfce4-session 
+      Description: |
+            Additional splash screen engines for the Xfce Session Manager.
+
+Configure: configure
+ConfigOptions:
+    - enable-gnome
+    - enable-final
+    - disable-static
+LocaleName: xfce4-session
+
+
