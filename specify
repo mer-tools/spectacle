@@ -15,11 +15,10 @@ class RPMWriter():
         print yaml.dump(yaml.load(self.stream))
     def parse(self):
         self.metadata = yaml.load(self.stream)
-        self.metadata["sp"] = []
-        if self.metadata.has_key("SubPackages"):
-            for sp in self.metadata["SubPackages"]:
-                self.metadata["sp"].append(self.metadata[sp])
-        print self.metadata["sp"]
+        #if self.metadata.has_key("SubPackages"):
+        #    self.metadata["sp"] = []
+        #    for sp in self.metadata["SubPackages"]:
+        #        self.metadata["sp"].append(self.metadata[sp])
         
     def parse_files(self, files = {}):
         self.extra = {

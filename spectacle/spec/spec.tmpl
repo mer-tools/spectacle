@@ -55,7 +55,7 @@ BuildRequires:  $br
 #end for
 #end if
 
-BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 
 %description
 ${metadata.Description}
@@ -72,8 +72,8 @@ Development files for %{name}
 #end for
 #end if
 
-#if $metadata.has_key("sp")
-#for $sp in $metadata.sp
+#if $metadata.has_key("SubPackages")
+#for $sp in $metadata.SubPackages
 %package $sp.Name
 Summary: $sp.Summary
 #if $sp.has_key("Group")
