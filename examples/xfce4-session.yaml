@@ -32,6 +32,12 @@ PkgConfigBR:
     - dbus-1
     - libstartup-notification-1.0
     - libglade-2.0
+Configure: configure
+ConfigOptions:
+    - enable-gnome
+    - enable-final
+    - disable-static
+LocaleName: xfce4-session
 
 AutoSubPackages:
     - devel
@@ -41,11 +47,5 @@ SubPackages:
       Description: |
             Additional splash screen engines for the Xfce Session Manager.
 
-Configure: configure
-ConfigOptions:
-    - enable-gnome
-    - enable-final
-    - disable-static
-LocaleName: xfce4-session
 
 
