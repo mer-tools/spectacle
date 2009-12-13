@@ -4,6 +4,7 @@ import  spectacle
 import yaml,  sys
 import re, os
 import tempfile
+import shutil
 
 class GitAccess():
     def __init__(self, path):
@@ -28,6 +29,7 @@ class RPMWriter():
         self.metadata = None
         self.scm = None
         self.pkg = None
+        self.version = None
         self.extra = {}
         pass
     def dump(self):
@@ -150,15 +152,16 @@ if __name__ == '__main__':
             tags = scm.gettags()
 	    print tags
             if len(tags) > 0:
-                last = tags.keys()[-1]
+                rpm.version = tags.keys()[-1]
+                rpm.metadata['Version'] = rpm.version
                 tmp = tempfile.mkdtemp()
                 pwd = os.getcwd()
                 os.chdir(tmp)
+                print "Creating archive %s/%s-%s.tar.bz2 ..." %( pwd, rpm.pkg, rpm.version )
                 os.system('git clone %s' %rpm.scm)
                 os.chdir( "%s/%s" %(tmp, rpm.pkg))
-                os.system(' git archive --format=tar --prefix=%s-%s/ %s | bzip2  > %s/%s-%s.tar.bz2' %(rpm.pkg, last, last, pwd, rpm.pkg, last ))
+                os.system(' git archive --format=tar --prefix=%s-%s/ %s | bzip2  > %s/%s-%s.tar.bz2' %(rpm.pkg, rpm.version, rpm.version, pwd, rpm.pkg, rpm.version ))
+                shutil.rmtree(tmp)
                 os.chdir(pwd)
 
         rpm.process()
-        #print rpm.extra
-        #print rpm.metadata
