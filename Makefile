@@ -1,8 +1,8 @@
-VERSION = 0.3
+VERSION = 0.4
 all:
 
 tag: 
-	git tag v$(VERSION)
+	git tag $(VERSION)
 dist:
 	git archive --format=tar --prefix=spectacle-$(VERSION)/ $(VERSION) | \
 		bzip2  > spectacle-$(VERSION).tar.bz2
