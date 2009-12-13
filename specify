@@ -152,7 +152,7 @@ if __name__ == '__main__':
             tags = scm.gettags()
 	    print tags
             if len(tags) > 0:
-                rpm.version = tags.keys()[-1]
+                rpm.version = sorted(tags.keys())[-1]
                 rpm.metadata['Version'] = rpm.version
                 tmp = tempfile.mkdtemp()
                 pwd = os.getcwd()
