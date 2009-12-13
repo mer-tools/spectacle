@@ -150,7 +150,6 @@ if __name__ == '__main__':
             scm = GitAccess(rpm.scm)
             print "Getting tags from SCM..."
             tags = scm.gettags()
-	    print tags
             if len(tags) > 0:
                 rpm.version = sorted(tags.keys())[-1]
                 rpm.metadata['Version'] = rpm.version
