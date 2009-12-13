@@ -10,6 +10,9 @@ Group:      ${metadata.Group}
 License:    ${metadata.License}
 URL:        ${metadata.URL}
 Release:    ${metadata.Release}%{?dist}
+#if $metadata.has_key("BuildArch")
+BuildArch: ${metadata.BuildArch}
+#end if
 ## Sources
 #if $metadata.has_key("Sources")
 #set $idx = 0
@@ -111,10 +114,14 @@ $l
 #end for
 #end if
 # << build pre
-#if $metadata.has_key('Configure') and $metadata.Configure == 'autogen'
+#if $metadata.has_key('Configure')
+#if $metadata.Configure == 'autogen'
 %autogen --disable-static#slurp
-#else if $metadata.has_key('Configure') and $metadata.Configure == 'reconfigure'
+#else if $metadata.Configure == 'reconfigure'
 %reconfigure --disable-static#slurp
+#else if $metadata.Configure == 'python'
+python setup.py build
+#end if
 #else
 %configure --disable-static#slurp
 #end if
@@ -135,7 +142,12 @@ $l
 
 #end if
 
+#if $metadata.has_key('Configure') and $metadata.Configure == 'python'
+# Call make
+#else
 make %{?_smp_mflags}
+#end if
+
 # >> build post
 #if $extra.content.has_key("build") and  $extra.content.build.has_key("post")
 #for $l in $extra.content.build.post
@@ -153,7 +165,11 @@ $l
 #end if
 # << install pre
 rm -rf %{buildroot}
+#if $metadata.has_key('Configure') and $metadata.Configure == 'python'
+%{__python} setup.py install --skip-build --root %{buildroot}
+#else
 %make_install
+#end if
 
 # >> install post
 #if $extra.content.has_key("install") and $extra.content.install.has_key("post")
