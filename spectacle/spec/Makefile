@@ -9,7 +9,7 @@ all: $(TEMPLATE_MODS)
 
 %.py: %.tmpl
 	$(CHEETAH) compile --settings='useStackFrames=False' $<
-	mv $@ __init__.py
+	cp $@ __init__.py
 
 clean:
 	rm -f $(TEMPLATE_MODS)
