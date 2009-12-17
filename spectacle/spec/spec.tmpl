@@ -117,6 +117,8 @@ $l
 #if $metadata.has_key('Configure')
 #if $metadata.Configure == 'autogen'
 %autogen --disable-static#slurp
+#else if $metadata.Configure == 'configure'
+%configure --disable-static#slurp
 #else if $metadata.Configure == 'reconfigure'
 %reconfigure --disable-static#slurp
 #else if $metadata.Configure == 'python'
