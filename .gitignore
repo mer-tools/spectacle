@@ -1,0 +1,4 @@
+*.spec
+spectacle/spec/*.py
+spectacle/dsc/*.py
+build/
