@@ -68,7 +68,7 @@ ${metadata.Description}
 %package $sp
 Summary: Development files for %{name}
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{version}
+Requires: %{name} = %{version}-%{release}
 %description $sp
 Development files for %{name}
 
@@ -89,7 +89,7 @@ Group: ${metadata.Group}
 Requires: $req
 #end for
 #end if
-Requires: %{name} = %{version}-%{version}
+Requires: %{name} = %{version}-%{release}
 %description $sp.Name
 $sp.Description
 
