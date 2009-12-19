@@ -79,6 +79,7 @@ class SpectacleDumper(object):
                 fp.write("\n")
                 continue
 
+
             if isinstance(value, list):
                 fp.write(cur_indent + "%s:\n" % (key))
 
@@ -87,6 +88,10 @@ class SpectacleDumper(object):
                         self.dump_yaml(item, cur_indent + TAB, fp)
                         fp.write("\n")
                     else:
+                        # ESC for leading '%', for yaml syntax
+                        if item.find('%') == 0:
+                            item = '\\' + item
+
                         fp.write(cur_indent + TAB + "- %s\n" % (item))
             else:
                 lines_to_write = value.splitlines()
@@ -94,6 +99,7 @@ class SpectacleDumper(object):
                 if len(lines_to_write) == 1:
                     fp.write(cur_indent + "%s: %s\n" % (key, value))
                 elif len(lines_to_write) == 0:
+                    # not exist until now
                     fp.write(cur_indent + "%s:\n" % (key))
                 else:
                     fp.write(cur_indent + "%s: |\n" % key)
