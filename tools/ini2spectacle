@@ -25,6 +25,7 @@
 
 import os
 import sys
+import re
 from ConfigParser import RawConfigParser
 
 # spectacle modules
@@ -42,6 +43,21 @@ class SBConvertor(Convertor):
         Convertor.__init__(self, sb_cv_table)
 
 class SBConfigParser(RawConfigParser):
+    """ SpecBuild ini specific parser """
+
+    # keys whose value need to split to list
+    multi_keys = ('Sources',
+                  'Patches',
+                  'ConfigOptions',
+                 )
+
+    deps_keys =  ('BuildRequires',
+                  'PreRequires',
+                  'Requires',
+                  'PostRequires',
+                  'PkgConfig',
+                 )
+
     def __init__(self, iniDir = None):
         RawConfigParser.__init__(self)
 
@@ -87,9 +103,17 @@ class SBConfigParser(RawConfigParser):
             items = self._sections[section]
 
             # Convert space seperated string to list
-            for multi in ('Sources', 'Patches', 'Requires', 'PkgConfig', 'ConfigOptions'):
+            for multi in self.multi_keys:
                 if multi in items:
-                    self.set(section, multi, items[multi].split())
+                    self.set(section, multi, map(str.strip, items[multi].split()))
+
+            # Convert dependent like entry to list
+            for req_key in self.deps_keys:
+                if req_key in items:
+                    reqs = []
+                    for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', items[req_key]):
+                        reqs.append(entry.split(',')[0])
+                    self.set(section, req_key, reqs)
 
             #If the key happens to be 'Files' then we need to find the corresponding *.files and expand it
             #The first line of *.files might contain %doc, this needs to be handled separatly
