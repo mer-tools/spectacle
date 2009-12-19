@@ -16,6 +16,8 @@
 #    with this program; if not, write to the Free Software Foundation, Inc., 59
 #    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import sys
+
 class Convertor(object):
     """ Class for generic operations:
         *   Translate field names between different format
@@ -83,8 +85,18 @@ class Convertor(object):
         except:
             pass
 
+        if 'Files' in dict:
+            files = dict['Files']
+            del dict['Files']
+        else:
+            files = []
+
         for k, v in dict.iteritems():
+            print >> sys.stderr, 'DEBUG: un-ordered entry: %s -> %s\n' % (k,v)
             items.append((k, v))
+
+        if files:
+            items.append(('Files', files))
 
         if subpkgs:
             items.append(('SubPackages', subpkgs))
