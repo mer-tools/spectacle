@@ -49,7 +49,12 @@ Requires(postun): /sbin/chkconfig
 ## BuildRequires
 #if $metadata.has_key("PkgConfigBR")
 #for $br in $metadata.PkgConfigBR
-BuildRequires:  pkgconfig($br)
+#set $br_comps = $br.split()
+#if $len($br_comps) > 1
+BuildRequires:  pkgconfig($br_comps[0])$br[$len($br_comps[0]):]
+#else
+BuildRequires:  pkgconfig($br_comps[0])
+#end if
 #end for
 #end if
 #if $metadata.has_key("PkgBR")
