@@ -3,12 +3,12 @@
 from distutils.core import setup
 
 setup(name='spectacle',
-      version='0.1',
+      version='0.5',
       description='Spectacle',
-      author='Anas Nashif',
-      author_email='anas.nashif@intel.com',
+      author='Anas Nashif, Jian-feng Ding',
+      author_email='anas.nashif@intel.com, jian-feng.ding@intel.com',
       url='http://moblin.org/',
-      scripts=['specify'],
-      packages=['spectacle', 'spectacle.spec', 'spectacle.dsc'],
+      scripts=['specify', 'tools/ini2spectacle'],
+      packages=['spectacle', 'spectacle.spec', 'spectacle.dsc', 'spectacle.util'],
      )
 

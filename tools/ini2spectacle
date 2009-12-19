@@ -1,0 +1,169 @@
+#!/usr/bin/python -tt
+# vim: ai ts=4 sts=4 et sw=4
+
+#    Copyright (c) 2009 Intel Corporation
+#
+#    This program is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by the Free
+#    Software Foundation; version 2 of the License
+#
+#    This program is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#    for more details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with this program; if not, write to the Free Software Foundation, Inc., 59
+#    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+"""Overview of ini2yaml
+    (1) ini2yaml reads the ini file and divides it into segments.    
+    (2) Parses the 'header' segment. Write out the key,value pairs 
+    (3) Expand the 'Files' if found
+    (4) Parse the sub-packages segments if found
+"""
+
+import os
+import sys
+from ConfigParser import RawConfigParser
+
+# spectacle modules
+from spectacle.util.convertor import *
+from spectacle.util.dumper import *
+
+class SBConvertor(Convertor):
+    """ Convertor for SpecBuild ini files """
+
+    def __init__(self):
+        sb_cv_table = {
+                'BuildRequires': 'PkgBR',
+                'PkgConfig': 'PkgConfigBR',
+                }
+        Convertor.__init__(self, sb_cv_table)
+
+class SBConfigParser(RawConfigParser):
+    def __init__(self, iniDir = None):
+        RawConfigParser.__init__(self)
+
+        if iniDir:
+            self.iniDir = iniDir
+        else:
+            self.iniDir = os.path.curdir
+
+    def optionxform(self, option):
+        # no change, otherwise the default one will lower-case them
+        return option
+
+    def __expand_files(self, filename):
+        """ Helper function to expand *.files """
+        doc = ""
+        files = []
+        if os.path.exists(filename):
+            for line in file(filename):
+                # Check if any line has %doc mentioned, to be handled seperatly
+                if "%doc" in line:
+                    doc = line[4:].strip()
+                else:
+                    line = line.strip()
+                    if line:
+                        files.append(line)
+        else:
+            raise "Missing file: %s" % filename
+
+        return doc, files
+
+    def __expand_desc(self, filename):
+        """ Helper function to expand *.desc """
+        if os.path.exists(filename):
+            return file(filename).read().strip()
+        else:
+            raise "Missing file: %s" % filename
+
+    def __cook_config(self):
+        """Function to update fields for spec-builder specific ones"""
+        all_items = {}
+
+        for section in self.sections():
+            items = self._sections[section]
+
+            # Convert space seperated string to list
+            for multi in ('Sources', 'Patches', 'Requires', 'PkgConfig', 'ConfigOptions'):
+                if multi in items:
+                    self.set(section, multi, items[multi].split())
+
+            #If the key happens to be 'Files' then we need to find the corresponding *.files and expand it
+            #The first line of *.files might contain %doc, this needs to be handled separatly
+            if 'Files' in items:
+                doc, files = self.__expand_files(os.path.join(self.iniDir, items['Files']))
+                self.set(section, 'Files', files)
+                if doc:
+                    self.set(section, 'Documents', doc)
+
+            if 'Description' in items:
+                self.set(section,
+                         'Description',
+                         self.__expand_desc(
+                            os.path.join(self.iniDir, items['Description'])))
+
+        for section in self.sections():
+            if section in ('header', 'configuration'):
+                all_items.update(dict(self.items(section)))
+
+        # Re-structure sub packages to inner level
+        if 'SubPackages' in all_items:
+            subpkg_list = all_items['SubPackages'].split()
+            all_items['SubPackages'] = []
+
+            for subpkg in subpkg_list:
+                try:
+                    all_items['SubPackages'].append(dict(self.items(subpkg)))
+                    all_items['SubPackages'][-1].update({'Name': subpkg})
+                except NoSectionError, e:
+                    print 'Needed section for sub-package %s not found' % subpkg
+                    raise e
+
+        return all_items
+
+    def cooked_items(self):
+        """ return all items in all sections """
+        return self.__cook_config()
+
+if __name__ == '__main__':
+    """ Main Function """
+
+    # Check to see if an argument was passed.
+    if len(sys.argv) < 2:
+        # If no arguments were passed, print the usage and exit.
+        print "Usage: ini2spectacle <inifile_path> [outfile_path]"
+        sys.exit(1)
+
+    ini_path = sys.argv[1]
+    if len(sys.argv) > 2:
+        try:
+            out_fp = file(sys.argv[2], 'w')
+        except IOError, e:
+            print '%s: Cannot open: %s\n' % (sys.argv[2], e)
+            sys.exit(1)
+    else:
+        out_fp = None
+
+    # Check if the input file exists
+    if not os.path.exists(ini_path):
+        # input file does not exist
+        print "%s: File does not exist" % ini_path
+        sys.exit(1)
+
+    iniDir = os.path.dirname(ini_path)
+    if not iniDir:
+        iniDir = os.path.curdir
+
+    """Read the input file"""
+    config = SBConfigParser(iniDir)
+    config.read(ini_path)
+
+    convertor = SBConvertor()
+
+    """Dump them to spectacle file"""
+    dumper = SpectacleDumper(format='yaml')
+    dumper.dump(convertor.convert(config.cooked_items()), fp = out_fp)
+
