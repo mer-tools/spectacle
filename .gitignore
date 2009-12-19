@@ -1,3 +1,7 @@
+*.py[oc]
+*.bak
+*.swp
+*~
 *.spec
 spectacle/spec/*.py
 spectacle/dsc/*.py
