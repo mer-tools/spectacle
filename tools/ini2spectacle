@@ -51,12 +51,17 @@ class SBConfigParser(RawConfigParser):
                   'ConfigOptions',
                  )
 
+    # keys whose value may have ver numbers
     deps_keys =  ('BuildRequires',
                   'PreRequires',
                   'Requires',
                   'PostRequires',
                   'PkgConfig',
                  )
+
+    # must have keys
+    must_keys =  {'Release': '1',
+                 }
 
     def __init__(self, iniDir = None):
         RawConfigParser.__init__(self)
@@ -132,6 +137,11 @@ class SBConfigParser(RawConfigParser):
         for section in self.sections():
             if section in ('header', 'configuration'):
                 all_items.update(dict(self.items(section)))
+
+        # Checking must-have keys
+        for key, default in self.must_keys.iteritems():
+            if key not in all_items:
+                all_items[key] = default
 
         # Re-structure sub packages to inner level
         if 'SubPackages' in all_items:
