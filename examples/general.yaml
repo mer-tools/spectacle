@@ -1,0 +1,51 @@
+Name: PackageName
+Summary: string
+Version: string
+Release: string
+Group: string
+License: string
+URL: string
+Description: |
+    Text
+
+Patches:
+    - li0
+    - li1
+    - li2
+
+Sources:
+    - li0
+    - li1
+
+Requires:
+    - li0
+    - li1
+    
+PkgBR:
+    - li0
+    - li1
+
+PkgConfigBR:
+    - li0
+    - li1
+
+Configure: string
+
+ConfigOptions:
+    - li0
+    - li1
+
+LocaleName: string
+
+AutoSubPackages:
+    - li0
+SubPackages:
+    - Name: string
+      Summary: string
+      Description: |
+            Text
+    - Name: string
+      Summary: string
+      Description: |
+            Text
+
