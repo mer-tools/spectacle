@@ -90,9 +90,10 @@ Requires: $req
 #end for
 #end if
 Requires: %{name} = %{version}-%{version}
-#end for
 %description $sp.Name
 $sp.Description
+
+#end for
 #end if
 
 %prep
@@ -132,7 +133,7 @@ python setup.py build
 #set $length = len($metadata.ConfigOptions)
 #set $idx = 1
 #for $opt in $metadata.ConfigOptions
-    --$opt#slurp
+    $opt#slurp
 #if $idx == $length
 
 #else
@@ -285,4 +286,5 @@ $l
 #end if
 # << files $sp
 #end for
+
 #end if
