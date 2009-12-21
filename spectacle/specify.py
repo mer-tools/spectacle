@@ -58,12 +58,15 @@ class RPMWriter():
                 'content': {},
             }
 
-    def __init__(self,  filename):
+    def __init__(self,  filename, clean_old = False):
         self.filename = filename
         self.metadata = None
         self.scm = None
         self.pkg = None
+        self.specfile = None
         self.version = None
+
+        self.clean_old = clean_old
 
         try:
             self.stream = file(filename, 'r')
@@ -78,8 +81,22 @@ class RPMWriter():
         self.metadata = yaml.load(self.stream)
         if self.metadata.has_key("SCM"):
             self.scm = self.metadata['SCM']
-        if self.metadata.has_key("Name"):
+
+        try:
             self.pkg = self.metadata['Name']
+            self.specfile = "%s.spec" % self.pkg
+
+            self.newspec = True
+
+            if os.path.exists(self.specfile):
+                if self.clean_old:
+                    os.unlink(self.specfile)
+                else:
+                    self.newspec = False
+
+        except KeyError:
+            print 'Invalid yaml file %s without "Name" directive' % self.filename
+            sys.exit(1)
 
         #if self.metadata.has_key("SubPackages"):
         #    self.metadata["sp"] = []
@@ -145,12 +162,11 @@ class RPMWriter():
                }
 
     def process(self, extra):
-        specfile = "%s.spec" % self.metadata['Name']
+        specfile = self.specfile
+        new = True
         if os.path.exists(specfile):
-            print "file exists, patching..."
+            new = False
             self.extra['content'] = self.parse_existing(specfile)
-        else:
-            print "Creating new spec file: %s" %specfile
 
         if extra:
             self.extra.update(extra)
@@ -165,31 +181,26 @@ class RPMWriter():
         file.write(spec_content)
         file.close()
 
-def generate_rpm(files, extra = None):
-    for filename in files:
-        if filename.find('/') != -1 and os.path.dirname(filename) != os.path.curdir:
-            print 'This tool need to be run in package dir, skip %s' % filename
-            continue
+def generate_rpm(filename, clean_old = False, extra = None):
+    rpm = RPMWriter(filename, clean_old)
+    rpm.parse()
+    if rpm.scm is not None:
+        scm = GitAccess(rpm.scm)
+        print "Getting tags from SCM..."
+        tags = scm.gettags()
+        if len(tags) > 0:
+            rpm.version = sorted(tags.keys())[-1]
+            rpm.metadata['Version'] = rpm.version
+            tmp = tempfile.mkdtemp()
+            pwd = os.getcwd()
+            os.chdir(tmp)
+            print "Creating archive %s/%s-%s.tar.bz2 ..." %( pwd, rpm.pkg, rpm.version )
+            os.system('git clone %s' %rpm.scm)
+            os.chdir( "%s/%s" %(tmp, rpm.pkg))
+            os.system(' git archive --format=tar --prefix=%s-%s/ %s | bzip2  > %s/%s-%s.tar.bz2' %(rpm.pkg, rpm.version, rpm.version, pwd, rpm.pkg, rpm.version ))
+            shutil.rmtree(tmp)
+            os.chdir(pwd)
 
-        rpm = RPMWriter(filename)
-        rpm.parse()
-        if rpm.scm is not None:
-            scm = GitAccess(rpm.scm)
-            print "Getting tags from SCM..."
-            tags = scm.gettags()
-            if len(tags) > 0:
-                rpm.version = sorted(tags.keys())[-1]
-                rpm.metadata['Version'] = rpm.version
-                tmp = tempfile.mkdtemp()
-                pwd = os.getcwd()
-                os.chdir(tmp)
-                print "Creating archive %s/%s-%s.tar.bz2 ..." %( pwd, rpm.pkg, rpm.version )
-                os.system('git clone %s' %rpm.scm)
-                os.chdir( "%s/%s" %(tmp, rpm.pkg))
-                os.system(' git archive --format=tar --prefix=%s-%s/ %s | bzip2  > %s/%s-%s.tar.bz2' %(rpm.pkg, rpm.version, rpm.version, pwd, rpm.pkg, rpm.version ))
-                shutil.rmtree(tmp)
-                os.chdir(pwd)
+    rpm.process(extra)
 
-        rpm.process(extra)
-
-    return 0
+    return rpm.specfile, rpm.newspec

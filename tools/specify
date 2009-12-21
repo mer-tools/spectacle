@@ -19,5 +19,14 @@
 import os,sys
 import spectacle.specify
 
-sys.exit(spectacle.specify.generate_rpm(sys.argv[1:]))
+for yaml_fpath in sys.argv[1:]:
+    if yaml_fpath.find('/') != -1 and os.path.dirname(yaml_fpath) != os.path.curdir:
+        print 'This tool need to be run in package dir, skip %s' % yaml_fpath
+        continue
+
+    spec_fpath, newspec = spectacle.specify.generate_rpm(yaml_fpath)
+    if newspec:
+        print "Creating new spec file: %s" % spec_fpath
+    else:
+        print "File exists, patching %s ..." % spec_fpath
 

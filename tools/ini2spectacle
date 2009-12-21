@@ -196,5 +196,9 @@ if __name__ == '__main__':
 
     """Dump them to spectacle file"""
     dumper = SpectacleDumper(format='yaml', opath = out_fpath)
-    dumper.dump(convertor.convert(config.cooked_items()))
+    spec_fpath = dumper.dump(convertor.convert(config.cooked_items()))
+
     print 'Yaml file %s created' % out_fpath
+    if spec_fpath:
+        print 'Spec file %s was create with extra data' % spec_fpath
+
