@@ -107,7 +107,7 @@ class SpectacleDumper(object):
     def _update_spec(self):
         import specify
         return specify.generate_rpm(self.opath, True,
-                                    {'content': {'files': self.files}})
+                                    {'content': {'files': self.files}})[0]
 
     def dump(self, data, format = None):
         if not format:
@@ -131,8 +131,7 @@ class SpectacleDumper(object):
             fp.close()
 
         if self.files and self.opath:
-            spec_fpath = self._update_spec()[0]
-            return spec_fpath
+            return self._update_spec()
 
         return None
 

@@ -90,7 +90,7 @@ class RPMWriter():
 
             if os.path.exists(self.specfile):
                 if self.clean_old:
-                    os.unlink(self.specfile)
+                    os.rename(self.specfile, self.specfile + '.bak')
                 else:
                     self.newspec = False
 
@@ -163,9 +163,7 @@ class RPMWriter():
 
     def process(self, extra):
         specfile = self.specfile
-        new = True
-        if os.path.exists(specfile):
-            new = False
+        if not self.newspec:
             self.extra['content'] = self.parse_existing(specfile)
 
         if extra:
