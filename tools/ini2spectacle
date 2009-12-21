@@ -171,33 +171,30 @@ if __name__ == '__main__':
         print "Usage: ini2spectacle <inifile_path> [outfile_path]"
         sys.exit(1)
 
-    ini_path = sys.argv[1]
+    ini_fpath = sys.argv[1]
+
     if len(sys.argv) > 2:
-        try:
-            out_fp = file(sys.argv[2], 'w')
-        except IOError, e:
-            print '%s: Cannot open: %s\n' % (sys.argv[2], e)
-            sys.exit(1)
+        out_fpath = sys.argv[2]
     else:
-        out_fp = None
+        out_fpath = ini_fpath.rstrip('.ini') + '.yaml'
 
     # Check if the input file exists
-    if not os.path.exists(ini_path):
+    if not os.path.exists(ini_fpath):
         # input file does not exist
-        print "%s: File does not exist" % ini_path
+        print "%s: File does not exist" % ini_fpath
         sys.exit(1)
 
-    iniDir = os.path.dirname(ini_path)
+    iniDir = os.path.dirname(ini_fpath)
     if not iniDir:
         iniDir = os.path.curdir
 
     """Read the input file"""
     config = SBConfigParser(iniDir)
-    config.read(ini_path)
+    config.read(ini_fpath)
 
     convertor = SBConvertor()
 
     """Dump them to spectacle file"""
-    dumper = SpectacleDumper(format='yaml')
-    dumper.dump(convertor.convert(config.cooked_items()), fp = out_fp)
-
+    dumper = SpectacleDumper(format='yaml', opath = out_fpath)
+    dumper.dump(convertor.convert(config.cooked_items()))
+    print 'Yaml file %s created' % out_fpath

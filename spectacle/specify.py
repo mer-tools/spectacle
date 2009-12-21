@@ -44,17 +44,36 @@ class GitAccess():
           return tags
 
 class RPMWriter():
+    extra = {
+                'PreUn': [],
+                'Desktop': False,
+                'Static': False,
+                'Schema': False,
+                'Schemas': [],
+                'Lib': False,
+                'Icon': False,
+                'Service': False,
+                'Info': False,
+                'Infos': [],
+                'content': {},
+            }
+
     def __init__(self,  filename):
         self.filename = filename
-        self.stream = file(filename, 'r')
         self.metadata = None
         self.scm = None
         self.pkg = None
         self.version = None
-        self.extra = {}
-        pass
+
+        try:
+            self.stream = file(filename, 'r')
+        except IOError:
+            print 'Cannot file %s for read.' % filename
+            sys.exit(1)
+
     def dump(self):
         print yaml.dump(yaml.load(self.stream))
+
     def parse(self):
         self.metadata = yaml.load(self.stream)
         if self.metadata.has_key("SCM"):
@@ -66,20 +85,8 @@ class RPMWriter():
         #    self.metadata["sp"] = []
         #    for sp in self.metadata["SubPackages"]:
         #        self.metadata["sp"].append(self.metadata[sp])
-        
+
     def parse_files(self, files = {}):
-        self.extra = {
-                'PreUn': [],
-                'Desktop': False,
-                'Static': False,
-                'Schema': False,
-                'Schemas': [],
-                'Lib': False,
-                'Icon': False,
-                'Service': False,
-                'Info': False,
-                'Infos': [],
-                }
         for k,v in files.iteritems():
             for l in v:
                 if re.match('.*\.info.*', l) and re.match('.*usr/share/info.*', l):
@@ -100,8 +107,7 @@ class RPMWriter():
                     self.extra['Schema'] = True
                     self.extra['Schemas'].append(l)
 
-
-    def parse_existing(self, file = None):
+    def parse_existing(self, filename):
         sin = re.compile("^# >> ([^\s]+) (.*)")
         sout = re.compile("^# << ([^\s]+) (.*)")
         recording = []
@@ -109,7 +115,7 @@ class RPMWriter():
         files = {}
         install = {}
         build = {}
-        for i in file.read().split("\n"):  
+        for i in file(filename).read().split("\n"):
             matchin = sin.match(i)
             matchout = sout.match(i)
             if matchin:
@@ -126,44 +132,45 @@ class RPMWriter():
                     install[matchout.group(2)] = recording
                 elif matchout.group(1) == "build":
                     build[matchout.group(2)] = recording
-        
+
             if record:
                 recording.append(i)
-        usercontent = {"files" : files, "install": install, "build" : build}
-        return usercontent
 
-    def process(self):
-        specfile = "%s.spec" %self.metadata['Name']
+        if files:
+            self.parse_files(files)
+
+        return { "files" : files,
+                 "install": install,
+                 "build" : build
+               }
+
+    def process(self, extra):
+        specfile = "%s.spec" % self.metadata['Name']
         if os.path.exists(specfile):
             print "file exists, patching..."
-            file = open(specfile, "r")
-            usercontent = self.parse_existing(file)
-            file.close()
-            self.parse_files(usercontent['files'])
-            self.extra['content'] = usercontent
-            nameSpace = {'metadata': self.metadata, 'extra': self.extra }
-            t = spec.spec(searchList=[nameSpace])
-            a = str(t)
-            file = open(specfile, "w")
-            file.write(a)
-            file.close()           
+            self.extra['content'] = self.parse_existing(specfile)
         else:
             print "Creating new spec file: %s" %specfile
-            self.parse_files()
-            self.extra['content'] = {}
-            nameSpace = {'metadata': self.metadata, 'extra': self.extra }
-            t = spec.spec(searchList=[nameSpace])
-            a = str(t)
-            file = open(specfile, "w")
-            file.write(a)
-            file.close()
 
-        #t = dsc(searchList=[nameSpace])
-        #a = str(t)
-        #print a
+        if extra:
+            self.extra.update(extra)
 
-def generate_rpm(args):
-    for filename in args[1:]:
+        spec_content = str(
+                spec.spec(searchList=[{
+                                        'metadata': self.metadata,
+                                        'extra': self.extra
+                                      }]))
+
+        file = open(specfile, "w")
+        file.write(spec_content)
+        file.close()
+
+def generate_rpm(files, extra = None):
+    for filename in files:
+        if filename.find('/') != -1 and os.path.dirname(filename) != os.path.curdir:
+            print 'This tool need to be run in package dir, skip %s' % filename
+            continue
+
         rpm = RPMWriter(filename)
         rpm.parse()
         if rpm.scm is not None:
@@ -183,6 +190,6 @@ def generate_rpm(args):
                 shutil.rmtree(tmp)
                 os.chdir(pwd)
 
-        rpm.process()
+        rpm.process(extra)
 
     return 0

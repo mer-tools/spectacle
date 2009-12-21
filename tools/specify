@@ -19,5 +19,5 @@
 import os,sys
 import spectacle.specify
 
-sys.exit(spectacle.specify.generate_rpm(sys.argv))
+sys.exit(spectacle.specify.generate_rpm(sys.argv[1:]))
 

@@ -44,26 +44,17 @@ class SpectacleDumper(object):
 
     """
 
-    def __init__(self, format = 'yaml'):
+    def __init__(self, format = 'yaml', opath = None):
         self.format = format
+        self.opath = opath
 
-    def dump(self, data, format = None, fp = None):
-        if not format:
-            format = self.format
+        self.files = {}
 
-        if format == 'yaml':
-            self.dump_yaml(data, fp=fp)
-        elif format == 'json':
-            self.dump_json(data)
-
-    def dump_json(self, data):
+    def _dump_json(self, data):
         import json
         print json.dumps(data, indent=4)
 
-    def dump_yaml(self, data, indent = '', fp = None):
-        if not fp:
-            fp = sys.stdout
-
+    def _dump_yaml(self, data, fp, indent = '', skip_files = True, cur_pkg = 'main'):
         if indent:
             cur_indent = indent + '- '
         else:
@@ -79,13 +70,18 @@ class SpectacleDumper(object):
                 fp.write("\n")
                 continue
 
+            if skip_files and key == 'Files':
+                self.files[cur_pkg] = value
+                continue
 
             if isinstance(value, list):
                 fp.write(cur_indent + "%s:\n" % (key))
 
                 for item in value:
                     if isinstance(item, list):
-                        self.dump_yaml(item, cur_indent + TAB, fp)
+                        # only 'SubPackges' will reach here
+                        # cur_pkg will be the 1st pair  ('Name', subpkg)
+                        self._dump_yaml(item, fp, cur_indent + TAB, cur_pkg = item[0][1])
                         fp.write("\n")
                     else:
                         # ESC for leading '%', for yaml syntax
@@ -107,4 +103,34 @@ class SpectacleDumper(object):
                         fp.write(cur_indent + TAB + "%s\n" % line)
 
             first_line = False
+
+    def _update_spec(self):
+        print 'update spec', self.files
+
+        import specify
+        specify.generate_rpm([self.opath], {'content': {'files': self.files}})
+
+    def dump(self, data, format = None):
+        if not format:
+            format = self.format
+
+        fp = sys.stdout
+        if self.opath:
+            try:
+                fp = file(self.opath, 'w')
+            except IOError:
+                print 'Cannot open file %s for writing' % self.opath
+                # print out
+                pass
+
+        try:
+            if format == 'yaml':
+                self._dump_yaml(data, fp)
+            elif format == 'json':
+                self._dump_json(data)
+        finally:
+            fp.close()
+
+        if self.files and self.opath:
+            self._update_spec()
 
