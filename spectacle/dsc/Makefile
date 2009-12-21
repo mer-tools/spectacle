@@ -16,3 +16,4 @@ clean:
 	rm -f $(addsuffix .bak,$(TEMPLATE_MODS))
 	rm -f *.xsd *.wsdl
 	rm -f *.pyc *.pyo
+	rm -f *.py

@@ -8,7 +8,7 @@ setup(name='spectacle',
       author='Anas Nashif, Jian-feng Ding',
       author_email='anas.nashif@intel.com, jian-feng.ding@intel.com',
       url='http://moblin.org/',
-      scripts=['specify', 'tools/ini2spectacle'],
-      packages=['spectacle', 'spectacle.spec', 'spectacle.dsc', 'spectacle.util'],
+      scripts=['tools/specify', 'tools/ini2spectacle'],
+      packages=['spectacle', 'spectacle.spec', 'spectacle.dsc'],
      )
 

@@ -29,8 +29,8 @@ import re
 from ConfigParser import RawConfigParser
 
 # spectacle modules
-from spectacle.util.convertor import *
-from spectacle.util.dumper import *
+from spectacle.convertor import *
+from spectacle.dumper import *
 
 class SBConvertor(Convertor):
     """ Convertor for SpecBuild ini files """
