@@ -294,6 +294,21 @@ $l
 #end for
 #end if
 # << files $sp
-#end for
 
+#end for
+#end if
+
+#if $metadata.has_key("SubPackages")
+#for $sp in $metadata.SubPackages
+%files $sp.Name
+%defattr(-,root,root,-)
+# >> files $sp.Name
+#if $extra.content.has_key("files") and $extra.content.files.has_key($sp.Name)
+#for $l in $extra.content.files[$sp.Name]
+$l
+#end for
+#end if
+# << files $sp.Name
+
+#end for
 #end if
