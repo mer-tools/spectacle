@@ -118,7 +118,7 @@ class RPMWriter():
                     self.extra['Service'] = True
                     self.extra['PreUn'].append("/sbin/chkconfig")
                     self.extra['PreUn'].append("/sbin/service")
-                if re.match('.*\.so\..*', l):
+                if re.match('.*%{_libdir}.*', l) or re.match('.*\.so\..*', l):
                     self.extra['Lib'] = True
                 if re.match('.*\.schema.*', l):
                     self.extra['Schema'] = True
@@ -153,9 +153,6 @@ class RPMWriter():
             if record:
                 recording.append(i)
 
-        if files:
-            self.parse_files(files)
-
         return { "files" : files,
                  "install": install,
                  "build" : build
@@ -168,6 +165,16 @@ class RPMWriter():
 
         if extra:
             self.extra.update(extra)
+
+        try:
+            self.parse_files(self.extra['content']['files'])
+        except KeyError:
+            pass
+
+
+        #import pprint
+        #pprint.pprint(self.metadata)
+        #pprint.pprint(self.extra)
 
         spec_content = str(
                 spec.spec(searchList=[{
