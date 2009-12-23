@@ -181,7 +181,11 @@ $l
 # << install pre
 rm -rf %{buildroot}
 #if $metadata.has_key('Configure') and $metadata.Configure == 'python'
-%{__python} setup.py install --skip-build --root %{buildroot}
+%if 0%{?suse_version}
+%{__python} setup.py install --root=%{buildroot} --prefix=%{_prefix} --record-rpm=INSTALLED_FILES
+%else
+%{__python} setup.py install --root=%{buildroot} -O1 --record=INSTALLED_FILES
+%endif
 #else
 %make_install
 #end if
