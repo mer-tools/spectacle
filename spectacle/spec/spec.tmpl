@@ -195,9 +195,7 @@ $l
 # << install post
 
 #if $metadata.has_key("LocaleName")
-%find_lang ${metadata.LocaleName} || echo -n >> ${metadata.LocaleName}.lang
-#else
-%find_lang ${metadata.Name} || echo -n >> ${metadata.Name}.lang
+%find_lang ${metadata.LocaleName} 
 #end if
 
 %clean
@@ -276,8 +274,6 @@ $metadata.PostScripts
 
 #if $metadata.has_key("LocaleName")
 %files -f ${metadata.LocaleName}.lang
-#else 
-%files -f ${metadata.Name}.lang
 #end if
 %defattr(-,root,root,-)
 #if $metadata.has_key("Documents")

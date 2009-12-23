@@ -1,5 +1,8 @@
 VERSION = 0.4
 all:
+	cd spectacle/spec; $(MAKE)
+	cd spectacle/dsc; $(MAKE)
+	python setup.py build
 
 tag: 
 	git tag $(VERSION)
@@ -8,6 +11,4 @@ dist:
 		bzip2  > spectacle-$(VERSION).tar.bz2
 
 install:
-	cd spectacle/spec; $(MAKE)
-	cd spectacle/dsc; $(MAKE)
 	python setup.py install
