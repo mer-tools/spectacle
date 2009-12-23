@@ -198,11 +198,14 @@ def generate_rpm(filename, clean_old = False, extra = None):
             rpm.metadata['Version'] = rpm.version
             tmp = tempfile.mkdtemp()
             pwd = os.getcwd()
-            os.chdir(tmp)
-            print "Creating archive %s/%s-%s.tar.bz2 ..." %( pwd, rpm.pkg, rpm.version )
-            os.system('git clone %s' %rpm.scm)
-            os.chdir( "%s/%s" %(tmp, rpm.pkg))
-            os.system(' git archive --format=tar --prefix=%s-%s/ %s | bzip2  > %s/%s-%s.tar.bz2' %(rpm.pkg, rpm.version, rpm.version, pwd, rpm.pkg, rpm.version ))
+            if os.path.exists("%s/%s-%s.tar.bz2" %(pwd, rpm.pkg, rpm.version )):
+		        print "Archive already exists, not creating a new one"
+            else:
+                print "Creating archive %s/%s-%s.tar.bz2 ..." %( pwd, rpm.pkg, rpm.version )
+                os.chdir(tmp)
+                os.system('git clone %s' %rpm.scm)
+                os.chdir( "%s/%s" %(tmp, rpm.pkg))
+                os.system(' git archive --format=tar --prefix=%s-%s/ %s | bzip2  > %s/%s-%s.tar.bz2' %(rpm.pkg, rpm.version, rpm.version, pwd, rpm.pkg, rpm.version ))
             shutil.rmtree(tmp)
             os.chdir(pwd)
 
