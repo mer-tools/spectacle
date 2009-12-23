@@ -274,6 +274,8 @@ $metadata.PostScripts
 
 #if $metadata.has_key("LocaleName")
 %files -f ${metadata.LocaleName}.lang
+#else
+%files
 #end if
 %defattr(-,root,root,-)
 #if $metadata.has_key("Documents")
