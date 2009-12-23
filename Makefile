@@ -1,4 +1,4 @@
-VERSION = 0.4
+VERSION = 0.5
 all:
 	cd spectacle/spec; $(MAKE)
 	cd spectacle/dsc; $(MAKE)
