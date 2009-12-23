@@ -123,6 +123,8 @@ class RPMWriter():
                 if re.match('.*\.schema.*', l):
                     self.extra['Schema'] = True
                     self.extra['Schemas'].append(l)
+                if re.match('.*\/icons\/.*', l):
+                    self.extra['Icon'] = True
 
     def parse_existing(self, filename):
         sin = re.compile("^# >> ([^\s]+) (.*)")

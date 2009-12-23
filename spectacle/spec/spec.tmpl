@@ -39,6 +39,9 @@ Requires:   $req
 #end for
 #end if
 ## Requires(post) etc.
+#if $extra.has_key("Icon") and $extra.Icon
+Requires(post):  /bin/touch
+#end if
 #if $extra.has_key("Info") and $extra.Info
 Requires(post):  /sbin/install-info
 Requires(postun):  /sbin/install-info
@@ -200,6 +203,13 @@ $l
 %find_lang ${metadata.Name} || echo -n >> ${metadata.Name}.lang
 #end if
 
+mkdir -p %{buildroot}/%{_datadir}/doc/%{name}-%{version}
+for f in `ls %{buildroot}/%{_datadir}/doc/`; do
+    if [ -f %{buildroot}/%{_datadir}/doc/\$f ]; then
+        mv %{buildroot}/%{_datadir}/doc/\$f %{buildroot}/%{_datadir}/doc/%{name}-%{version}
+    fi
+done
+
 %clean
 rm -rf %{buildroot}
 ## Pre
@@ -221,7 +231,8 @@ fi
 ## PreUn
 #if $extra.Schema
 %preun
-if [ "$1" -gt 1 ]; then
+## TODO: confirm? if [ "$1" -gt 1 ]; then
+if [ "$1" -gt 0 ]; then
 #end if
 #if $extra.Schema
 #for $schema in $extra.Schemas
