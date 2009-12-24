@@ -20,6 +20,7 @@ import os, sys
 import re
 import tempfile
 import shutil
+import copy
 
 # third-party modules
 import yaml
@@ -44,17 +45,21 @@ class GitAccess():
           return tags
 
 class RPMWriter():
+    extra_per_pkg = {
+                        'PreUn': [],
+                        'Desktop': False,
+                        'Static': False,
+                        'Schema': False,
+                        'Schemas': [],
+                        'Lib': False,
+                        'Icon': False,
+                        'Service': False,
+                        'Info': False,
+                        'Infos': [],
+                    }
+
     extra = {
-                'PreUn': [],
-                'Desktop': False,
-                'Static': False,
-                'Schema': False,
-                'Schemas': [],
-                'Lib': False,
-                'Icon': False,
-                'Service': False,
-                'Info': False,
-                'Infos': [],
+                'subpkgs':  {},
                 'content': {},
             }
 
@@ -67,6 +72,9 @@ class RPMWriter():
         self.version = None
 
         self.clean_old = clean_old
+
+        # update extra info for main package
+        self.extra.update(copy.deepcopy(self.extra_per_pkg))
 
         try:
             self.stream = file(filename, 'r')
@@ -98,33 +106,43 @@ class RPMWriter():
             print 'Invalid yaml file %s without "Name" directive' % self.filename
             sys.exit(1)
 
+        if self.metadata.has_key("SubPackages"):
+            for sp in self.metadata["SubPackages"]:
+                self.extra['subpkgs'][sp['Name']] = copy.deepcopy(self.extra_per_pkg)
+
         #if self.metadata.has_key("SubPackages"):
         #    self.metadata["sp"] = []
         #    for sp in self.metadata["SubPackages"]:
         #        self.metadata["sp"].append(self.metadata[sp])
 
     def parse_files(self, files = {}):
-        for k,v in files.iteritems():
+        for pkg_name,v in files.iteritems():
+
+            if pkg_name == 'main':
+                pkg_extra = self.extra
+            else:
+                pkg_extra = self.extra['subpkgs'][pkg_name]
+
             for l in v:
                 if re.match('.*\.info.*', l) and re.match('.*usr/share/info.*', l):
-                    self.extra['PreUn'].append("/sbin/install-info")
-                    self.extra['Infos'].append(l)
-                    self.extra['Info'] = True
+                    pkg_extra['PreUn'].append("/sbin/install-info")
+                    pkg_extra['Infos'].append(l)
+                    pkg_extra['Info'] = True
                 if re.match('.*\.desktop$', l):
-                    self.extra['Desktop'] = True
+                    pkg_extra['Desktop'] = True
                 if re.match('.*\.a$', l):
-                    self.extra['Static'] = True
+                    pkg_extra['Static'] = True
                 if re.match('.*etc/rc.d/init.d.*', l) or re.match('.*etc/init.d.*', l):
-                    self.extra['Service'] = True
-                    self.extra['PreUn'].append("/sbin/chkconfig")
-                    self.extra['PreUn'].append("/sbin/service")
+                    pkg_extra['Service'] = True
+                    pkg_extra['PreUn'].append("/sbin/chkconfig")
+                    pkg_extra['PreUn'].append("/sbin/service")
                 if re.match('.*%{_libdir}.*', l) or re.match('.*\.so\..*', l):
-                    self.extra['Lib'] = True
+                    pkg_extra['Lib'] = True
                 if re.match('.*\.schema.*', l):
-                    self.extra['Schema'] = True
-                    self.extra['Schemas'].append(l)
+                    pkg_extra['Schema'] = True
+                    pkg_extra['Schemas'].append(l)
                 if re.match('.*\/icons\/.*', l):
-                    self.extra['Icon'] = True
+                    pkg_extra['Icon'] = True
 
     def parse_existing(self, filename):
         sin = re.compile("^# >> ([^\s]+) (.*)")
@@ -172,7 +190,6 @@ class RPMWriter():
             self.parse_files(self.extra['content']['files'])
         except KeyError:
             pass
-
 
         #import pprint
         #pprint.pprint(self.metadata)
