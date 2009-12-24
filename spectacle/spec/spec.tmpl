@@ -5,6 +5,9 @@
 #  - spectacle version number replacing
 #  - LocalName
 # ###############################################
+#if $metadata.Configure == 'python'
+%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
+#end if
 
 Name:       ${metadata.Name}
 Summary:    ${metadata.Summary}
@@ -184,7 +187,11 @@ $l
 # << install pre
 rm -rf %{buildroot}
 #if $metadata.has_key('Configure') and $metadata.Configure == 'python'
-%{__python} setup.py install --skip-build --root %{buildroot}
+%if 0%{?suse_version}
+%{__python} setup.py install --root=%{buildroot} --prefix=%{_prefix} --record-rpm=INSTALLED_FILES
+%else
+%{__python} setup.py install --root=%{buildroot} -O1 --record=INSTALLED_FILES
+%endif
 #else
 %make_install
 #end if
@@ -198,9 +205,7 @@ $l
 # << install post
 
 #if $metadata.has_key("LocaleName")
-%find_lang ${metadata.LocaleName} || echo -n >> ${metadata.LocaleName}.lang
-#else
-%find_lang ${metadata.Name} || echo -n >> ${metadata.Name}.lang
+%find_lang ${metadata.LocaleName} 
 #end if
 
 mkdir -p %{buildroot}/%{_datadir}/doc/%{name}-%{version}
@@ -338,8 +343,8 @@ gconftool-2 --makefile-install-rule \
 
 #if $metadata.has_key("LocaleName")
 %files -f ${metadata.LocaleName}.lang
-#else 
-%files -f ${metadata.Name}.lang
+#else
+%files
 #end if
 %defattr(-,root,root,-)
 #if $metadata.has_key("Documents")
