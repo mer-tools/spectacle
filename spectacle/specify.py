@@ -58,11 +58,6 @@ class RPMWriter():
                         'Infos': [],
                     }
 
-    extra = {
-                'subpkgs':  {},
-                'content': {},
-            }
-
     def __init__(self,  filename, clean_old = False):
         self.filename = filename
         self.metadata = None
@@ -72,6 +67,9 @@ class RPMWriter():
         self.version = None
 
         self.clean_old = clean_old
+
+        # initialize extra info for spec
+        self.extra = { 'subpkgs': {}, 'content': {} }
 
         # update extra info for main package
         self.extra.update(copy.deepcopy(self.extra_per_pkg))
