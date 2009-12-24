@@ -92,7 +92,7 @@ class Convertor(object):
             files = []
 
         for k, v in dict.iteritems():
-            print >> sys.stderr, 'DEBUG: un-ordered entry: %s -> %s\n' % (k,v)
+            print >> sys.stderr, 'DEBUG: un-ordered entry: %s\n' % (k)
             items.append((k, v))
 
         if files:

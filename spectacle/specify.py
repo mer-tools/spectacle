@@ -178,13 +178,13 @@ class RPMWriter():
                  "build" : build
                }
 
-    def process(self, extra):
+    def process(self, extra_content):
         specfile = self.specfile
         if not self.newspec:
             self.extra['content'] = self.parse_existing(specfile)
 
-        if extra:
-            self.extra.update(extra)
+        if extra_content:
+            self.extra['content'].update(extra_content)
 
         try:
             self.parse_files(self.extra['content']['files'])
@@ -205,7 +205,7 @@ class RPMWriter():
         file.write(spec_content)
         file.close()
 
-def generate_rpm(filename, clean_old = False, extra = None):
+def generate_rpm(filename, clean_old = False, extra_content = None):
     rpm = RPMWriter(filename, clean_old)
     rpm.parse()
     if rpm.scm is not None:
@@ -228,6 +228,6 @@ def generate_rpm(filename, clean_old = False, extra = None):
             shutil.rmtree(tmp)
             os.chdir(pwd)
 
-    rpm.process(extra)
+    rpm.process(extra_content)
 
     return rpm.specfile, rpm.newspec

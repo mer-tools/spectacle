@@ -59,6 +59,11 @@ class SBConfigParser(RawConfigParser):
                   'PkgConfig',
                  )
 
+    # keys whose value need to be expand(reading extra file)
+    expand_keys =  ('Description',
+                    'PostMakeInstallExtras',
+                   )
+
     # must have keys
     must_keys =  {'Release': '1',
                  }
@@ -93,7 +98,7 @@ class SBConfigParser(RawConfigParser):
 
         return doc, files
 
-    def __expand_desc(self, filename):
+    def __expand_single(self, filename):
         """ Helper function to expand *.desc """
         if os.path.exists(filename):
             return file(filename).read().strip()
@@ -108,17 +113,25 @@ class SBConfigParser(RawConfigParser):
             items = self._sections[section]
 
             # Convert space seperated string to list
-            for multi in self.multi_keys:
-                if multi in items:
-                    self.set(section, multi, map(str.strip, items[multi].split()))
+            for key in self.multi_keys:
+                if key in items:
+                    self.set(section, key, map(str.strip, items[key].split()))
 
             # Convert dependent like entry to list
-            for req_key in self.deps_keys:
-                if req_key in items:
+            for key in self.deps_keys:
+                if key in items:
                     reqs = []
-                    for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', items[req_key]):
+                    for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', items[key]):
                         reqs.append(entry.split(',')[0])
-                    self.set(section, req_key, reqs)
+                    self.set(section, key, reqs)
+
+            # Convert keys which need expanding from external file
+            for key in self.expand_keys:
+                if key in items:
+                    self.set(section,
+                             key,
+                             self.__expand_single(
+                                os.path.join(self.iniDir, items[key])))
 
             #If the key happens to be 'Files' then we need to find the corresponding *.files and expand it
             #The first line of *.files might contain %doc, this needs to be handled separatly
@@ -127,12 +140,6 @@ class SBConfigParser(RawConfigParser):
                 self.set(section, 'Files', files)
                 if doc:
                     self.set(section, 'Documents', doc)
-
-            if 'Description' in items:
-                self.set(section,
-                         'Description',
-                         self.__expand_desc(
-                            os.path.join(self.iniDir, items['Description'])))
 
         for section in self.sections():
             if section in ('header', 'configuration'):

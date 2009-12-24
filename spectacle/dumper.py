@@ -44,17 +44,25 @@ class SpectacleDumper(object):
 
     """
 
+    spec_extra_keys = {
+            # key -> ( nkey, nsubkey)
+            #                ^^ None means to use <pkg_name>
+            'Files': ('files', None),
+            'PostMakeInstallExtras': ('install', 'post'),
+            'PreMakeInstallExtras': ('install', 'pre'),
+            }
+
     def __init__(self, format = 'yaml', opath = None):
         self.format = format
         self.opath = opath
 
-        self.files = {}
+        self.spec_extra = {}
 
     def _dump_json(self, data):
         import json
         print json.dumps(data, indent=4)
 
-    def _dump_yaml(self, data, fp, indent = '', skip_files = True, cur_pkg = 'main'):
+    def _dump_yaml(self, data, fp, indent = '', cur_pkg = 'main'):
         if indent:
             cur_indent = indent + '- '
         else:
@@ -70,8 +78,18 @@ class SpectacleDumper(object):
                 fp.write("\n")
                 continue
 
-            if skip_files and key == 'Files':
-                self.files[cur_pkg] = value
+            if key in self.spec_extra_keys:
+                nkey    = self.spec_extra_keys[key][0]
+                nsubkey = self.spec_extra_keys[key][1]
+                if not nsubkey:
+                    nsubkey = cur_pkg
+                if not isinstance(value, list):
+                    value = [value]
+
+                if nkey not in self.spec_extra:
+                    self.spec_extra[nkey] = {}
+                self.spec_extra[nkey][nsubkey] = value
+
                 continue
 
             if isinstance(value, list):
@@ -106,8 +124,7 @@ class SpectacleDumper(object):
 
     def _update_spec(self):
         import specify
-        return specify.generate_rpm(self.opath, True,
-                                    {'content': {'files': self.files}})[0]
+        return specify.generate_rpm(self.opath, True, self.spec_extra) [0]
 
     def dump(self, data, format = None):
         if not format:
@@ -130,7 +147,7 @@ class SpectacleDumper(object):
         finally:
             fp.close()
 
-        if self.files and self.opath:
+        if self.spec_extra and self.opath:
             return self._update_spec()
 
         return None
