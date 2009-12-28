@@ -5,6 +5,7 @@
 #  - spectacle version number replacing
 #  - LocalName
 # ###############################################
+#set $str_newline = '\n'
 
 # >> macros 
 #if $extra.content.has_key("macros")
@@ -213,7 +214,7 @@ rm -rf %{buildroot}
 %{__python} setup.py install --root=%{buildroot} -O1 --record=INSTALLED_FILES
 %endif
 #else
-#if $metadata.has_key('Builder') and not $metadata.Builder.endswith('make'):
+#if $metadata.has_key('Builder') and $metadata.Builder != 'make' and $metadata.Builder != 'single-make'
 # Please write install script under ">> install post"
 #else
 %make_install
