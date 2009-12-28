@@ -6,12 +6,9 @@
 #  - LocalName
 # ###############################################
 #set $str_newline = '\n'
-
 # >> macros 
 #if $extra.content.has_key("macros")
-#for $l in $extra.content.macros
-$l
-#end for
+$str_newline.join($extra.content.macros)
 #end if
 # << macros 
 
@@ -170,7 +167,7 @@ $l
 
 #end if
 #else
-# no "%configure" needed
+# no configure call needed
 #end if
 
 #if $metadata.has_key('Configure') and $metadata.Configure == 'python'
