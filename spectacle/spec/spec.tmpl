@@ -5,7 +5,16 @@
 #  - spectacle version number replacing
 #  - LocalName
 # ###############################################
-#if $metadata.Configure == 'python'
+
+# >> macros 
+#if $extra.content.has_key("macros")
+#for $l in $extra.content.macros
+$l
+#end for
+#end if
+# << macros 
+
+#if $metadata.has_key('Configure') and $metadata.Configure == 'python'
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 #end if
 

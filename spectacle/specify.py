@@ -150,6 +150,7 @@ class RPMWriter():
         files = {}
         install = {}
         build = {}
+        macros = {}
         for i in file(filename).read().split("\n"):
             matchin = sin.match(i)
             matchout = sout.match(i)
@@ -167,13 +168,17 @@ class RPMWriter():
                     install[matchout.group(2)] = recording
                 elif matchout.group(1) == "build":
                     build[matchout.group(2)] = recording
+                elif matchout.group(1) == "macros":
+                    macros = recording
 
             if record:
                 recording.append(i)
 
+        print macros
         return { "files" : files,
                  "install": install,
-                 "build" : build
+                 "build" : build,
+                 "macros" : macros
                }
 
     def process(self, extra_content):

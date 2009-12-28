@@ -10,5 +10,5 @@ dist:
 	git archive --format=tar --prefix=spectacle-$(VERSION)/ $(VERSION) | \
 		bzip2  > spectacle-$(VERSION).tar.bz2
 
-install:
+install: all
 	python setup.py install
