@@ -5,6 +5,8 @@ Release: string
 Group: string
 License: string
 URL: string
+BuildArch: string # optional
+
 Description: |
     Text
 
@@ -29,11 +31,13 @@ PkgConfigBR:
     - li0
     - li1
 
-Configure: string
+Configure: string # autogen, configure, reconfigure, etc, optional
 
 ConfigOptions:
     - li0
     - li1
+
+Builder: make  # make, single-make, or other special builder, optional
 
 LocaleName: string
 

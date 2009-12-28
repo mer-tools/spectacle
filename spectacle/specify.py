@@ -174,7 +174,6 @@ class RPMWriter():
             if record:
                 recording.append(i)
 
-        print macros
         return { "files" : files,
                  "install": install,
                  "build" : build,
