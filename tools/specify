@@ -20,6 +20,15 @@ import os,sys
 import spectacle.specify
 
 for yaml_fpath in sys.argv[1:]:
+    if yaml_fpath == '--version':
+        try:
+            import spectacle.__version__
+            version = spectacle.__version__.version
+        except ImportError:
+            version = 'Unkown'
+        print 'spectacle tools version', version
+        sys.exit(0)
+
     if yaml_fpath.find('/') != -1 and os.path.dirname(yaml_fpath) != os.path.curdir:
         print 'This tool need to be run in package dir, skip %s' % yaml_fpath
         continue
