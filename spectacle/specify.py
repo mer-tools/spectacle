@@ -26,6 +26,7 @@ import copy
 import yaml
 
 # internal modules
+import __version__
 import spec
 
 class GitAccess():
@@ -197,6 +198,7 @@ class RPMWriter():
         #pprint.pprint(self.metadata)
         #pprint.pprint(self.extra)
 
+        self.metadata['MyVersion'] = __version__.version
         spec_content = str(
                 spec.spec(searchList=[{
                                         'metadata': self.metadata,
