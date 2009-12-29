@@ -77,7 +77,7 @@ class RPMWriter():
         try:
             self.stream = file(filename, 'r')
         except IOError:
-            print 'Cannot file %s for read.' % filename
+            print 'Cannot read file: %s' % filename
             sys.exit(1)
 
     def dump(self):
