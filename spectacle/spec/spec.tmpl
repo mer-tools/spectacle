@@ -6,12 +6,9 @@
 #  - LocalName
 # ###############################################
 #set $str_newline = '\n'
-
 # >> macros 
 #if $extra.content.has_key("macros")
-#for $l in $extra.content.macros
-$l
-#end for
+$str_newline.join($extra.content.macros)
 #end if
 # << macros 
 
@@ -138,9 +135,7 @@ $sp.Description
 %build
 # >> build pre
 #if $extra.content.has_key("build") and $extra.content.build.has_key("pre")
-#for $l in $extra.content.build.pre
-$l
-#end for
+$str_newline.join($extra.content.build.pre)
 #end if
 # << build pre
 #if $metadata.has_key('Configure')
@@ -192,18 +187,14 @@ make %{?_smp_mflags}
 
 # >> build post
 #if $extra.content.has_key("build") and  $extra.content.build.has_key("post")
-#for $l in $extra.content.build.post
-$l
-#end for
+$str_newline.join($extra.content.build.post)
 #end if
 # << build post
 
 %install
 # >> install pre
 #if $extra.content.has_key("install") and  $extra.content.install.has_key("pre")
-#for $l in $extra.content.install.pre
-$l
-#end for
+$str_newline.join($extra.content.install.pre)
 #end if
 # << install pre
 rm -rf %{buildroot}
@@ -223,9 +214,7 @@ rm -rf %{buildroot}
 
 # >> install post
 #if $extra.content.has_key("install") and $extra.content.install.has_key("post")
-#for $l in $extra.content.install.post
-$l
-#end for
+$str_newline.join($extra.content.install.post)
 #end if
 # << install post
 
@@ -377,9 +366,7 @@ gconftool-2 --makefile-install-rule \
 #end if
 # >> files 
 #if $extra.content.has_key("files") and $extra.content.files.has_key("main")
-#for $l in $extra.content.files.main
-$l
-#end for
+$str_newline.join($extra.content.files.main)
 #end if
 # << files 
 
@@ -389,9 +376,7 @@ $l
 %defattr(-,root,root,-)
 # >> files $sp
 #if $extra.content.has_key("files") and $extra.content.files.has_key($sp)
-#for $l in $extra.content.files[$sp]
-$l
-#end for
+$str_newline.join($extra.content.files[$sp])
 #end if
 # << files $sp
 
@@ -404,9 +389,7 @@ $l
 %defattr(-,root,root,-)
 # >> files $sp.Name
 #if $extra.content.has_key("files") and $extra.content.files.has_key($sp.Name)
-#for $l in $extra.content.files[$sp.Name]
-$l
-#end for
+$str_newline.join($extra.content.files[$sp.Name])
 #end if
 # << files $sp.Name
 
