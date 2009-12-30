@@ -139,7 +139,7 @@ $str_newline.join($extra.content.build.pre)
 #if $metadata.has_key('Configure')
 #set $Configure = $metadata.Configure
 #else
-#set $Configure = 'configure'
+#set $Configure = 'noconfigure'
 #end if
 
 #if $Configure == 'python'
@@ -151,10 +151,10 @@ python setup.py build
 %configure --disable-static#slurp
 #else if $Configure == 'reconfigure'
 %reconfigure --disable-static#slurp
-#else ## any other values fall thru to 'configure'
-%configure --disable-static#slurp
 #end if
-#if $metadata.has_key("ConfigOptions")
+## any other values fall thru to 'noconfigure'
+
+#if $Configure != 'noconfigure' and $metadata.has_key("ConfigOptions")
  \
 #set $length = len($metadata.ConfigOptions)
 #set $idx = 1
@@ -207,7 +207,7 @@ rm -rf %{buildroot}
 #if $metadata.has_key('Builder') and $metadata.Builder != 'make' and $metadata.Builder != 'single-make'
 # Please write install script under ">> install post"
 #else
-%make_install
+make install DESTDIR=%{buildroot}
 #end if
 #end if ## of Configure==python
 
