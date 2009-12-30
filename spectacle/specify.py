@@ -161,6 +161,8 @@ class RPMWriter():
                 continue
             if matchout:
                 record = False
+                if not recording: continue # empty
+
                 if matchout.group(1) == "files" and not matchout.group(2):
                     files['main'] = recording
                 elif matchout.group(1) == "files" and matchout.group(2):
@@ -170,7 +172,7 @@ class RPMWriter():
                 elif matchout.group(1) == "build":
                     build[matchout.group(2)] = recording
                 elif matchout.group(1) == "macros":
-                    macros = recording
+                    macros['main'] = recording
 
             if record:
                 recording.append(i)

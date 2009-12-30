@@ -4,8 +4,8 @@
 # ###############################################
 #set $str_newline = '\n'
 # >> macros 
-#if $extra.content.has_key("macros")
-$str_newline.join($extra.content.macros)
+#if $extra.content.has_key("macros") and $extra.content.macros.has_key("main")
+$str_newline.join($extra.content.macros.main)
 #end if
 # << macros 
 
