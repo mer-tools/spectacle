@@ -135,14 +135,23 @@ $sp.Description
 $str_newline.join($extra.content.build.pre)
 #end if
 # << build pre
+
 #if $metadata.has_key('Configure')
-#if $metadata.Configure == 'autogen'
-%autogen --disable-static#slurp
-#else if $metadata.Configure == 'configure'
-%configure --disable-static#slurp
-#else if $metadata.Configure == 'reconfigure'
-%reconfigure --disable-static#slurp
+#set $Configure = $metadata.Configure
 #else
+#set $Configure = 'configure'
+#end if
+
+#if $Configure == 'python'
+python setup.py build
+#else
+#if $Configure == 'autogen'
+%autogen --disable-static#slurp
+#else if $Configure == 'configure'
+%configure --disable-static#slurp
+#else if $Configure == 'reconfigure'
+%reconfigure --disable-static#slurp
+#else ## any other values fall thru to 'configure'
 %configure --disable-static#slurp
 #end if
 #if $metadata.has_key("ConfigOptions")
@@ -158,16 +167,7 @@ $str_newline.join($extra.content.build.pre)
 #end if
 #set $idx = $idx + 1
 #end for
-#else
-
-#end if
-#else
-# no configure call needed
-#end if
-
-#if $metadata.has_key('Configure') and $metadata.Configure == 'python'
-python setup.py build
-#end if
+#end if ## ConfigOptions
 
 # Call make instruction
 #if $metadata.has_key('Builder')
@@ -180,7 +180,9 @@ $metadata.Builder
 #end if
 #else
 make %{?_smp_mflags}
-#end if
+#end if ## has_key Builder
+
+#end if ## == python
 
 # >> build post
 #if $extra.content.has_key("build") and  $extra.content.build.has_key("post")
