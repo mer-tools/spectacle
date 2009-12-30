@@ -197,9 +197,9 @@ $str_newline.join($extra.content.install.pre)
 rm -rf %{buildroot}
 #if $metadata.has_key('Configure') and $metadata.Configure == 'python'
 %if 0%{?suse_version}
-%{__python} setup.py install --root=%{buildroot} --prefix=%{_prefix} --record-rpm=INSTALLED_FILES
+%{__python} setup.py install --root=%{buildroot} --prefix=%{_prefix} --record-rpm=PY_INSTALLED_FILES
 %else
-%{__python} setup.py install --root=%{buildroot} -O1 --record=INSTALLED_FILES
+%{__python} setup.py install --root=%{buildroot} -O1 --record=PY_INSTALLED_FILES
 %endif
 #else
 #if $metadata.has_key('Builder') and $metadata.Builder != 'make' and $metadata.Builder != 'single-make'
@@ -354,6 +354,8 @@ gconftool-2 --makefile-install-rule \
 
 #if $metadata.has_key("LocaleName")
 %files -f ${metadata.LocaleName}.lang
+#else if $metadata.has_key('Configure') and $metadata.Configure == 'python'
+%files -f PY_INSTALLED_FILES
 #else
 %files
 #end if
