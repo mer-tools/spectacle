@@ -183,7 +183,10 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         out_fpath = sys.argv[2]
     else:
-        out_fpath = ini_fpath.rstrip('.ini') + '.yaml'
+        if ini_fpath.endswith('.ini'):
+            out_fpath = ini_fpath[:-3] + 'yaml'
+        else:
+            out_fpath = ini_fpath + '.yaml'
 
     # Check if the input file exists
     if not os.path.exists(ini_fpath):
