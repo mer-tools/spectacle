@@ -62,6 +62,13 @@ class SpectacleDumper(object):
         import json
         print json.dumps(data, indent=4)
 
+    def __esc_value(self, val):
+        # ESC for leading '%', for yaml syntax
+        if val.startswith('%'):
+            return '"' + val + '"'
+        else:
+            return val
+
     def _dump_yaml(self, data, fp, indent = '', cur_pkg = 'main'):
         if indent:
             cur_indent = indent + '- '
@@ -102,16 +109,12 @@ class SpectacleDumper(object):
                         self._dump_yaml(item, fp, cur_indent + TAB, cur_pkg = item[0][1])
                         fp.write("\n")
                     else:
-                        # ESC for leading '%', for yaml syntax
-                        if item.find('%') == 0:
-                            item = '\\' + item
-
-                        fp.write(cur_indent + TAB + "- %s\n" % (item))
+                        fp.write(cur_indent + TAB + "- %s\n" % (self.__esc_value(item)))
             else:
                 lines_to_write = value.splitlines()
 
                 if len(lines_to_write) == 1:
-                    fp.write(cur_indent + "%s: %s\n" % (key, value))
+                    fp.write(cur_indent + "%s: %s\n" % (key, self.__esc_value(value)))
                 elif len(lines_to_write) == 0:
                     # not exist until now
                     fp.write(cur_indent + "%s:\n" % (key))
