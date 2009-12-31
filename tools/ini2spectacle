@@ -82,19 +82,24 @@ class SBConfigParser(RawConfigParser):
 
     def __expand_files(self, filename):
         """ Helper function to expand *.files """
-        doc = ""
+        docs = []
         files = []
         if os.path.exists(filename):
             for line in file(filename):
                 # Check if any line has %doc mentioned, to be handled seperatly
                 if "%doc" in line:
-                    doc = line[4:].strip()
+                    docs.append(line[4:].strip())
                 else:
                     line = line.strip()
                     if line:
                         files.append(line)
         else:
             raise "Missing file: %s" % filename
+
+        if docs:
+            doc = ' '.join(docs)
+        else:
+            doc = ''
 
         return doc, files
 
