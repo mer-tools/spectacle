@@ -78,7 +78,11 @@ class SBConfigParser(RawConfigParser):
 
     def optionxform(self, option):
         # no change, otherwise the default one will lower-case them
-        return option
+        lead = option[0]
+        if lead.upper() != lead:
+            return lead.upper() + option[1:]
+        else:
+            return option
 
     def __expand_files(self, filename):
         """ Helper function to expand *.files """

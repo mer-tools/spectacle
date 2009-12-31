@@ -48,6 +48,7 @@ class Convertor(object):
                      'PkgConfigBR',
                      'Configure',
                      'ConfigOptions',
+                     'Documents',
                     ]
 
     def __init__(self, cv_table = {}, order_entries = []):
