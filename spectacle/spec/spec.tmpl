@@ -113,7 +113,11 @@ Requires: $req
 #end if
 Requires: %{name} = %{version}-%{release}
 %description $sp.Name
+#if $sp.has_key('Description')
 $sp.Description
+#else
+Description: %{summary}
+#end if
 
 #end for
 #end if
@@ -388,6 +392,9 @@ $str_newline.join($extra.content.files[$sp])
 #for $sp in $metadata.SubPackages
 %files $sp.Name
 %defattr(-,root,root,-)
+#if $sp.has_key("Documents")
+%doc ${sp.Documents}
+#end if
 # >> files $sp.Name
 #if $extra.content.has_key("files") and $extra.content.files.has_key($sp.Name)
 $str_newline.join($extra.content.files[$sp.Name])
