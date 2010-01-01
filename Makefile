@@ -1,4 +1,4 @@
-VERSION = 0.5
+VERSION = $(shell cat VERSION)
 all:
 	cd spectacle/spec; $(MAKE)
 	cd spectacle/dsc; $(MAKE)
