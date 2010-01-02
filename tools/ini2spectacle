@@ -66,6 +66,7 @@ class SBConfigParser(RawConfigParser):
 
     # must have keys
     must_keys =  {'Release': '1',
+                  'Configure': 'configure',
                  }
 
     def __init__(self, iniDir = None):
