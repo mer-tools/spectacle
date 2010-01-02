@@ -372,7 +372,9 @@ gconftool-2 --makefile-install-rule \
 #end if
 %defattr(-,root,root,-)
 #if $metadata.has_key("Documents")
-%doc ${metadata.Documents}
+#for $doc in $metadata.Documents
+%doc $doc
+#end for
 #end if
 # >> files 
 #if $extra.content.has_key("files") and $extra.content.files.has_key("main")
@@ -398,7 +400,9 @@ $str_newline.join($extra.content.files[$sp])
 %files $sp.Name
 %defattr(-,root,root,-)
 #if $sp.has_key("Documents")
-%doc ${sp.Documents}
+#for $doc in $sp.Documents
+%doc $doc
+#end for
 #end if
 # >> files $sp.Name
 #if $extra.content.has_key("files") and $extra.content.files.has_key($sp.Name)

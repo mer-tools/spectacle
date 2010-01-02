@@ -68,6 +68,7 @@ class SBConfigParser(RawConfigParser):
     must_keys =  {'Release': '1',
                   'Configure': 'configure',
                  }
+    # ?? LocalName default as Name
 
     def __init__(self, iniDir = None):
         RawConfigParser.__init__(self)
@@ -87,13 +88,18 @@ class SBConfigParser(RawConfigParser):
 
     def __expand_files(self, filename):
         """ Helper function to expand *.files """
-        docs = set()
+        docs_elem = set()
+        docs = []
         files = []
         if os.path.exists(filename):
             for line in file(filename):
                 # Check if any line has %doc mentioned, to be handled seperatly
                 if "%doc" in line:
-                    docs.update(line[4:].strip().split())
+                    doc_entry = line[4:].strip().split()
+                    if len(doc_entry) == 1:
+                        docs.append(doc_entry[0])
+                    else:
+                        docs_elem.update(doc_entry)
                 else:
                     line = line.strip()
                     if line:
@@ -101,12 +107,10 @@ class SBConfigParser(RawConfigParser):
         else:
             raise "Missing file: %s" % filename
 
-        if docs:
-            doc = ' '.join(list(docs))
-        else:
-            doc = ''
+        if docs_elem:
+            docs = [' '.join(list(docs_elem))] + docs
 
-        return doc, files
+        return docs, files
 
     def __expand_single(self, filename):
         """ Helper function to expand *.desc """
@@ -146,10 +150,10 @@ class SBConfigParser(RawConfigParser):
             #If the key happens to be 'Files' then we need to find the corresponding *.files and expand it
             #The first line of *.files might contain %doc, this needs to be handled separatly
             if 'Files' in items:
-                doc, files = self.__expand_files(os.path.join(self.iniDir, items['Files']))
+                docs, files = self.__expand_files(os.path.join(self.iniDir, items['Files']))
                 self.set(section, 'Files', files)
-                if doc:
-                    self.set(section, 'Documents', doc)
+                if docs:
+                    self.set(section, 'Documents', docs)
 
         for section in self.sections():
             if section in ('header', 'configuration'):
