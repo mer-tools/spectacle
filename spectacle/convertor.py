@@ -18,6 +18,33 @@
 
 import sys
 
+ORDER_ENTRIES = ['Name',
+                 'Summary',
+                 'Version',
+                 'Release',
+                 'Group',
+                 'License',
+                 'URL',
+                 'Description',
+                 '',
+                 'Sources',
+                 'Patches',
+                 '',
+                 'Requires',
+                 'PkgBR',
+                 'PkgConfigBR',
+                 'Configure',
+                 'ConfigOptions',
+                 'Documents',
+                 'LocaleName',
+                ]
+
+EXTRA_ENTRIES = ['Files',
+                 'PostMakeInstallExtras',
+                ]
+
+# TODO, move 'files', 'extra scripts' to extra
+
 class Convertor(object):
     """ Class for generic operations:
         *   Translate field names between different format
@@ -31,29 +58,9 @@ class Convertor(object):
 
     # un-ordered ones will be append the ordered ones in random order
     # 'Files', 'SubPackages' will the last two
-    order_entries = ['Name',
-                     'Summary',
-                     'Version',
-                     'Release',
-                     'Group',
-                     'License',
-                     'URL',
-                     'Description',
-                     '',
-                     'Sources',
-                     'Patches',
-                     '',
-                     'Requires',
-                     'PkgBR',
-                     'PkgConfigBR',
-                     'Configure',
-                     'ConfigOptions',
-                     'Documents',
-                    ]
 
-    def __init__(self, cv_table = {}, order_entries = []):
+    def __init__(self, cv_table = {}):
         self.cv_table.update(cv_table)
-        self.order_entries.extend(order_entries)
 
     def _replace_keys(self, dict):
         for k,v in self.cv_table.iteritems():
@@ -65,7 +72,7 @@ class Convertor(object):
         self._replace_keys(dict)
 
         items = []
-        for entry in self.order_entries:
+        for entry in ORDER_ENTRIES:
             if not entry:
                 # empty string means a blank line for break
                 if need_break:
@@ -86,18 +93,18 @@ class Convertor(object):
         except:
             pass
 
-        if 'Files' in dict:
-            files = dict['Files']
-            del dict['Files']
-        else:
-            files = []
+        extra = {}
+        for entry in EXTRA_ENTRIES:
+            if entry in dict:
+                extra[entry] = dict[entry]
+                del dict[entry]
 
         for k, v in dict.iteritems():
             print >> sys.stderr, 'DEBUG: un-ordered entry: %s\n' % (k)
             items.append((k, v))
 
-        if files:
-            items.append(('Files', files))
+        if extra:
+            items.append(('extra', extra))
 
         if subpkgs:
             items.append(('SubPackages', subpkgs))

@@ -27,11 +27,11 @@ class SpectacleDumper(object):
 
         The format of medium data of spectacle, as input for dumping:
         data = [
-                 (key1, val1),
-                 ('', '')                       # for blank line
-                 (key2, [val21, val22, val23])
-                 (key3, [
-                          [
+                 (key1, val1),                  # atom value
+                 ('', ''),                      # for blank line
+                 (key2, [val21, val22, val23]), # list of values
+                 (key3, [                       # special for 'SubPackages'
+                          [                         # items for subpkg
                             (key31, val31),
                             (key32, val32),
                             ...
@@ -39,7 +39,11 @@ class SpectacleDumper(object):
                           [
                             ...
                           ],
-                        ])
+                        ]),
+                 (key4, {                       # special for 'extra'
+                          'key41': 'value41'
+                          ...
+                        })
                ]
 
     """
@@ -85,17 +89,26 @@ class SpectacleDumper(object):
                 fp.write("\n")
                 continue
 
-            if key in self.spec_extra_keys:
-                nkey    = self.spec_extra_keys[key][0]
-                nsubkey = self.spec_extra_keys[key][1]
-                if not nsubkey:
-                    nsubkey = cur_pkg
-                if not isinstance(value, list):
-                    value = [value]
+            if key == 'extra':
+                for extra_key, extra_val in value.iteritems():
+                    if not extra_val:
+                        continue
 
-                if nkey not in self.spec_extra:
-                    self.spec_extra[nkey] = {}
-                self.spec_extra[nkey][nsubkey] = value
+                    try:
+                        nkey    = self.spec_extra_keys[extra_key][0]
+                        nsubkey = self.spec_extra_keys[extra_key][1]
+                        if not nsubkey:
+                            nsubkey = cur_pkg
+                    except KeyError:
+                        nkey    = extra_key
+                        nsubkey = cur_pkg
+
+                    if not isinstance(extra_val, list):
+                        extra_val = [extra_val]
+
+                    if nkey not in self.spec_extra:
+                        self.spec_extra[nkey] = {}
+                    self.spec_extra[nkey][nsubkey] = extra_val
 
                 continue
 

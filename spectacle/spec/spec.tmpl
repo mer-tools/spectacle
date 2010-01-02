@@ -147,7 +147,7 @@ $str_newline.join($extra.content.build.pre)
 #end if
 
 #if $Configure == 'python'
-python setup.py build
+%{__python} setup.py build
 #else
 #if $Configure == 'autogen'
 %autogen --disable-static#slurp
@@ -257,9 +257,8 @@ fi
 #end if
 
 ## Post
-#if $extra.Info or $extra.Lib or $metadata.has_key('PostScripts')
+#if $extra.Info or $extra.Lib or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts')
 %post
-#end if
 ## -ldconfog
 #if $extra.Lib
 /sbin/ldconfig
@@ -282,10 +281,17 @@ $metadata.PostScripts
 %install_info $inf /usr/share/info/dir
 #end for
 #end if
+## -Icon
+#if $extra.Icon
+/bin/touch --no-create %{_datadir}/icons/hicolor || :
+%{_bindir}/gtk-update-icon-cache \
+  --quiet %{_datadir}/icons/hicolor 2> /dev/null|| :
+#end if
+#end if ## need post
+
 ## PostUn
 #if $extra.Info or $extra.Lib
 %postun
-#end if
 #if $extra.Lib
 /sbin/ldconfig
 #end if
@@ -294,6 +300,7 @@ $metadata.PostScripts
 %install_info_delete $inf /usr/share/info/dir
 #end for
 #end if
+#end if ## need postun
 ## Post for SubPackages
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
