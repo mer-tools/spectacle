@@ -147,7 +147,7 @@ $str_newline.join($extra.content.build.pre)
 #end if
 
 #if $Configure == 'python'
-python setup.py build
+%{__python} setup.py build
 #else
 #if $Configure == 'autogen'
 %autogen --disable-static#slurp
@@ -157,7 +157,6 @@ python setup.py build
 %reconfigure --disable-static#slurp
 #end if
 ## any other values fall thru to 'noconfigure'
-
 #if $Configure != 'noconfigure' and $metadata.has_key("ConfigOptions")
  \
 #set $length = len($metadata.ConfigOptions)
@@ -222,7 +221,7 @@ $str_newline.join($extra.content.install.post)
 # << install post
 
 #if $metadata.has_key("LocaleName")
-%find_lang ${metadata.LocaleName} 
+%find_lang ${metadata.LocaleName} || echo -n >> ${metadata.LocaleName}.lang
 #end if
 
 mkdir -p %{buildroot}/%{_datadir}/doc/%{name}-%{version}
