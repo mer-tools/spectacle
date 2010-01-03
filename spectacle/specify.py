@@ -135,7 +135,7 @@ class RPMWriter():
                     pkg_extra['Service'] = True
                     pkg_extra['PreUn'].append("/sbin/chkconfig")
                     pkg_extra['PreUn'].append("/sbin/service")
-                if re.match('.*%{_libdir}.*', l) or re.match('.*\.so\..*', l):
+                if re.match('.*%{_libdir}.*', l) and re.match('.*\.so\..*', l):
                     pkg_extra['Lib'] = True
                 if re.match('.*\.schema.*', l):
                     pkg_extra['Schema'] = True

@@ -143,7 +143,7 @@ $str_newline.join($extra.content.build.pre)
 #if $metadata.has_key('Configure')
 #set $Configure = $metadata.Configure
 #else
-#set $Configure = 'noconfigure'
+#set $Configure = 'configure'
 #end if
 
 #if $Configure == 'python'
@@ -155,6 +155,8 @@ $str_newline.join($extra.content.build.pre)
 %configure --disable-static#slurp
 #else if $Configure == 'reconfigure'
 %reconfigure --disable-static#slurp
+#else if $Configure == 'noconfigure'
+
 #end if
 ## any other values fall thru to 'noconfigure'
 #if $Configure != 'noconfigure' and $metadata.has_key("ConfigOptions")
@@ -175,14 +177,14 @@ $str_newline.join($extra.content.build.pre)
 # Call make instruction
 #if $metadata.has_key('Builder')
 #if $metadata.Builder == 'make'
-make %{?_smp_mflags}
+make %{?jobs:-j%jobs}
 #else if $metadata.Builder == 'single-make'
 make
 #else
 $metadata.Builder
 #end if
 #else
-make %{?_smp_mflags}
+make %{?jobs:-j%jobs}
 #end if ## has_key Builder
 
 #end if ## == python
@@ -210,7 +212,7 @@ rm -rf %{buildroot}
 #if $metadata.has_key('Builder') and $metadata.Builder != 'make' and $metadata.Builder != 'single-make'
 # Please write install script under ">> install post"
 #else
-make install DESTDIR=%{buildroot}
+%make_install
 #end if
 #end if ## of Configure==python
 
@@ -221,15 +223,8 @@ $str_newline.join($extra.content.install.post)
 # << install post
 
 #if $metadata.has_key("LocaleName")
-%find_lang ${metadata.LocaleName} || echo -n >> ${metadata.LocaleName}.lang
+%find_lang ${metadata.LocaleName} 
 #end if
-
-mkdir -p %{buildroot}/%{_datadir}/doc/%{name}-%{version}
-for f in `ls %{buildroot}/%{_datadir}/doc/`; do
-    if [ -f %{buildroot}/%{_datadir}/doc/\$f ]; then
-        mv %{buildroot}/%{_datadir}/doc/\$f %{buildroot}/%{_datadir}/doc/%{name}-%{version}
-    fi
-done
 
 %clean
 rm -rf %{buildroot}
@@ -306,12 +301,10 @@ $metadata.PostScripts
 #end for
 #end if
 #end if ## need postun
-
 ## Post for SubPackages
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
 #set $sub_extra = $extra.subpkgs[$sp.Name]
-
 #if $sub_extra.Info or $sub_extra.Lib ### TODO  $metadata.has_key('PostScripts')
 %post $sp.Name
 #end if
@@ -327,27 +320,22 @@ gconftool-2 --makefile-install-rule \
     $schema  > /dev/null || :
 #end for
 #end if
-
 ## -Extra Post Script
 ### #if $metadata.has_key('PostScripts')
 ### $metadata.PostScripts
 ### #end if
-
 ## -Info
 #if $sub_extra.Info
 #for $inf in $sub_extra.Infos
 %install_info $inf /usr/share/info/dir
 #end for
 #end if
-
 #end for ## per subpackage
 #end if ## has subpackages
-
 ## PostUn for SubPackages
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
 #set $sub_extra = $extra.subpkgs[$sp.Name]
-
 #if $sub_extra.Info or $sub_extra.Lib
 %postun $sp.Name
 #end if
@@ -359,7 +347,6 @@ gconftool-2 --makefile-install-rule \
 %install_info_delete $inf /usr/share/info/dir
 #end for
 #end if
-
 #end for ## per subpackage
 #end if ## has subpackages
 
