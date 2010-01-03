@@ -8,8 +8,14 @@
 $str_newline.join($extra.content.macros.main)
 #end if
 # << macros 
+#if $metadata.has_key('Builder')
+#set $Builder = $metadata.Builder
+#else
+## default
+#set $Builder = 'make'
+#end if
 
-#if $metadata.has_key('Configure') and $metadata.Configure == 'python'
+#if $Builder == 'python'
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 #end if
 
@@ -140,23 +146,22 @@ $str_newline.join($extra.content.build.pre)
 #end if
 # << build pre
 
+#if $Builder == 'python'
+%{__python} setup.py build
+#else
 #if $metadata.has_key('Configure')
 #set $Configure = $metadata.Configure
 #else
-#set $Configure = 'configure'
+## default
+#set $Configure = 'noconfigure'
 #end if
 
-#if $Configure == 'python'
-%{__python} setup.py build
-#else
 #if $Configure == 'autogen'
 %autogen --disable-static#slurp
 #else if $Configure == 'configure'
 %configure --disable-static#slurp
 #else if $Configure == 'reconfigure'
 %reconfigure --disable-static#slurp
-#else if $Configure == 'noconfigure'
-
 #end if
 ## any other values fall thru to 'noconfigure'
 #if $Configure != 'noconfigure' and $metadata.has_key("ConfigOptions")
@@ -175,19 +180,14 @@ $str_newline.join($extra.content.build.pre)
 #end if ## ConfigOptions
 
 # Call make instruction
-#if $metadata.has_key('Builder')
-#if $metadata.Builder == 'make'
+#if $Builder == 'make'
 make %{?jobs:-j%jobs}
-#else if $metadata.Builder == 'single-make'
+#else if $Builder == 'single-make'
 make
 #else
-$metadata.Builder
+$Builder
 #end if
-#else
-make %{?jobs:-j%jobs}
-#end if ## has_key Builder
-
-#end if ## == python
+#end if ## Builder == python
 
 # >> build post
 #if $extra.content.has_key("build") and  $extra.content.build.has_key("post")
@@ -202,19 +202,17 @@ $str_newline.join($extra.content.install.pre)
 #end if
 # << install pre
 rm -rf %{buildroot}
-#if $metadata.has_key('Configure') and $metadata.Configure == 'python'
+#if $Builder == 'python'
 %if 0%{?suse_version}
 %{__python} setup.py install --root=%{buildroot} --prefix=%{_prefix} --record-rpm=PY_INSTALLED_FILES
 %else
 %{__python} setup.py install --root=%{buildroot} -O1 --record=PY_INSTALLED_FILES
 %endif
-#else
-#if $metadata.has_key('Builder') and $metadata.Builder != 'make' and $metadata.Builder != 'single-make'
-# Please write install script under ">> install post"
-#else
+#else if $Builder == 'make' or $Builder == 'single-make'
 %make_install
-#end if
-#end if ## of Configure==python
+#else
+# Please write install script under ">> install post"
+#end if ## of Builder==python
 
 # >> install post
 #if $extra.content.has_key("install") and $extra.content.install.has_key("post")
