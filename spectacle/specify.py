@@ -63,9 +63,11 @@ class RPMWriter():
         self.filename = filename
         self.metadata = None
         self.scm = None
+        self.archive = 'bzip2'
         self.pkg = None
         self.specfile = None
         self.version = None
+        
 
         self.clean_old = clean_old
 
@@ -88,6 +90,16 @@ class RPMWriter():
         self.metadata = yaml.load(self.stream)
         if self.metadata.has_key("SCM"):
             self.scm = self.metadata['SCM']
+
+        supported_archive = ['bzip2', 'gzip']
+        if self.metadata.has_key("Archive"):
+            self.archive = self.metadata['Archive']
+            if self.archive not in supported_archive:
+                self.archive = 'bzip2'
+        if self.archive == 'bzip2':
+            self.appendix = 'bz2'
+        else:
+            self.appendix = 'gz'
 
         try:
             self.pkg = self.metadata['Name']
@@ -223,14 +235,14 @@ def generate_rpm(filename, clean_old = False, extra_content = None):
             rpm.metadata['Version'] = rpm.version
             tmp = tempfile.mkdtemp()
             pwd = os.getcwd()
-            if os.path.exists("%s/%s-%s.tar.bz2" %(pwd, rpm.pkg, rpm.version )):
+            if os.path.exists("%s/%s-%s.tar.%s" %(pwd, rpm.pkg, rpm.version, rpm.appendix )):
 		        print "Archive already exists, not creating a new one"
             else:
-                print "Creating archive %s/%s-%s.tar.bz2 ..." %( pwd, rpm.pkg, rpm.version )
+                print "Creating archive %s/%s-%s.tar.%s ..." %( pwd, rpm.pkg, rpm.version, rpm.appendix )
                 os.chdir(tmp)
                 os.system('git clone %s' %rpm.scm)
                 os.chdir( "%s/%s" %(tmp, rpm.pkg))
-                os.system(' git archive --format=tar --prefix=%s-%s/ %s | bzip2  > %s/%s-%s.tar.bz2' %(rpm.pkg, rpm.version, rpm.version, pwd, rpm.pkg, rpm.version ))
+                os.system(' git archive --format=tar --prefix=%s-%s/ %s | %s  > %s/%s-%s.tar.%s' %(rpm.pkg, rpm.version, rpm.version, rpm.archive, pwd, rpm.pkg, rpm.version, rpm.appendix ))
             shutil.rmtree(tmp)
             os.chdir(pwd)
 
