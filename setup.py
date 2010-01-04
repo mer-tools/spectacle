@@ -19,7 +19,7 @@ setup(name='spectacle',
       author='Anas Nashif, Jian-feng Ding',
       author_email='anas.nashif@intel.com, jian-feng.ding@intel.com',
       url='http://moblin.org/',
-      scripts=['tools/specify', 'tools/ini2spectacle'],
+      scripts=['tools/specify', 'tools/ini2spectacle', 'tools/spec2spectacle'],
       packages=['spectacle', 'spectacle.spec', 'spectacle.dsc'],
      )
 
