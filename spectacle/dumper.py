@@ -54,6 +54,8 @@ class SpectacleDumper(object):
             'Files': ('files', None),
             'PostMakeInstallExtras': ('install', 'post'),
             'PreMakeInstallExtras': ('install', 'pre'),
+            'PostMakeExtras': ('build', 'post'),
+            'PreMakeExtras': ('build', 'pre'),
             }
 
     def __init__(self, format = 'yaml', opath = None):
