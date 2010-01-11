@@ -184,7 +184,7 @@ $str_newline.join($extra.content.build.pre)
 make %{?jobs:-j%jobs}
 #else if $Builder == 'single-make'
 make
-#else
+#else if $Builder != 'no-make'
 $Builder
 #end if
 #end if ## Builder == python

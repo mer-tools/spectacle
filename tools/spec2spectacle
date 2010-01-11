@@ -1,0 +1,425 @@
+#!/usr/bin/python -tt
+# vim: ai ts=4 sts=4 et sw=4
+
+#    Copyright (c) 2009 Intel Corporation
+#
+#    This program is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by the Free
+#    Software Foundation; version 2 of the License
+#
+#    This program is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#    for more details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with this program; if not, write to the Free Software Foundation, Inc., 59
+#    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+"""Overview of spec2spectacle
+"""
+
+import os
+import sys
+import re
+
+# spectacle modules
+from spectacle.convertor import *
+from spectacle.dumper import *
+
+class SpecError(Exception):
+    def __ini__(self, cur_state, cur_pkg, cur_line):
+        self.cur_state = cur_state
+        self.cur_pkg = cur_pkg
+        self.cur_line = cur_line
+
+    def __repr__(self):
+        return self.cur_state + self.cur_pkg + self.cur_line
+
+class SpecFormatError(SpecError):
+    pass
+
+class SpecUnknowLineError(SpecError):
+    pass
+
+class SpecUnknowHeaderError(SpecError):
+    pass
+
+HEADERS = ( 'package',
+            'description',
+            'prep',
+            'build',
+            'install',
+            'clean',
+            'post',
+            'postun',
+            'files',
+            'changelog' )
+SINGLES = ( 'Summary',
+            'Name',
+            'Version',
+            'Release',
+            'URL',
+            'Url',
+            'Group',
+            'License' )
+SKIPS   = ( 'BuildRoot',)
+
+# state definition of parser
+(
+    ST_DEFINE,
+    ST_MAIN,
+    ST_INLINE,
+    ST_SUBPKG,
+)   = range(4)
+
+class SpecConvertor(Convertor):
+    """ Convertor for SpecBuild ini files """
+
+    def __init__(self):
+        sb_cv_table = {
+                'BuildRequires': 'PkgBR',
+                'PkgConfig': 'PkgConfigBR',
+                'pre': 'install-pre',
+                'description': 'Description',
+                'Requires(post)': 'RequirePost',
+                'Requires(postun)': 'RequirePostun',
+                'Requires(pre)': 'RequirePre',
+                'Requires(preun)': 'RequirePreun',
+                'Url': 'URL',
+                }
+        Convertor.__init__(self, sb_cv_table)
+
+class SpecParser(object):
+    """ Parser of SPEC file of rpm package """
+
+    def __init__(self):
+        # runtime variables
+        self.items = {}
+        self.table = {}
+        self.cur_pkg = 'main'
+
+    def __switch_subpkg(self, subpkg):
+        if 'SubPackages' not in self.items:
+            self.items['SubPackages'] = {}
+        if subpkg not in self.items['SubPackages']:
+            self.items['SubPackages'][subpkg] = {}
+
+        return self.items['SubPackages'][subpkg]
+
+    def _do_package(self, items, k, v):
+        # skip
+        pass
+
+    def _do_prep(self, items, k, v):
+        # skip
+        pass
+
+    def _do_build(self, items, k, v):
+        """ to handle build script:
+            trying to find out the most of the generic cases
+        """
+
+        # parts of build script
+        (PRE, POST_CFG, POST_BUILD) = range(3)
+        parts = { 'pre': [], 'post': [] }
+        cur_part = PRE
+
+        cfgr_save = None
+        bldr_save = None
+
+        cont_line = False
+        for line in v.split('\n'):
+            if cont_line:
+                whole_line = whole_line + ' ' + line.strip()
+            else:
+                if not line.strip():
+                    # empty line, skip
+                    continue
+
+                whole_line = line.strip()
+
+            if line[-1:] == '\\':
+                cont_line = True
+                whole_line = whole_line[:-1].strip()
+                continue
+            else:
+                cont_line = False
+
+            found_cfgr = False
+            found_bldr = False
+
+            # find configure in current line
+            for cfgr in ('configure', 'reconfigure', 'autogen'):
+                if cfgr in whole_line.split():
+                    found_cfgr = True
+                    cfgr_save = (cfgr, whole_line)
+                    break
+
+            # find builder in current line
+            if 'make' in whole_line.split():
+                found_bldr = True
+                bldr_save = ('make', whole_line)
+            elif re.search('python\W*setup.py\W*build', whole_line):
+                found_bldr = True
+                bldr_save = ('python', whole_line)
+
+            if cur_part == PRE:
+                if found_cfgr:
+                    cur_part = POST_CFG
+                elif found_bldr:
+                    cur_part = POST_BUILD
+                else:
+                    parts['pre'].append(whole_line)
+
+            elif cur_part == POST_CFG:
+                if found_cfgr:
+                    # more 'configr', wrong
+                    cur_part = PRE
+                    break
+                elif found_bldr:
+                    cur_part = POST_BUILD
+                else:
+                    # another line(s) between configr and buildr, wrong
+                    # or no supported buildr found, wrong
+                    cur_part = PRE
+                    break
+
+            elif cur_part == POST_BUILD:
+                parts['post'].append(whole_line)
+
+        if cur_part == PRE:
+            # means match failed
+
+            # make sure no 'make' generated auto
+            items['Builder'] = 'no-make'
+
+            # put all script to 'post install'
+            items['extra']['PostMakeExtras'] = \
+                    ['# all build scripts in origin specfile as the following:'] + v.split('\n')
+
+        else:
+            if cfgr_save:
+                items['Configure'] = cfgr_save[0]
+                # parse the configure options
+                for opt in cfgr_save[1].split()[1:]:
+                    if 'ConfigOptions' not in items:
+                        items['ConfigOptions'] = [opt]
+                    else:
+                        items['ConfigOptions'].append(opt)
+
+            if bldr_save:
+                items['Builder'] = bldr_save[0]
+
+            items['extra']['PreMakeExtras'] = \
+                    ['# The followings are the origin script in this spec file'] + \
+                    map(lambda s: '#>> ' + s, v.split('\n'))
+
+            if parts['pre']:
+                items['extra']['PreMakeExtras'].extend(['', '# splitted pre-build part by auto-parsing'] + parts['pre'])
+            if parts['post']:
+                items['extra']['PostMakeExtras'] = ['# splitted post-build part by auto-parsing'] + parts['post']
+
+    def _do_install(self, items, k, v):
+        items['extra']['PostMakeInstallExtras'] = ['# all install scripts in origin specfile as the following:'] + v.split('\n')
+
+    def _do_clean(self, items, k, v):
+        # skip
+        pass
+
+    def _do_post(self, items, k, v):
+        # skip
+        pass
+
+    def _do_postun(self, items, k, v):
+        # skip
+        pass
+
+    def _do_changelog(self, items, k, v):
+        # TODO
+        print 'TODO: move changelog to new file'
+
+    def _do_files(self, items, k, v):
+        files = v.strip().split()
+        try:
+            files.remove('%defattr(-,root,root,-)')
+        except ValueError:
+            pass
+        items['Files'] = files
+
+    def _do_description(self, items, k, v):
+        items['Description'] = v.strip()
+
+    def _do_generic_header(self, items, k, v):
+        items[k] = v.strip()
+
+    def read(self, filename):
+        """ read in all recognized directives and headers """
+
+        comment = re.compile('^#.*')
+        directive = re.compile('^([\w()]+):[ \t]*(.*)')
+        define_re = re.compile('^%define\W+(\w+)\W+(.*)')
+        header_re = re.compile('^%(prep|build|install|clean|postun|post|files|changelog|package|description)\s*(.*)')
+
+        state = ST_DEFINE
+        items = self.items
+        for line in file(filename):
+
+            if state == ST_DEFINE:
+                m = define_re.match(line.strip())
+                if m:
+                    self.table[m.group(1)] = m.group(2)
+                    continue
+                else:
+                    state = ST_MAIN
+
+            if state == ST_INLINE:
+                if header_re.match(line):
+                    state = ST_MAIN
+                    # fall through
+                else:
+                    items[cur_block] += line
+                    continue
+
+            if state == ST_MAIN:
+                line = line.strip()
+                if comment.match(line) or not line:
+                    # skip comment line and empty line
+                    continue
+
+                dm = directive.match(line)
+                if not dm:
+                    hm = header_re.match(line)
+
+                if dm:
+                    key = dm.group(1)
+                    val = dm.group(2)
+                    if key not in items:
+                        items[key] = [val]
+                    else:
+                        items[key].append(val)
+
+                elif hm:
+                    header = hm.group(1)
+                    opt = hm.group(2)
+                    if header not in HEADERS:
+                        raise SpecUnknowHeaderError(state, self.cur_pkg, header)
+
+                    if header == 'package':
+                        if not opt:
+                            raise SpecFormatError(line)
+                        self.cur_pkg = opt
+                        items = self.__switch_subpkg(self.cur_pkg)
+
+                    else:
+                        state = ST_INLINE
+                        if opt and not opt.startswith('-'):
+                            # section with sub-pkg specified
+                            self.cur_pkg = opt.split()[0]
+                            opts = opt.split()[1:]
+                            items = self.__switch_subpkg(self.cur_pkg)
+                        else:
+                            items = self.items
+
+                        cur_block = header
+                        if cur_block not in items:
+                            items[cur_block] = opt #TODO
+                else:
+                    # unparsed line
+                    raise SpecUnknowLineError(state, self.cur_pkg, line)
+
+    def cooked_items(self):
+        """ return all items """
+        #import pprint
+        #pprint.pprint( self.items )
+        #pprint.pprint( self.table )
+
+        ck_items = {'extra': {}}
+
+        sources = []
+        patches = []
+        for k, v in self.items.iteritems():
+            if k in SKIPS:
+                continue
+
+            if k in HEADERS:
+                routine = getattr(self, '_do_' + k)
+                routine(ck_items, k, v)
+                continue
+
+            # check for macro replacing
+            macro_re = re.compile('%{(\w+)}')
+            nv = []
+            for vi in v:
+                nvi = vi
+                for m in macro_re.finditer(vi):
+                    macro, name = m.group(0, 1)
+                    if name in self.table:
+                        nvi = nvi.replace(macro, self.table[name])
+                nv.append(nvi)
+
+                if k in SINGLES:
+                    # special case for Release
+                    if k == 'Release':
+                        m = re.match('(\d+)%{\?dist}', nv[0])
+                        if m: ck_items[k] = m.group(1)
+                    else:
+                        ck_items[k] = nv[0]
+
+                # special case for Source and Patch
+                elif k.startswith('Source'):
+                    sources.extend(nv)
+                elif k.startswith('Patch'):
+                    patches.extend(nv)
+
+                else:
+                    ck_items[k] = nv
+
+        if sources:
+            ck_items['Sources'] = sources
+        if patches:
+            ck_items['Patches'] = patches
+
+        #pprint.pprint( ck_items )
+        return ck_items
+
+if __name__ == '__main__':
+    """ Main Function """
+
+    # Check to see if an argument was passed.
+    if len(sys.argv) < 2:
+        # If no arguments were passed, print the usage and exit.
+        print "Usage: spec2spectacle <specpath> [outfile_path]"
+        sys.exit(1)
+
+    spec_fpath = sys.argv[1]
+
+    if len(sys.argv) > 2:
+        out_fpath = sys.argv[2]
+    else:
+        out_fpath = spec_fpath.rstrip('.spec') + '.yaml'
+        if spec_fpath.endswith('.spec'):
+            out_fpath = spec_fpath[:-4] + 'yaml'
+        else:
+            out_fpath = spec_fpath + '.yaml'
+
+    # Check if the input file exists
+    if not os.path.exists(spec_fpath):
+        # input file does not exist
+        print "%s: File does not exist" % spec_fpath
+        sys.exit(1)
+
+    """Read the input file"""
+    spec_parser = SpecParser()
+    spec_parser.read(spec_fpath)
+
+    convertor = SpecConvertor()
+
+    """Dump them to spectacle file"""
+    dumper = SpectacleDumper(format='yaml', opath = out_fpath)
+    newspec_fpath = dumper.dump(convertor.convert(spec_parser.cooked_items()))
+
+    print 'Yaml file %s created' % out_fpath
+    if newspec_fpath:
+        print 'New spec file %s was created by new yaml file' % newspec_fpath
+
