@@ -87,6 +87,18 @@ class RPMWriter():
         print yaml.dump(yaml.load(self.stream))
 
     def parse(self):
+
+        # customized Resolver for Loader, in PyYAML
+        # remove all resolver for 'int' and 'float', handle them as str
+        for ch in u'+-1234567890.':
+            if ch in yaml.loader.Loader.yaml_implicit_resolvers:
+                for tp in yaml.loader.Loader.yaml_implicit_resolvers.get(ch):
+                    if tp[0] == u'tag:yaml.org,2002:float':
+                        yaml.loader.Loader.yaml_implicit_resolvers.get(ch).remove(tp)
+                for tp in yaml.loader.Loader.yaml_implicit_resolvers.get(ch):
+                    if tp[0] == u'tag:yaml.org,2002:int':
+                        yaml.loader.Loader.yaml_implicit_resolvers.get(ch).remove(tp)
+
         self.metadata = yaml.load(self.stream)
         if self.metadata.has_key("SCM"):
             self.scm = self.metadata['SCM']

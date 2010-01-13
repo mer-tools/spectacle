@@ -80,7 +80,7 @@ class SBConfigParser(RawConfigParser):
             self.iniDir = os.path.curdir
 
     def optionxform(self, option):
-        # no change, otherwise the default one will lower-case them
+        # Capitalize the first char
         lead = option[0]
         if lead.upper() != lead:
             return lead.upper() + option[1:]
