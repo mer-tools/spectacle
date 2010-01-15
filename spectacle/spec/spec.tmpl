@@ -260,10 +260,10 @@ fi
 
 ## Post
 #if $extra.Info or $extra.Lib or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts')
-%post
-## -ldconfog
 #if $extra.Lib
-/sbin/ldconfig
+%post -p /sbin/ldconfig
+#eles
+%post
 #end if
 ## -Schema
 #if $extra.Schema
@@ -293,9 +293,10 @@ $metadata.PostScripts
 
 ## PostUn
 #if $extra.Info or $extra.Lib
-%postun
 #if $extra.Lib
-/sbin/ldconfig
+%postun -p /sbin/ldconfig
+#else
+%postun
 #end if
 #if $extra.Info
 #for $inf in $extra.Infos
@@ -303,16 +304,16 @@ $metadata.PostScripts
 #end for
 #end if
 #end if ## need postun
+
 ## Post for SubPackages
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
 #set $sub_extra = $extra.subpkgs[$sp.Name]
-#if $sub_extra.Info or $sub_extra.Lib ### TODO  $metadata.has_key('PostScripts')
-%post $sp.Name
-#end if
-## -ldconfog
+#if $sub_extra.Info or $sub_extra.Lib or $sub_extra.Schema ### TODO  $metadata.has_key('PostScripts')
 #if $sub_extra.Lib
-/sbin/ldconfig
+%post $sp.Name -p /sbin/ldconfig
+#else
+%post $sp.Name
 #end if
 ## -Schema
 #if $sub_extra.Schema
@@ -331,24 +332,22 @@ gconftool-2 --makefile-install-rule \
 #for $inf in $sub_extra.Infos
 %install_info $inf /usr/share/info/dir
 #end for
-#end if
-#end for ## per subpackage
-#end if ## has subpackages
+#end if ## Info
+#end if ## need post
+
 ## PostUn for SubPackages
-#if $metadata.has_key("SubPackages")
-#for $sp in $metadata.SubPackages
-#set $sub_extra = $extra.subpkgs[$sp.Name]
 #if $sub_extra.Info or $sub_extra.Lib
-%postun $sp.Name
-#end if
 #if $sub_extra.Lib
-/sbin/ldconfig
+%postun $sp.Name -p /sbin/ldconfig
+#else
+%postun $sp.Name
 #end if
 #if $sub_extra.Info
 #for $inf in $sub_extra.Infos
 %install_info_delete $inf /usr/share/info/dir
 #end for
-#end if
+#end if ## Info
+#end if ## need postun
 #end for ## per subpackage
 #end if ## has subpackages
 
