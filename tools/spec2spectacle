@@ -326,7 +326,7 @@ class SpecParser(object):
                             items[cur_block] = opt #TODO
                 else:
                     # unparsed line
-                    raise SpecUnknowLineError(state, self.cur_pkg, line)
+                    print 'Unkown spec line skipped:', line
 
     def cooked_items(self):
         """ return all items """
@@ -411,7 +411,12 @@ if __name__ == '__main__':
 
     """Read the input file"""
     spec_parser = SpecParser()
-    spec_parser.read(spec_fpath)
+    try:
+        spec_parser.read(spec_fpath)
+    except SpecFormatError, e:
+        print 'Spec syntax error:', e
+    except SpecUnknowHeaderError, e:
+        print 'Unknown spec header:', e
 
     convertor = SpecConvertor()
 
