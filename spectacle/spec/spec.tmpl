@@ -247,7 +247,7 @@ rm -rf %{buildroot}
 %if 0%{?moblin_version}
 %make_install
 %else
-make install DESTDIR=%{buildroot}
+%makeinstall
 %endif
 #else
 # Please write install script under ">> install post"
