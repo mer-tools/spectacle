@@ -33,8 +33,12 @@ ORDER_ENTRIES = ['Name',
                  'Requires',
                  'PkgBR',
                  'PkgConfigBR',
+                 'Provides',
+                 'Obsoletes',
+                 'Conflicts',
                  'Configure',
                  'ConfigOptions',
+                 'Builder',
                  'Documents',
                  'LocaleName',
                 ]
@@ -98,6 +102,10 @@ class Convertor(object):
             if entry in dict:
                 extra[entry] = dict[entry]
                 del dict[entry]
+
+        if 'extra' in dict:
+            extra.update(dict['extra'])
+            del dict['extra']
 
         for k, v in dict.iteritems():
             print >> sys.stderr, 'DEBUG: un-ordered entry: %s\n' % (k)

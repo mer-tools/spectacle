@@ -96,6 +96,24 @@ BuildRequires:  pkgconfig($br_comps[0])
 BuildRequires:  $br
 #end for
 #end if
+## Provides
+#if $metadata.has_key("Provides")
+#for $prd in $metadata.Provides
+Provides:   $prd
+#end for
+#end if
+## Conflicts
+#if $metadata.has_key("Conflicts")
+#for $cfl in $metadata.Conflicts
+Conflicts:   $cfl
+#end for
+#end if
+## Obsoletes
+#if $metadata.has_key("Obsoletes")
+#for $obs in $metadata.Obsoletes
+Obsoletes:   $obs
+#end for
+#end if
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 
@@ -226,13 +244,11 @@ rm -rf %{buildroot}
 %{__python} setup.py install --root=%{buildroot} -O1 --record=PY_INSTALLED_FILES
 %endif
 #else if $Builder == 'make' or $Builder == 'single-make'
-#if $metadata.has_key("Legacy"):
-%if 0%{?suse_version}{?fedora}
-%makeinstall
-%else
+%if 0%{?moblin_version}
 %make_install
+%else
+make install DESTDIR=%{buildroot}
 %endif
-#end if
 #else
 # Please write install script under ">> install post"
 #end if ## of Builder==python

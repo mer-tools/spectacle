@@ -99,6 +99,9 @@ class SpecParser(object):
         self.table = {}
         self.cur_pkg = 'main'
 
+        self._Builder = None
+        self._Configure = None
+
     def __switch_subpkg(self, subpkg):
         if 'SubPackages' not in self.items:
             self.items['SubPackages'] = {}
@@ -107,29 +110,30 @@ class SpecParser(object):
 
         return self.items['SubPackages'][subpkg]
 
-    def _do_package(self, items, k, v):
+    def _do_package(self, items, pkg, v):
         # skip
         pass
 
-    def _do_prep(self, items, k, v):
+    def _do_prep(self, items, pkg, v):
         # skip
         pass
 
-    def _do_build(self, items, k, v):
+    def _do_build(self, items, pkg, v):
         """ to handle build script:
             trying to find out the most of the generic cases
         """
+
+        lines = v.split('\n')
+        if lines[0].startswith('-'):
+            lines.pop(0)
 
         # parts of build script
         (PRE, POST_CFG, POST_BUILD) = range(3)
         parts = { 'pre': [], 'post': [] }
         cur_part = PRE
 
-        cfgr_save = None
-        bldr_save = None
-
         cont_line = False
-        for line in v.split('\n'):
+        for line in lines:
             if cont_line:
                 whole_line = whole_line + ' ' + line.strip()
             else:
@@ -153,16 +157,17 @@ class SpecParser(object):
             for cfgr in ('configure', 'reconfigure', 'autogen'):
                 if cfgr in whole_line.split():
                     found_cfgr = True
-                    cfgr_save = (cfgr, whole_line)
+                    self._Configure = cfgr
+                    cfgr_line = whole_line
                     break
 
             # find builder in current line
             if 'make' in whole_line.split():
                 found_bldr = True
-                bldr_save = ('make', whole_line)
-            elif re.search('python\W*setup.py\W*build', whole_line):
+                self._Builder = 'make'
+            elif re.search('python\W+setup.py\W+build', whole_line):
                 found_bldr = True
-                bldr_save = ('python', whole_line)
+                self._Builder = 'python'
 
             if cur_part == PRE:
                 if found_cfgr:
@@ -196,62 +201,110 @@ class SpecParser(object):
 
             # put all script to 'post install'
             items['extra']['PostMakeExtras'] = \
-                    ['# all build scripts in origin specfile as the following:'] + v.split('\n')
+                    ['# all build scripts in origin specfile as the following:'] + lines
 
         else:
-            if cfgr_save:
-                items['Configure'] = cfgr_save[0]
+            if self._Configure:
+                items['Configure'] = self._Configure
                 # parse the configure options
-                for opt in cfgr_save[1].split()[1:]:
+                for opt in cfgr_line.split()[1:]:
                     if 'ConfigOptions' not in items:
                         items['ConfigOptions'] = [opt]
                     else:
                         items['ConfigOptions'].append(opt)
 
-            if bldr_save:
-                items['Builder'] = bldr_save[0]
+            if self._Builder:
+                items['Builder'] = self._Builder
 
             items['extra']['PreMakeExtras'] = \
                     ['# The followings are the origin script in this spec file'] + \
-                    map(lambda s: '#>> ' + s, v.split('\n'))
+                    map(lambda s: '# >> ' + s, lines)
 
             if parts['pre']:
                 items['extra']['PreMakeExtras'].extend(['', '# splitted pre-build part by auto-parsing'] + parts['pre'])
             if parts['post']:
                 items['extra']['PostMakeExtras'] = ['# splitted post-build part by auto-parsing'] + parts['post']
 
-    def _do_install(self, items, k, v):
-        items['extra']['PostMakeInstallExtras'] = ['# all install scripts in origin specfile as the following:'] + v.split('\n')
+    def _do_install(self, items, pkg, v):
+        """ to handle install script:
+            trying to find out the most of the generic cases
+        """
 
-    def _do_clean(self, items, k, v):
+        lines = v.split('\n')
+        if lines[0].startswith('-'):
+            lines.pop(0)
+
+        parts = { 'pre': [], 'post': [] }
+
+        if self._Builder == 'make':
+            re_installer = re.compile('make[_ \t]+install')
+        elif self._Builder == 'python':
+            re_installer = re.compile('python\W+setup.py\W+install')
+
+        re_cleanup = re.compile('rm\W+-rf\W+(\$RPM_BUILD_ROOT|\%\{buildroot\})')
+
+        if self._Builder:
+            # have found 'Builder' in build scripts
+
+            found_insaller = False
+            for line in lines:
+                if not found_insaller:
+                    if re_installer.search(line):
+                        found_insaller = True
+                    elif re_cleanup.search(line):
+                        # skip cleanup line
+                        pass
+                    else:
+                        parts['pre'].append(line)
+                else:
+                    parts['post'].append(line)
+
+            if found_insaller:
+                items['extra']['PreMakeInstallExtras'] = \
+                        ['# The followings are the origin script in this spec file'] + \
+                        map(lambda s: '# >> ' + s, lines)
+
+                if parts['pre']:
+                    items['extra']['PreMakeInstallExtras'].extend(['', '# splitted pre-install part by auto-parsing'] + parts['pre'])
+                if parts['post']:
+                    items['extra']['PostMakeInstallExtras'] = ['# splitted post-install part by auto-parsing'] + parts['post']
+
+                return
+
+        # false safe case
+        items['extra']['PostMakeInstallExtras'] = ['# all install scripts in origin specfile as the following:'] + lines
+
+    def _do_clean(self, items, pkg, v):
         # skip
         pass
 
-    def _do_post(self, items, k, v):
+    def _do_post(self, items, pkg, v):
         # skip
         pass
 
-    def _do_postun(self, items, k, v):
+    def _do_postun(self, items, pkg, v):
         # skip
         pass
 
-    def _do_changelog(self, items, k, v):
+    def _do_changelog(self, items, pkg, v):
         # TODO
         print 'TODO: move changelog to new file'
 
-    def _do_files(self, items, k, v):
-        files = v.strip().split()
+    def _do_files(self, items, pkg, v):
+        files = map(str.strip, v.strip().split('\n'))
+
+        # skip option line
+        if files[0].startswith('-'):
+            files.pop(0)
+
         try:
             files.remove('%defattr(-,root,root,-)')
         except ValueError:
             pass
         items['Files'] = files
 
-    def _do_description(self, items, k, v):
+    def _do_description(self, items, pkg, v):
         items['Description'] = v.strip()
-
-    def _do_generic_header(self, items, k, v):
-        items[k] = v.strip()
 
     def read(self, filename):
         """ read in all recognized directives and headers """
@@ -312,50 +365,63 @@ class SpecParser(object):
                         items = self.__switch_subpkg(self.cur_pkg)
 
                     else:
+                        # inline sections of other headers
                         state = ST_INLINE
                         if opt and not opt.startswith('-'):
                             # section with sub-pkg specified
                             self.cur_pkg = opt.split()[0]
-                            opts = opt.split()[1:]
                             items = self.__switch_subpkg(self.cur_pkg)
                         else:
+                            # for 'main' package
                             items = self.items
 
                         cur_block = header
                         if cur_block not in items:
-                            items[cur_block] = opt #TODO
+                            items[cur_block] = ''
+
+                            # options in header line as the first line
+                            if '-' in opt:
+                                items[cur_block] = opt[opt.index('-'):] + '\n'
+
                 else:
                     # unparsed line
                     print 'Unkown spec line skipped:', line
 
     def cooked_items(self):
+        """ return all items in all sections """
+        return self.__cook_items('main', self.items)
+
+    def __cook_items(self, pkg_name, items):
         """ return all items """
         #import pprint
-        #pprint.pprint( self.items )
+        #pprint.pprint( items )
         #pprint.pprint( self.table )
 
-        ck_items = {'extra': {}}
+        # pattern of macros
+        macro_re = re.compile('%{(\w+)}')
+
+        ck_items = {}
+        if pkg_name == 'main':
+            ck_items['extra'] = {}
+        else:
+            ck_items['Name'] = pkg_name
 
         sources = []
         patches = []
-        for k, v in self.items.iteritems():
-            if k in SKIPS:
+
+        for k, v in items.iteritems():
+            if k in SKIPS or k in HEADERS or k == 'SubPackages':
                 continue
 
-            if k in HEADERS:
-                routine = getattr(self, '_do_' + k)
-                routine(ck_items, k, v)
-                continue
-
-            # check for macro replacing
-            macro_re = re.compile('%{(\w+)}')
             nv = []
             for vi in v:
                 nvi = vi
+                # check for macro replacing
                 for m in macro_re.finditer(vi):
                     macro, name = m.group(0, 1)
                     if name in self.table:
                         nvi = nvi.replace(macro, self.table[name])
+
                 nv.append(nvi)
 
                 if k in SINGLES:
@@ -379,6 +445,17 @@ class SpecParser(object):
             ck_items['Sources'] = sources
         if patches:
             ck_items['Patches'] = patches
+
+        # handle all sectinos with header, in ORDER
+        for hdr in HEADERS:
+            if hdr in items:
+                routine = getattr(self, '_do_' + hdr)
+                routine(ck_items, pkg_name, items[hdr])
+
+        if 'SubPackages' in items:
+            ck_items['SubPackages'] = []
+            for sub, sub_items in items['SubPackages'].iteritems():
+                ck_items['SubPackages'].append(self.__cook_items(sub, sub_items))
 
         #pprint.pprint( ck_items )
         return ck_items
@@ -426,5 +503,6 @@ if __name__ == '__main__':
 
     print 'Yaml file %s created' % out_fpath
     if newspec_fpath:
-        print 'New spec file %s was created by new yaml file' % newspec_fpath
+        bak_spec_fpath = spec_fpath + '.orig'
+        print 'New spec file %s was created by new yaml file, and orignal spec file was saved as %s' % (newspec_fpath, bak_spec_fpath)
 
