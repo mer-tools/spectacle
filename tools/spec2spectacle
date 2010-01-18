@@ -503,5 +503,6 @@ if __name__ == '__main__':
 
     print 'Yaml file %s created' % out_fpath
     if newspec_fpath:
-        print 'New spec file %s was created by new yaml file' % newspec_fpath
+        bak_spec_fpath = spec_fpath + '.orig'
+        print 'New spec file %s was created by new yaml file, and orignal spec file was saved as %s' % (newspec_fpath, bak_spec_fpath)
 

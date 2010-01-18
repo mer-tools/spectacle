@@ -121,7 +121,14 @@ class RPMWriter():
 
             if os.path.exists(self.specfile):
                 if self.clean_old:
-                    os.rename(self.specfile, self.specfile + '.bak')
+                    # backup original file
+                    bak_spec_fpath = self.specfile + '.orig'
+                    if os.path.exists(bak_spec_fpath):
+                        repl = raw_input('%s will be overwritten by the backup, continue?' % bak_spec_fpath)
+                        if repl == 'n':
+                            sys.exit(1)
+
+                    os.rename(self.specfile, bak_spec_fpath)
                 else:
                     self.newspec = False
 
