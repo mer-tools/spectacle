@@ -52,6 +52,21 @@ Requires:   $req
 #end for
 #end if
 ## Requires(post) etc.
+#if $metadata.has_key("RequiresPost")
+#for $req in $metadata.RequiresPost
+Requires(post): $req
+#end for
+#end if
+#if $metadata.has_key("RequiresPre")
+#for $req in $metadata.RequiresPre
+Requires(pre): $req
+#end for
+#end if
+#if $metadata.has_key("RequiresPostUn")
+#for $req in $metadata.RequiresPostUn
+Requires(postun): $req
+#end for
+#end if
 #if $extra.has_key("Icon") and $extra.Icon
 Requires(post):  /bin/touch
 #end if
@@ -129,7 +144,9 @@ Description: %{summary}
 #end if
 
 %prep
-%setup -q -n %{name}-%{version}
+#if $metadata.has_key("Sources")
+%setup -q 
+#end if
 ## Patches
 #if $metadata.has_key("Patches")
 #set $idx = 0
@@ -209,7 +226,13 @@ rm -rf %{buildroot}
 %{__python} setup.py install --root=%{buildroot} -O1 --record=PY_INSTALLED_FILES
 %endif
 #else if $Builder == 'make' or $Builder == 'single-make'
+#if $metadata.has_key("Legacy"):
+%if 0%{?suse_version}{?fedora}
+%makeinstall
+%else
 %make_install
+%endif
+#end if
 #else
 # Please write install script under ">> install post"
 #end if ## of Builder==python
