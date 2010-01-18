@@ -209,7 +209,11 @@ rm -rf %{buildroot}
 %{__python} setup.py install --root=%{buildroot} -O1 --record=PY_INSTALLED_FILES
 %endif
 #else if $Builder == 'make' or $Builder == 'single-make'
+%if 0%{?moblin_version}
 %make_install
+%else
+make install DESTDIR=%{buildroot}
+%endif
 #else
 # Please write install script under ">> install post"
 #end if ## of Builder==python
