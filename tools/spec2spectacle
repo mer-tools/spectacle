@@ -237,7 +237,7 @@ class SpecParser(object):
         parts = { 'pre': [], 'post': [] }
 
         if self._Builder == 'make':
-            re_installer = re.compile('make[_ \t]+install')
+            re_installer = re.compile('make[_ \t]*install')
         elif self._Builder == 'python':
             re_installer = re.compile('python\W+setup.py\W+install')
 
