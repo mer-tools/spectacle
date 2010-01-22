@@ -1,0 +1,159 @@
+# Spectacle Tutorial
+
+## Introduction
+Spectacle is the toolset for packaging maintenance of Moblin, including the tool
+to generate spec files from metadata file in YAML format, and tools to convert
+spec files or spec-builder's ini files to YAML format.
+
+For spectacle managed packages, all generic packaging information will be stored
+in the YAML file, and it also allows maintaining customizations in the spec file
+directly with special enclosure tags.
+
+Three separated tools will be installed:
+
+* specify: the tool to generate or to update spec file, based on YAML
+* ini2spectacle: the tool to convert spec-builder .ini to YAML and new spec file
+* spec2spectacle: the tool to convert original spec to YAML and new spec file
+
+## Installation
+### Instruction
+Several methods available for spectacle installation:
+
+* rpm/deb packages for several supported Linux distributions
+
+    From [M2 Repos](http://repo.mobile-central.org/repositories/Tools:/Building/), repo urls can be found for:
+
+    * Moblin
+    * Fedora 10,11,12
+    * openSUSE(s)
+    * xUbuntu 8.10/9.04/9.10
+    * Debian 5.0
+
+* Download the latest source package, and install it by ``make install``
+
+    The latest code in git tree can be accessed at:
+    [git tree](ssh://git@git.moblin.org/spectacle.git)
+
+### Requirements
+* python 2.x, above 2.5
+* PyYAML, the python module for YAML parsing
+* cheetah, one popular templating system for python<br>
+    In many linux distributions, the package may be named as python-cheetah.
+
+## Usage
+### specify
+    specify <pkg_name.yaml>
+### ini2spectacle
+    ini2spectacle <pkg_name.ini>
+### spec2spectacle
+    spec2spectacle <pkg_name.spec>
+
+## Syntax of spectacle YAML
+The syntax of YAML can be refered here: <http://www.yaml.org/spec/>
+
+Two example spectacle YAML files are placed to examples/ directory in source
+code:
+
+* xfce4-session.yaml, a real world sample with most of the elements
+* general.yaml, a fake spectacle contains all the available elements,
+    with comments
+
+All available directives for spectacle are listed as the following:
+
+* Name: **string**
+* Summary: **string**
+* Version: **string**, version string (not version NUMBER)
+* Release: **string**
+* Group: **string**
+* License: **string**
+* URL: **string**
+* BuildArch: **string**, *optional*
+* LocaleName: **string**, *optional*
+* LocaleOptions: **string**, *optional*
+* Description: **text**, *optional*
+* Sources: **list** of **string**
+* ExtraSources: **list** of **string**, *optional*
+* Patches: **list** of **string**
+* Requires: **list** of **string**
+* RequiresPre: **list** of **string**
+* RequiresPost: **list** of **string**
+* RequiresPostUn: **list** of **string**
+* PkgBR: **list** of **string**, packages required by build, or BuildRequires
+* PkgConfigBR: **list** of **string**, pkg-config requires by build
+* Provides: **list** of **string**
+* Conflicts: **list** of **string**
+* Obsoletes: **list** of **string**
+* Configure: **string**, *optional*, valid values: autogen, configure, reconfigure
+* Builder: **string**, *optional*, valid values: make, single-make, python
+* AutoSubPackages: **list** of **string**, mainly for '-devel'
+* SubPackages: **list** of **dict**, the **dict** item is the lower level
+directives for sub packages:
+    * Name
+    * Summary
+    * Description, *optional*
+    * Group, *optional*
+    * Requires, *optional*
+    * etc.
+
+**CAUTION**: The following cases of value string have special meaning in YAML:
+
+* string with leading '%' charactor
+* string contains ':' charactor and one or more spaces after ':'
+
+**Then these string values need to be quoted by ``'``(single-quote) or ``"``
+(double-quote), and the choice of quote char should not conflict with the value
+string self.**
+
+## Customizations in spec
+Generated spec files by specify will have many placeholders for customizations,
+such as:
+
+    # >> build pre
+    # << build pre
+
+You can add any custom code between the markers, next time when you run
+``specify``, the text between the markers will be kept as is, all other sections
+relying on the meta data from the yaml file will be changed depending on the
+values in the YAML file.
+
+Totally 5 places with placeholders in spec can be customized:
+
+* Pre-Build, scripts before package building
+
+    With placeholder:
+
+        # >> build pre
+        # << build pre
+
+* Post-Build, scripts after package building
+
+    With placeholder:
+
+        # >> build post
+        # << build post
+
+* Pre-Install, scripts before package installation
+
+    With placeholder:
+
+        # >> install pre
+        # << install pre
+
+* Post-Install, scripts after package installation
+
+    With placeholder:
+
+        # >> install post
+        # << install post
+
+* Files, files list in packaged rpm
+
+    With placeholder:
+
+        # >> files [sub-package]
+        # << files [sub-package]
+**NOTE**: "sub-packge", the name of sub-packge should be specified here
+
+## Internal Implementation
+Spectacle uses cheetah templates to generate the spec file, based the metadata
+from yaml file. But the end users need not tackle it.

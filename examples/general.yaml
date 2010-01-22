@@ -10,16 +10,30 @@ BuildArch: string # optional
 Description: |
     Text
 
-Patches:
+Sources:
     - li0
     - li1
-    - li2
+ExtraSources: # optional
+    - file1;path1
+    - file2     # path2 default to '/'
 
-Sources:
+Patches:
     - li0
     - li1
 
 Requires:
+    - li0
+    - li1
+    
+RequiresPre:
+    - li0
+    - li1
+    
+RequiresPost:
+    - li0
+    - li1
+    
+RequiresPostUn:
     - li0
     - li1
     
@@ -31,18 +45,34 @@ PkgConfigBR:
     - li0
     - li1
 
+Provides:
+    - li0
+    - li1
+    
+Conflicts:
+    - li0
+    - li1
+    
+Obsoletes:
+    - li0
+    - li1
+    
 Configure: string # autogen, configure, reconfigure, etc, optional
-
 ConfigOptions:
     - li0
     - li1
 
-Builder: make  # make, single-make, or other special builder, optional
+Builder: make  # make, single-make, python, or other special builder, optional
 
-LocaleName: string
+LocaleName: string # optional
+LocaleOptions: string # optional
+
+Documents:
+    - doc1
+    - doc2
 
 AutoSubPackages:
-    - li0
+    - devel
 SubPackages:
     - Name: string
       Summary: string
