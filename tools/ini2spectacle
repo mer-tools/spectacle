@@ -48,6 +48,7 @@ class SBConfigParser(RawConfigParser):
     # keys whose value need to split to list
     multi_keys = ('Sources',
                   'Patches',
+                  'Extras',
                  )
 
     # keys whose value may have ver numbers
@@ -131,12 +132,6 @@ class SBConfigParser(RawConfigParser):
                 if key in items:
                     self.set(section, key, map(str.strip, items[key].split()))
 
-            # special cases
-            if 'ConfigOptions' in items:
-                self.set(section, 'ConfigOptions',
-                            map(lambda s: '--'+s,
-                                [opt for opt in map(str.strip, items['ConfigOptions'].split('--')) if opt]))
-
             # Convert dependent like entry to list
             for key in self.deps_keys:
                 if key in items:
@@ -144,6 +139,12 @@ class SBConfigParser(RawConfigParser):
                     for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', items[key]):
                         reqs.append(entry.split(',')[0])
                     self.set(section, key, reqs)
+
+            # special cases for 'ConfigOptions'
+            if 'ConfigOptions' in items:
+                self.set(section, 'ConfigOptions',
+                            map(lambda s: '--'+s,
+                                [opt for opt in map(str.strip, items['ConfigOptions'].split('--')) if opt]))
 
             # Convert keys which need expanding from external file
             for key in self.expand_keys:

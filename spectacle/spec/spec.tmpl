@@ -252,6 +252,9 @@ rm -rf %{buildroot}
 #else
 # Please write install script under ">> install post"
 #end if ## of Builder==python
+#if $metadata.has_key("ExtraInstall")
+$metadata.ExtraInstall
+#end if
 
 # >> install post
 #if $extra.content.has_key("install") and $extra.content.install.has_key("post")

@@ -61,13 +61,12 @@ class RPMWriter():
 
     def __init__(self,  filename, clean_old = False):
         self.filename = filename
-        self.metadata = None
+        self.metadata = {'MyVersion': __version__.version}
         self.scm = None
         self.archive = 'bzip2'
         self.pkg = None
         self.specfile = None
         self.version = None
-        
 
         self.clean_old = clean_old
 
@@ -76,6 +75,9 @@ class RPMWriter():
 
         # update extra info for main package
         self.extra.update(copy.deepcopy(self.extra_per_pkg))
+
+        # record filelist from 'Extras' directive
+        self.extras_filelist = []
 
         try:
             self.stream = file(filename, 'r')
@@ -99,7 +101,31 @@ class RPMWriter():
                     if tp[0] == u'tag:yaml.org,2002:int':
                         yaml.loader.Loader.yaml_implicit_resolvers.get(ch).remove(tp)
 
-        self.metadata = yaml.load(self.stream)
+        self.metadata.update(yaml.load(self.stream))
+
+        # handling 'Extras', extra separated files which need to be install
+        # specific paths
+        if self.metadata.has_key("Extras"):
+            extra_srcs = []
+            extra_install = ''
+            count = len(self.metadata['Sources'])
+            for extra_src in self.metadata['Extras']:
+                try:
+                    file, path = map(str.strip, extra_src.split(';'))
+                except:
+                    file = extra_src.strip()
+                    path = ''
+                self.extras_filelist.append(os.path.join(path, file))
+
+                extra_srcs.append(file)
+                if path:
+                    extra_install += "mkdir -p %%{buildroot}%s\n" % (path)
+                extra_install += "cp -a %%{SOURCE%s} %%{buildroot}%s\n" % (count, path)
+                count = count + 1
+
+            self.metadata['Sources'].extend(extra_srcs)
+            self.metadata['ExtraInstall'] = extra_install
+
         if self.metadata.has_key("SCM"):
             self.scm = self.metadata['SCM']
 
@@ -139,11 +165,6 @@ class RPMWriter():
         if self.metadata.has_key("SubPackages"):
             for sp in self.metadata["SubPackages"]:
                 self.extra['subpkgs'][sp['Name']] = copy.deepcopy(self.extra_per_pkg)
-
-        #if self.metadata.has_key("SubPackages"):
-        #    self.metadata["sp"] = []
-        #    for sp in self.metadata["SubPackages"]:
-        #        self.metadata["sp"].append(self.metadata[sp])
 
     def parse_files(self, files = {}):
         for pkg_name,v in files.iteritems():
@@ -223,6 +244,15 @@ class RPMWriter():
         if extra_content:
             self.extra['content'].update(extra_content)
 
+        """
+        TODO: should not regard them as the content of MAIN pkg
+        if self.extras_filelist:
+            try:
+                self.extra['content']['files']['main'].extend(self.extras_filelist)
+            except KeyError:
+                self.extra['content'].update({'files': {'main': self.extras_filelist}})
+        """
+
         try:
             self.parse_files(self.extra['content']['files'])
         except KeyError:
@@ -232,7 +262,6 @@ class RPMWriter():
         #pprint.pprint(self.metadata)
         #pprint.pprint(self.extra)
 
-        self.metadata['MyVersion'] = __version__.version
         spec_content = str(
                 spec.spec(searchList=[{
                                         'metadata': self.metadata,
