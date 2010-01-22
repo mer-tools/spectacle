@@ -70,8 +70,12 @@ class SpectacleDumper(object):
 
     def __esc_value(self, val):
         # ESC for leading '%', for yaml syntax
-        if val.startswith('%'):
-            return '"' + val + '"'
+        if val.startswith('%') or ': ' in val:
+            if '"' in val:
+                quote_char = '\''
+            else:
+                quote_char = '\"'
+            return quote_char + val + quote_char
         else:
             return val
 
