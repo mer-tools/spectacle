@@ -76,7 +76,7 @@ class RPMWriter():
         # update extra info for main package
         self.extra.update(copy.deepcopy(self.extra_per_pkg))
 
-        # record filelist from 'Extras' directive
+        # record filelist from 'ExtraSources' directive
         self.extras_filelist = []
 
         try:
@@ -103,13 +103,13 @@ class RPMWriter():
 
         self.metadata.update(yaml.load(self.stream))
 
-        # handling 'Extras', extra separated files which need to be install
+        # handling 'ExtraSources', extra separated files which need to be install
         # specific paths
-        if self.metadata.has_key("Extras"):
+        if self.metadata.has_key("ExtraSources"):
             extra_srcs = []
             extra_install = ''
             count = len(self.metadata['Sources'])
-            for extra_src in self.metadata['Extras']:
+            for extra_src in self.metadata['ExtraSources']:
                 try:
                     file, path = map(str.strip, extra_src.split(';'))
                 except:

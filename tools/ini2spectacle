@@ -39,6 +39,7 @@ class SBConvertor(Convertor):
         sb_cv_table = {
                 'BuildRequires': 'PkgBR',
                 'PkgConfig': 'PkgConfigBR',
+                'Extras': 'ExtraSources',
                 }
         Convertor.__init__(self, sb_cv_table)
 
