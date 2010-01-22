@@ -48,7 +48,6 @@ class SBConfigParser(RawConfigParser):
     # keys whose value need to split to list
     multi_keys = ('Sources',
                   'Patches',
-                  'ConfigOptions',
                  )
 
     # keys whose value may have ver numbers
@@ -131,6 +130,12 @@ class SBConfigParser(RawConfigParser):
             for key in self.multi_keys:
                 if key in items:
                     self.set(section, key, map(str.strip, items[key].split()))
+
+            # special cases
+            if 'ConfigOptions' in items:
+                self.set(section, 'ConfigOptions',
+                            map(lambda s: '--'+s,
+                                [opt for opt in map(str.strip, items['ConfigOptions'].split('--')) if opt]))
 
             # Convert dependent like entry to list
             for key in self.deps_keys:
