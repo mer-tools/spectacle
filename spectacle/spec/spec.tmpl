@@ -163,7 +163,7 @@ Description: %{summary}
 
 %prep
 #if $metadata.has_key("Sources")
-%setup -q 
+%setup -q -n $metadata.BuildingPath
 #end if
 ## Patches
 #if $metadata.has_key("Patches")

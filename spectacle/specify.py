@@ -46,6 +46,15 @@ class GitAccess():
           return tags
 
 class RPMWriter():
+    """
+        The following keys will be generated on the fly based on values from
+        YAML, and transfered to tmpl:
+            MyVersion:    version of spectacle
+            ExtraInstall: extra install script for 'ExtraSources'
+            BuildingPath: path for rpm 'setup' macro
+
+    """
+
     extra_per_pkg = {
                         'PreUn': [],
                         'Desktop': False,
@@ -138,6 +147,12 @@ class RPMWriter():
             self.appendix = 'bz2'
         else:
             self.appendix = 'gz'
+
+        try:
+            dirname, ignore = os.path.basename(self.metadata['Sources'][0]).split('.tar.')
+            self.metadata['BuildingPath'] = dirname
+        except:
+            self.metadata['BuildingPath'] = self.metadata['Name']
 
         try:
             self.pkg = self.metadata['Name']
