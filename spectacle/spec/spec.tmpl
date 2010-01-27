@@ -56,7 +56,11 @@ Requires:   $req
 Requires(pre): $req
 #end for
 #end if
-## Requires(post) etc.
+#if $metadata.has_key("RequiresPreUn")
+#for $req in $metadata.RequiresPreUn
+Requires(preun): $req
+#end for
+#end if
 #if $metadata.has_key("RequiresPost")
 #for $req in $metadata.RequiresPost
 Requires(post): $req
@@ -154,6 +158,11 @@ Requires: $req
 #if $sp.has_key("RequiresPre")
 #for $req in $sp.RequiresPre
 Requires(pre): $req
+#end for
+#end if
+#if $sp.has_key("RequiresPreUn")
+#for $req in $sp.RequiresPreUn
+Requires(preun): $req
 #end for
 #end if
 #if $sp.has_key("RequiresPost")
