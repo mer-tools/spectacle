@@ -155,14 +155,15 @@ class SpecParser(object):
 
             # find configure in current line
             for cfgr in ('configure', 'reconfigure', 'autogen'):
-                if cfgr in whole_line.split():
+                pieces = whole_line.split()
+                if cfgr in pieces or '%'+cfgr in pieces:
                     found_cfgr = True
                     self._Configure = cfgr
                     cfgr_line = whole_line
                     break
 
             # find builder in current line
-            if 'make' in whole_line.split():
+            if re.match('^(%__)?make', whole_line):
                 found_bldr = True
                 self._Builder = 'make'
             elif re.search('python\W+setup.py\W+build', whole_line):

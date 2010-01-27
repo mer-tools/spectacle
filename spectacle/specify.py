@@ -164,7 +164,7 @@ class RPMWriter():
                     # backup original file
                     bak_spec_fpath = self.specfile + '.orig'
                     if os.path.exists(bak_spec_fpath):
-                        repl = raw_input('%s will be overwritten by the backup, continue?' % bak_spec_fpath)
+                        repl = raw_input('%s will be overwritten by the backup, continue?(Y/n) ' % bak_spec_fpath)
                         if repl == 'n':
                             sys.exit(1)
 
@@ -321,7 +321,7 @@ def download_sources(pkg, rev, sources):
             target = target.replace('%{version}', rev)
             f_name = os.path.basename(target)
             if not os.path.isfile(f_name):
-                repl = raw_input('Need to download source package: %s ?(Y/n)' % f_name)
+                repl = raw_input('Need to download source package: %s ?(Y/n) ' % f_name)
                 if repl == 'n': break
 
                 print 'Downloading latest source package from:', target
