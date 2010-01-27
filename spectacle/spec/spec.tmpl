@@ -51,15 +51,15 @@ Patch${idx}:     $patch
 Requires:   $req
 #end for
 #end if
+#if $metadata.has_key("RequiresPre")
+#for $req in $metadata.RequiresPre
+Requires(pre): $req
+#end for
+#end if
 ## Requires(post) etc.
 #if $metadata.has_key("RequiresPost")
 #for $req in $metadata.RequiresPost
 Requires(post): $req
-#end for
-#end if
-#if $metadata.has_key("RequiresPre")
-#for $req in $metadata.RequiresPre
-Requires(pre): $req
 #end for
 #end if
 #if $metadata.has_key("RequiresPostUn")
@@ -145,12 +145,27 @@ Group: $sp.Group
 #else
 Group: ${metadata.Group}
 #end if
+Requires: %{name} = %{version}-%{release}
 #if $sp.has_key("Requires")
 #for $req in $sp.Requires
 Requires: $req
 #end for
 #end if
-Requires: %{name} = %{version}-%{release}
+#if $sp.has_key("RequiresPre")
+#for $req in $sp.RequiresPre
+Requires(pre): $req
+#end for
+#end if
+#if $sp.has_key("RequiresPost")
+#for $req in $sp.RequiresPost
+Requires(post): $req
+#end for
+#end if
+#if $sp.has_key("RequiresPostUn")
+#for $req in $sp.RequiresPostUn
+Requires(postun): $req
+#end for
+#end if
 %description $sp.Name
 #if $sp.has_key('Description')
 $sp.Description
