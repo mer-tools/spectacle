@@ -68,14 +68,13 @@ class RPMWriter():
                         'Infos': [],
                     }
 
-    def __init__(self,  filename, clean_old = False):
-        self.filename = filename
+    def __init__(self, yaml_fpath, clean_old = False):
+        self.yaml_fpath = yaml_fpath
         self.metadata = {'MyVersion': __version__.version}
         self.scm = None
         self.archive = 'bzip2'
         self.pkg = None
         self.specfile = None
-        self.version = None
 
         self.clean_old = clean_old
 
@@ -89,9 +88,9 @@ class RPMWriter():
         self.extras_filelist = []
 
         try:
-            self.stream = file(filename, 'r')
+            self.stream = file(yaml_fpath, 'r')
         except IOError:
-            print 'Cannot read file: %s' % filename
+            print 'Cannot read file: %s' % yaml_fpath
             sys.exit(1)
 
     def dump(self):
@@ -174,7 +173,7 @@ class RPMWriter():
                     self.newspec = False
 
         except KeyError:
-            print 'Invalid yaml file %s without "Name" directive' % self.filename
+            print 'Invalid yaml file %s without "Name" directive' % self.yaml_fpath
             sys.exit(1)
 
         if self.metadata.has_key("SubPackages"):
@@ -211,7 +210,7 @@ class RPMWriter():
                 if re.match('.*\/icons\/.*', l):
                     pkg_extra['Icon'] = True
 
-    def parse_existing(self, filename):
+    def parse_existing(self, spec_fpath):
         sin = re.compile("^# >> ([^\s]+) (.*)")
         sout = re.compile("^# << ([^\s]+) (.*)")
         recording = []
@@ -220,7 +219,7 @@ class RPMWriter():
         install = {}
         build = {}
         macros = {}
-        for i in file(filename).read().split("\n"):
+        for i in file(spec_fpath).read().split("\n"):
             matchin = sin.match(i)
             matchout = sout.match(i)
             if matchin:
@@ -287,28 +286,62 @@ class RPMWriter():
         file.write(spec_content)
         file.close()
 
-def generate_rpm(filename, clean_old = False, extra_content = None):
-    rpm = RPMWriter(filename, clean_old)
+def get_scm_latest_release(rpm):
+    scm = GitAccess(rpm.scm)
+    print "Getting tags from SCM..."
+    tags = scm.gettags()
+    if len(tags) > 0:
+        rpm.version = sorted(tags.keys())[-1]
+        rpm.metadata['Version'] = rpm.version
+        tmp = tempfile.mkdtemp()
+        pwd = os.getcwd()
+        if os.path.exists("%s/%s-%s.tar.%s" %(pwd, rpm.pkg, rpm.version, rpm.appendix )):
+            print "Archive already exists, not creating a new one"
+        else:
+            print "Creating archive %s/%s-%s.tar.%s ..." %( pwd, rpm.pkg, rpm.version, rpm.appendix )
+            os.chdir(tmp)
+            os.system('git clone %s' %rpm.scm)
+            os.chdir( "%s/%s" %(tmp, rpm.pkg))
+            os.system(' git archive --format=tar --prefix=%s-%s/ %s | %s  > %s/%s-%s.tar.%s' %(rpm.pkg, rpm.version, rpm.version, rpm.archive, pwd, rpm.pkg, rpm.version, rpm.appendix ))
+        shutil.rmtree(tmp)
+        os.chdir(pwd)
+
+def download_sources(pkg, rev, sources):
+    def _dl_progress(count, s_block, s_total):
+        percent = int(count * s_block*100 / s_total)
+        if percent > 100: percent = 100
+        sys.stdout.write('\r... %d%%' % percent)
+        if percent == 100: print ' Done.'
+
+        sys.stdout.flush()
+
+    for s in sources:
+        if s.startswith('http://') or s.startswith('ftp://'):
+            target = s.replace('%{name}', pkg)
+            target = target.replace('%{version}', rev)
+            f_name = os.path.basename(target)
+            if not os.path.isfile(f_name):
+                repl = raw_input('Need to download source package: %s ?(Y/n)' % f_name)
+                if repl == 'n': break
+
+                print 'Downloading latest source package from:', target
+                import urllib
+                urllib.urlretrieve(target, f_name, reporthook = _dl_progress)
+                """
+                for ext in ('.md5', '.gpg', '.sig', '.sha1sum'):
+                    urllib.urlretrieve(target + ext, f_name + ext)
+                """
+
+def generate_rpm(yaml_fpath, clean_old = False, extra_content = None):
+    rpm = RPMWriter(yaml_fpath, clean_old)
     rpm.parse()
+
+    # update to SCM latest release
     if rpm.scm is not None:
-        scm = GitAccess(rpm.scm)
-        print "Getting tags from SCM..."
-        tags = scm.gettags()
-        if len(tags) > 0:
-            rpm.version = sorted(tags.keys())[-1]
-            rpm.metadata['Version'] = rpm.version
-            tmp = tempfile.mkdtemp()
-            pwd = os.getcwd()
-            if os.path.exists("%s/%s-%s.tar.%s" %(pwd, rpm.pkg, rpm.version, rpm.appendix )):
-		        print "Archive already exists, not creating a new one"
-            else:
-                print "Creating archive %s/%s-%s.tar.%s ..." %( pwd, rpm.pkg, rpm.version, rpm.appendix )
-                os.chdir(tmp)
-                os.system('git clone %s' %rpm.scm)
-                os.chdir( "%s/%s" %(tmp, rpm.pkg))
-                os.system(' git archive --format=tar --prefix=%s-%s/ %s | %s  > %s/%s-%s.tar.%s' %(rpm.pkg, rpm.version, rpm.version, rpm.archive, pwd, rpm.pkg, rpm.version, rpm.appendix ))
-            shutil.rmtree(tmp)
-            os.chdir(pwd)
+        get_scm_latest_release(rpm)
+
+    # if no srcpkg with yaml.version exists in cwd, trying to download
+    download_sources(rpm.pkg, rpm.metadata['Version'], rpm.metadata['Sources'])
 
     rpm.process(extra_content)
 
