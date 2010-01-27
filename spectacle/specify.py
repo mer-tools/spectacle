@@ -74,6 +74,7 @@ class RPMWriter():
         self.scm = None
         self.archive = 'bzip2'
         self.pkg = None
+        self.version = None
         self.specfile = None
 
         self.clean_old = clean_old
@@ -111,6 +112,16 @@ class RPMWriter():
 
         self.metadata.update(yaml.load(self.stream))
 
+        try:
+            self.pkg = self.metadata['Name']
+            self.version = self.metadata['Version']
+            self.specfile = "%s.spec" % self.pkg
+
+            self.newspec = True
+        except KeyError:
+            print 'Invalid yaml file %s without "Name" or "Version" directive' % self.yaml_fpath
+            sys.exit(1)
+
         # handling 'ExtraSources', extra separated files which need to be install
         # specific paths
         if self.metadata.has_key("ExtraSources"):
@@ -147,38 +158,39 @@ class RPMWriter():
         else:
             self.appendix = 'gz'
 
+        # sometime cannot rely on the "name-version" presume, better to use the name
+        # of source package
         try:
             dirname, ignore = os.path.basename(self.metadata['Sources'][0]).split('.tar.')
             self.metadata['BuildingPath'] = dirname
         except:
             self.metadata['BuildingPath'] = self.metadata['Name']
 
-        try:
-            self.pkg = self.metadata['Name']
-            self.specfile = "%s.spec" % self.pkg
+        # handling old spec file
+        if os.path.exists(self.specfile):
+            if self.clean_old:
+                # backup original file
+                bak_spec_fpath = self.specfile + '.orig'
+                if os.path.exists(bak_spec_fpath):
+                    repl = raw_input('%s will be overwritten by the backup, continue?(Y/n) ' % bak_spec_fpath)
+                    if repl == 'n':
+                        sys.exit(1)
 
-            self.newspec = True
-
-            if os.path.exists(self.specfile):
-                if self.clean_old:
-                    # backup original file
-                    bak_spec_fpath = self.specfile + '.orig'
-                    if os.path.exists(bak_spec_fpath):
-                        repl = raw_input('%s will be overwritten by the backup, continue?(Y/n) ' % bak_spec_fpath)
-                        if repl == 'n':
-                            sys.exit(1)
-
-                    os.rename(self.specfile, bak_spec_fpath)
-                else:
-                    self.newspec = False
-
-        except KeyError:
-            print 'Invalid yaml file %s without "Name" directive' % self.yaml_fpath
-            sys.exit(1)
+                os.rename(self.specfile, bak_spec_fpath)
+            else:
+                self.newspec = False
 
         if self.metadata.has_key("SubPackages"):
             for sp in self.metadata["SubPackages"]:
                 self.extra['subpkgs'][sp['Name']] = copy.deepcopy(self.extra_per_pkg)
+
+        """ NOTE
+        we need NOT to do the following checking:
+         * whether '%{name} = %{version}-%{release}' in subpackages' requires
+         * whether --disable-static in ConfigOptions
+
+        They should be checked by users.
+        """
 
     def parse_files(self, files = {}):
         for pkg_name,v in files.iteritems():
@@ -296,7 +308,7 @@ def get_scm_latest_release(rpm):
         tmp = tempfile.mkdtemp()
         pwd = os.getcwd()
         if os.path.exists("%s/%s-%s.tar.%s" %(pwd, rpm.pkg, rpm.version, rpm.appendix )):
-            print "Archive already exists, not creating a new one"
+            print "Archive already exists, will not creating a new one"
         else:
             print "Creating archive %s/%s-%s.tar.%s ..." %( pwd, rpm.pkg, rpm.version, rpm.appendix )
             os.chdir(tmp)
@@ -341,7 +353,7 @@ def generate_rpm(yaml_fpath, clean_old = False, extra_content = None):
         get_scm_latest_release(rpm)
 
     # if no srcpkg with yaml.version exists in cwd, trying to download
-    download_sources(rpm.pkg, rpm.metadata['Version'], rpm.metadata['Sources'])
+    download_sources(rpm.pkg, rpm.version, rpm.metadata['Sources'])
 
     rpm.process(extra_content)
 
