@@ -302,7 +302,7 @@ class SpecParser(object):
             files.remove('%defattr(-,root,root,-)')
         except ValueError:
             pass
-        items['Files'] = files
+        items['extra']['Files'] = files
 
     def _do_description(self, items, pkg, v):
         items['Description'] = v.strip()
@@ -401,10 +401,8 @@ class SpecParser(object):
         # pattern of macros
         macro_re = re.compile('%{(\w+)}')
 
-        ck_items = {}
-        if pkg_name == 'main':
-            ck_items['extra'] = {}
-        else:
+        ck_items = {'extra': {}}
+        if pkg_name != 'main':
             ck_items['Name'] = pkg_name
 
         sources = []

@@ -44,15 +44,13 @@ ORDER_ENTRIES = ['Name',
                  'Configure',
                  'ConfigOptions',
                  'Builder',
-                 'Documents',
                  'LocaleName',
                 ]
 
 EXTRA_ENTRIES = ['Files',
+                 'PostMakeExtras',
                  'PostMakeInstallExtras',
                 ]
-
-# TODO, move 'files', 'extra scripts' to extra
 
 class Convertor(object):
     """ Class for generic operations:
@@ -105,6 +103,7 @@ class Convertor(object):
         extra = {}
         for entry in EXTRA_ENTRIES:
             if entry in dict:
+                print >> sys.stderr, 'Warning: need to remove this key to extra', entry
                 extra[entry] = dict[entry]
                 del dict[entry]
 
@@ -113,11 +112,41 @@ class Convertor(object):
             del dict['extra']
 
         for k, v in dict.iteritems():
-            print >> sys.stderr, 'DEBUG: un-ordered entry: %s\n' % (k)
+            print >> sys.stderr, 'Warning: un-ordered entry: %s\n' % (k)
             items.append((k, v))
 
         if extra:
-            items.append(('extra', extra))
+            # pick '%doc' out
+            if 'Files' in extra:
+                docs_elem = set() # for mutli items in single line
+                docs = [] # %doc lines
+                files = []
+                for line in extra['Files']:
+                    # Check if any line has %doc mentioned, to be handled seperatly
+                    if line.startswith("%doc"):
+                        doc_entry = line[4:].strip().split()
+                        if len(doc_entry) == 1:
+                            docs.append(doc_entry[0])
+                        else:
+                            docs_elem.update(doc_entry)
+                    else:
+                        line = line.strip()
+                        if line:
+                            files.append(line)
+
+                if docs_elem:
+                    docs = [' '.join(sorted(list(docs_elem)))] + docs
+
+                if docs:
+                    items.append(('Documents', docs))
+
+                if files:
+                    extra['Files'] = files
+                else:
+                    del extra['Files']
+
+            if extra: # check it again
+                items.append(('extra', extra))
 
         if subpkgs:
             items.append(('SubPackages', subpkgs))

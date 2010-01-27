@@ -40,6 +40,7 @@ class SBConvertor(Convertor):
                 'BuildRequires': 'PkgBR',
                 'PkgConfig': 'PkgConfigBR',
                 'Extras': 'ExtraSources',
+                'Extra': 'extra',
                 }
         Convertor.__init__(self, sb_cv_table)
 
@@ -61,16 +62,23 @@ class SBConfigParser(RawConfigParser):
                  )
 
     # keys whose value need to be expand(reading extra file)
-    expand_keys =  ('Description',
+    expand_keys =  ('Files',
+                    'Description',
                     'PostMakeExtras',
                     'PostMakeInstallExtras',
+                   )
+
+    # keys need to be placed to 'extra'
+    extra_keys =  ('Files',
+                   'PostMakeExtras',
+                   'PostMakeInstallExtras',
                    )
 
     # must have keys
     must_keys =  {'Release': '1',
                   'Configure': 'configure',
                  }
-    # ?? LocalName default as Name
+
 
     def __init__(self, iniDir = None):
         RawConfigParser.__init__(self)
@@ -88,32 +96,6 @@ class SBConfigParser(RawConfigParser):
         else:
             return option
 
-    def __expand_files(self, filename):
-        """ Helper function to expand *.files """
-        docs_elem = set()
-        docs = []
-        files = []
-        if os.path.exists(filename):
-            for line in file(filename):
-                # Check if any line has %doc mentioned, to be handled seperatly
-                if "%doc" in line:
-                    doc_entry = line[4:].strip().split()
-                    if len(doc_entry) == 1:
-                        docs.append(doc_entry[0])
-                    else:
-                        docs_elem.update(doc_entry)
-                else:
-                    line = line.strip()
-                    if line:
-                        files.append(line)
-        else:
-            raise "Missing file: %s" % filename
-
-        if docs_elem:
-            docs = [' '.join(list(docs_elem))] + docs
-
-        return docs, files
-
     def __expand_single(self, filename):
         """ Helper function to expand *.desc """
         if os.path.exists(filename):
@@ -124,6 +106,7 @@ class SBConfigParser(RawConfigParser):
     def __cook_config(self):
         """Function to update fields for spec-builder specific ones"""
         all_items = {}
+        main_extra = {} # for extra keys of main pkg
 
         for section in self.sections():
             items = self._sections[section]
@@ -150,22 +133,32 @@ class SBConfigParser(RawConfigParser):
             # Convert keys which need expanding from external file
             for key in self.expand_keys:
                 if key in items:
-                    self.set(section,
-                             key,
-                             self.__expand_single(
-                                os.path.join(self.iniDir, items[key])))
+                    content = self.__expand_single(
+                                    os.path.join(self.iniDir, items[key]))
+                    if key == 'Files':
+                        # 'Files' need split to list
+                        self.set(section, key, content.split('\n'))
+                    else:
+                        self.set(section, key, content)
 
-            #If the key happens to be 'Files' then we need to find the corresponding *.files and expand it
-            #The first line of *.files might contain %doc, this needs to be handled separatly
-            if 'Files' in items:
-                docs, files = self.__expand_files(os.path.join(self.iniDir, items['Files']))
-                self.set(section, 'Files', files)
-                if docs:
-                    self.set(section, 'Documents', docs)
+            # move extra keys to 'extra' key
+            extra = {}
+            for key in self.extra_keys:
+                if key in items:
+                    extra[key] = items[key]
+                    del items[key]
+            if extra:
+                if section not in ('header', 'configuration'):
+                    self.set(section, 'extra', extra)
+                else:
+                    main_extra.update(extra)
 
         for section in self.sections():
             if section in ('header', 'configuration'):
                 all_items.update(dict(self.items(section)))
+
+        if main_extra:
+            all_items['extra'] = main_extra
 
         # Checking must-have keys
         for key, default in self.must_keys.iteritems():
