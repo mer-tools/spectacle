@@ -157,3 +157,9 @@ Totally 5 places with placeholders in spec can be customized:
 ## Internal Implementation
 Spectacle uses cheetah templates to generate the spec file, based the metadata
 from yaml file. But the end users need not tackle it.
+
+## Tips
+
+* If to upgrade the pkg to a newer version, you can just edit the version str
+  in yaml, and when you run ``specify``, it will download the needed files for
+  you automatically.
