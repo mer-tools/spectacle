@@ -201,7 +201,9 @@ class RPMWriter():
                 pkg_extra = self.extra['subpkgs'][pkg_name]
 
             for l in v:
-                if re.match('.*\.info.*', l) and re.match('.*usr/share/info.*', l):
+                if re.match('.*\.info.*', l) and re.match('.*(usr/share/info|%{_infodir}).*', l):
+                    # TODO 'PreUn' still needed ?
+                    # TODO delete info should be in postun or preun ?
                     pkg_extra['PreUn'].append("/sbin/install-info")
                     pkg_extra['Infos'].append(l)
                     pkg_extra['Info'] = True
