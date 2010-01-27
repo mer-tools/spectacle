@@ -202,7 +202,7 @@ class RPMWriter():
                     pkg_extra['Service'] = True
                     pkg_extra['PreUn'].append("/sbin/chkconfig")
                     pkg_extra['PreUn'].append("/sbin/service")
-                if re.match('.*%{_libdir}.*', l) and re.match('.*\.so\..*', l) and pkg_name != 'devel':
+                if re.match('.*%{_libdir}.*', l) and re.match('.*\.so.*', l) and pkg_name != 'devel':
                     # 'devel' sub pkgs should not set Lib flags
                     pkg_extra['Lib'] = True
                 if re.match('.*\.schema.*', l):
