@@ -82,10 +82,10 @@ class SpecConvertor(Convertor):
                 'PkgConfig': 'PkgConfigBR',
                 'pre': 'install-pre',
                 'description': 'Description',
-                'Requires(post)': 'RequirePost',
-                'Requires(postun)': 'RequirePostun',
-                'Requires(pre)': 'RequirePre',
-                'Requires(preun)': 'RequirePreun',
+                'Requires(post)': 'RequiresPost',
+                'Requires(postun)': 'RequiresPostUn',
+                'Requires(pre)': 'RequiresPre',
+                'Requires(preun)': 'RequiresPreUn',
                 'Url': 'URL',
                 }
         Convertor.__init__(self, sb_cv_table)
