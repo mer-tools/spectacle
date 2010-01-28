@@ -239,6 +239,18 @@ class SpecParser(object):
         if lines[0].startswith('-'):
             lines.pop(0)
 
+        # try to search %find_lang
+        filter_lines = []
+        for line in lines:
+            if line.startswith('%find_lang'):
+                m = re.compile('^%find_lang\s+(.*)\s*').match(line)
+                if m:
+                    items['LocaleName'] = m.group(1)
+                    continue
+
+            filter_lines.append(line)
+        lines = filter_lines
+
         parts = { 'pre': [], 'post': [] }
 
         if self._Builder == 'make':
