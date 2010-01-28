@@ -18,7 +18,6 @@ $str_newline.join($extra.content.macros.main)
 #if $Builder == 'python'
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 #end if
-
 Name:       ${metadata.Name}
 Summary:    ${metadata.Summary}
 Version:    ${metadata.Version}
@@ -70,6 +69,10 @@ Requires(post): $req
 #for $req in $metadata.RequiresPostUn
 Requires(postun): $req
 #end for
+#end if
+#if $extra.has_key("Lib") and $extra.Lib
+Requires(post):  /sbin/ldconfig
+Requires(postun):  /sbin/ldconfig
 #end if
 #if $extra.has_key("Icon") and $extra.Icon
 Requires(post):  /bin/touch
@@ -175,6 +178,10 @@ Requires(post): $req
 #for $req in $sp.RequiresPostUn
 Requires(postun): $req
 #end for
+#end if
+#if $sub_extra.has_key("Lib") and $sub_extra.Lib
+Requires(post):  /sbin/ldconfig
+Requires(postun):  /sbin/ldconfig
 #end if
 #if $sub_extra.has_key("Icon") and $sub_extra.Icon
 Requires(post):  /bin/touch
