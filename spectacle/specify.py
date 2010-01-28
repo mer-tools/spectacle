@@ -56,7 +56,6 @@ class RPMWriter():
     """
 
     extra_per_pkg = {
-                        'PreUn': [],
                         'Desktop': False,
                         'Static': False,
                         'Schema': False,
@@ -75,6 +74,7 @@ class RPMWriter():
         self.archive = 'bzip2'
         self.pkg = None
         self.version = None
+        self.release = None
         self.specfile = None
 
         self.clean_old = clean_old
@@ -115,8 +115,9 @@ class RPMWriter():
         try:
             self.pkg = self.metadata['Name']
             self.version = self.metadata['Version']
-            self.specfile = "%s.spec" % self.pkg
+            self.release = self.metadata['Release']
 
+            self.specfile = "%s.spec" % self.pkg
             self.newspec = True
         except KeyError:
             print 'Invalid yaml file %s without "Name" or "Version" directive' % self.yaml_fpath
@@ -193,9 +194,8 @@ class RPMWriter():
         They should be checked by users manually.
         """
 
-    def parse_files(self, files = {}):
+    def parse_files(self, files = {}, docs = {}):
         for pkg_name,v in files.iteritems():
-
             if pkg_name == 'main':
                 pkg_extra = self.extra
             else:
@@ -203,9 +203,6 @@ class RPMWriter():
 
             for l in v:
                 if re.match('.*\.info.*', l) and re.match('.*(usr/share/info|%{_infodir}).*', l):
-                    # TODO 'PreUn' still needed ?
-                    # TODO delete info should be in postun or preun ?
-                    pkg_extra['PreUn'].append("/sbin/install-info")
                     pkg_extra['Infos'].append(l)
                     pkg_extra['Info'] = True
                 if re.match('.*\.desktop$', l):
@@ -214,8 +211,6 @@ class RPMWriter():
                     pkg_extra['Static'] = True
                 if re.match('.*etc/rc.d/init.d.*', l) or re.match('.*etc/init.d.*', l):
                     pkg_extra['Service'] = True
-                    pkg_extra['PreUn'].append("/sbin/chkconfig")
-                    pkg_extra['PreUn'].append("/sbin/service")
                 if re.match('.*%{_libdir}.*', l) and re.match('.*\.so.*', l) and pkg_name != 'devel':
                     # 'devel' sub pkgs should not set Lib flags
                     pkg_extra['Lib'] = True
@@ -224,6 +219,20 @@ class RPMWriter():
                     pkg_extra['Schemas'].append(l)
                 if re.match('.*\/icons\/.*', l):
                     pkg_extra['Icon'] = True
+
+        # files listed in '%doc' need handling
+        for pkg_name,v in docs.iteritems():
+            if pkg_name == 'main':
+                pkg_extra = self.extra
+            else:
+                pkg_extra = self.extra['subpkgs'][pkg_name]
+
+            for l in v:
+                for item in l.split(' '):
+                    if re.match('.*\.info.*', item) and \
+                       re.match('.*(usr/share/info|%{_infodir}).*', item):
+                        pkg_extra['Info'] = True
+                        pkg_extra['Infos'].append(item)
 
     def parse_existing(self, spec_fpath):
         sin = re.compile("^# >> ([^\s]+) (.*)")
@@ -285,7 +294,15 @@ class RPMWriter():
         """
 
         try:
-            self.parse_files(self.extra['content']['files'])
+            docs = {}
+            if 'Documents' in self.metadata:
+                docs['main'] = self.metadata['Documents']
+            if "SubPackages" in self.metadata:
+                for sp in self.metadata["SubPackages"]:
+                    if 'Documents' in sp:
+                        docs[sp['Name']] = sp['Documents']
+
+            self.parse_files(self.extra['content']['files'], docs)
         except KeyError:
             pass
 

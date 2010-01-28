@@ -65,6 +65,10 @@ SINGLES = ( 'Summary',
             'License' )
 SKIPS   = ( 'BuildRoot',)
 
+# must have keys for 'main' package
+MUSTHAVE = {'Release': '1',
+           }
+
 # state definition of parser
 (
     ST_DEFINE,
@@ -389,11 +393,13 @@ class SpecParser(object):
                     print 'Unkown spec line skipped:', line
 
     def cooked_items(self):
-        """ return all items in all sections """
+        """ return all items, cooked to the input of convertor """
         return self.__cook_items('main', self.items)
 
     def __cook_items(self, pkg_name, items):
-        """ return all items """
+        """ helper function to transfer data structure
+            <recursive>
+        """
         #import pprint
         #pprint.pprint( items )
         #pprint.pprint( self.table )
@@ -428,6 +434,7 @@ class SpecParser(object):
                     if k == 'Release':
                         m = re.match('(\d+)%{\?dist}', nv[0])
                         if m: ck_items[k] = m.group(1)
+                        else: ck_items[k] = nv[0]
                     else:
                         ck_items[k] = nv[0]
 
@@ -445,16 +452,26 @@ class SpecParser(object):
         if patches:
             ck_items['Patches'] = patches
 
-        # handle all sectinos with header, in ORDER
+        # handle all sectinos with header, IN-ORDER
         for hdr in HEADERS:
             if hdr in items:
                 routine = getattr(self, '_do_' + hdr)
                 routine(ck_items, pkg_name, items[hdr])
 
+        if pkg_name != 'main':
+            # shortcut for subpkg
+            return ck_items
+
+        # handle subpackages
         if 'SubPackages' in items:
             ck_items['SubPackages'] = []
             for sub, sub_items in items['SubPackages'].iteritems():
                 ck_items['SubPackages'].append(self.__cook_items(sub, sub_items))
+
+        # check must-have keys
+        for key, default in MUSTHAVE.iteritems():
+            if key not in ck_items:
+                ck_items[key] = default
 
         #pprint.pprint( ck_items )
         return ck_items

@@ -76,7 +76,7 @@ class SBConfigParser(RawConfigParser):
 
     # must have keys
     must_keys =  {'Release': '1',
-                  'Configure': 'configure',
+                  'Configure': 'configure', #TODO need still?
                  }
 
 
@@ -104,7 +104,8 @@ class SBConfigParser(RawConfigParser):
             raise "Missing file: %s" % filename
 
     def __cook_config(self):
-        """Function to update fields for spec-builder specific ones"""
+        """ Helper function to update fields for spec-builder specific ones
+        """
         all_items = {}
         main_extra = {} # for extra keys of main pkg
 
@@ -181,7 +182,7 @@ class SBConfigParser(RawConfigParser):
         return all_items
 
     def cooked_items(self):
-        """ return all items in all sections """
+        """ return all items, cooked to the input of convertor """
         return self.__cook_config()
 
 if __name__ == '__main__':
