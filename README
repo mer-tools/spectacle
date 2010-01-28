@@ -76,6 +76,7 @@ All available directives for spectacle are listed as the following:
 * Patches: **list** of **string**
 * Requires: **list** of **string**
 * RequiresPre: **list** of **string**
+* RequiresPreUn: **list** of **string**
 * RequiresPost: **list** of **string**
 * RequiresPostUn: **list** of **string**
 * PkgBR: **list** of **string**, packages required by build, or BuildRequires
@@ -116,7 +117,14 @@ You can add any custom code between the markers, next time when you run
 relying on the meta data from the yaml file will be changed depending on the
 values in the YAML file.
 
-Totally 5 places with placeholders in spec can be customized:
+Totally 7 places with placeholders in spec can be customized:
+
+* Private Macros, used in this package's spec
+
+    With placeholder:
+
+        # >> macros
+        # << macros
 
 * Pre-Build, scripts before package building
 
@@ -152,7 +160,15 @@ Totally 5 places with placeholders in spec can be customized:
 
         # >> files [sub-package]
         # << files [sub-package]
-**NOTE**: "sub-packge", the name of sub-packge should be specified here
+**NOTE**: "sub-packge" stands for the name of sub-packge, and it is optional.
+If no sub-package name specified, it means the files of **main** package.
+
+* Extra-Sections, other spec sections that spectacle does not covered
+
+    With placeholder:
+
+        # >> extra_sections
+        # << extra_sections
 
 ## Internal Implementation
 Spectacle uses cheetah templates to generate the spec file, based the metadata
