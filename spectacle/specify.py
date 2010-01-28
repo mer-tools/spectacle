@@ -188,8 +188,9 @@ class RPMWriter():
         we need NOT to do the following checking:
          * whether '%{name} = %{version}-%{release}' in subpackages' requires
          * whether --disable-static in ConfigOptions
+         * whether auto-added Requires(include pre/post/preun/postun) duplicated
 
-        They should be checked by users.
+        They should be checked by users manually.
         """
 
     def parse_files(self, files = {}):
@@ -236,10 +237,12 @@ class RPMWriter():
         for i in file(spec_fpath).read().split("\n"):
             matchin = sin.match(i)
             matchout = sout.match(i)
-            if matchin:
+
+            if matchin and not record:
                 record = True
                 recording = []
                 continue
+
             if matchout:
                 record = False
                 if not recording: continue # empty
