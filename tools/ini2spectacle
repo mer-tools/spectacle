@@ -26,6 +26,7 @@
 import os
 import sys
 import re
+import shutil
 from ConfigParser import RawConfigParser
 
 # spectacle modules
@@ -76,17 +77,27 @@ class SBConfigParser(RawConfigParser):
 
     # must have keys
     must_keys =  {'Release': '1',
-                  'Configure': 'configure', #TODO need still?
+                  'Configure': 'configure',
                  }
 
-
-    def __init__(self, iniDir = None):
+    def __init__(self, ini_dir = None):
         RawConfigParser.__init__(self)
 
-        if iniDir:
-            self.iniDir = iniDir
+        if ini_dir:
+            self.ini_dir = ini_dir
         else:
-            self.iniDir = os.path.curdir
+            self.ini_dir = os.path.curdir
+
+        self.record_used_files = []
+
+    def read(self, filenames):
+        """ override super read to record input files """
+
+        if isinstance(filenames, basestring):
+            filenames = [filenames]
+        self.record_used_files.extend(filenames)
+
+        return RawConfigParser.read(self, filenames)
 
     def optionxform(self, option):
         # Capitalize the first char
@@ -99,6 +110,7 @@ class SBConfigParser(RawConfigParser):
     def __expand_single(self, filename):
         """ Helper function to expand *.desc """
         if os.path.exists(filename):
+            self.record_used_files.append(filename)
             return file(filename).read().strip()
         else:
             raise "Missing file: %s" % filename
@@ -135,7 +147,7 @@ class SBConfigParser(RawConfigParser):
             for key in self.expand_keys:
                 if key in items:
                     content = self.__expand_single(
-                                    os.path.join(self.iniDir, items[key]))
+                                    os.path.join(self.ini_dir, items[key]))
                     if key == 'Files':
                         # 'Files' need split to list
                         self.set(section, key, content.split('\n'))
@@ -228,3 +240,14 @@ if __name__ == '__main__':
     if spec_fpath:
         print 'Spec file %s was created with extra data' % spec_fpath
 
+    # move old spec-builder files to backup dir
+    backDir = os.path.join(iniDir, 'spec-builder.backup')
+    try:
+        os.mkdir(backDir)
+    except:
+        pass
+    if os.path.exists(backDir) and not os.path.isfile(backDir):
+        print 'The following used spec-builder files are moved to dir:', backDir
+        for file in config.record_used_files:
+            print '\t', os.path.basename(file)
+            shutil.move(file, backDir)
