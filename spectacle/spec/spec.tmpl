@@ -22,13 +22,13 @@ $str_newline.join($extra.content.macros.main)
 Name:       ${metadata.Name}
 Summary:    ${metadata.Summary}
 Version:    ${metadata.Version}
+Release:    ${metadata.Release}%{?dist}
 Group:      ${metadata.Group}
 License:    ${metadata.License}
-URL:        ${metadata.URL}
-Release:    ${metadata.Release}%{?dist}
 #if $metadata.has_key("BuildArch")
 BuildArch: ${metadata.BuildArch}
 #end if
+URL:        ${metadata.URL}
 ## Sources
 #if $metadata.has_key("Sources")
 #set $idx = 0
@@ -142,6 +142,7 @@ Development files for %{name}
 
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
+#set $sub_extra = $extra.subpkgs[$sp.Name]
 %package $sp.Name
 Summary: $sp.Summary
 #if $sp.has_key("Group")
@@ -175,6 +176,19 @@ Requires(post): $req
 Requires(postun): $req
 #end for
 #end if
+#if $sub_extra.has_key("Icon") and $sub_extra.Icon
+Requires(post):  /bin/touch
+#end if
+#if $sub_extra.has_key("Info") and $sub_extra.Info
+Requires(post):  /sbin/install-info
+Requires(postun):  /sbin/install-info
+#end if
+#if $sub_extra.Service
+Requires(post):  /sbin/service
+Requires(post):  /sbin/chkconfig
+Requires(postun): /sbin/service
+Requires(postun): /sbin/chkconfig
+#end if
 %description $sp.Name
 #if $sp.has_key('Description')
 $sp.Description
@@ -185,6 +199,7 @@ Description: %{summary}
 #end for
 #end if
 
+############################ prep scripts
 %prep
 #if $metadata.has_key("Sources")
 %setup -q -n $metadata.BuildingPath
@@ -198,23 +213,26 @@ Description: %{summary}
 #end for
 #end if
 
+############################ build scripts
 %build
 # >> build pre
 #if $extra.content.has_key("build") and $extra.content.build.has_key("pre")
 $str_newline.join($extra.content.build.pre)
 #end if
 # << build pre
-
+############################
 #if $Builder == 'python'
 %{__python} setup.py build
 #else
+#######
 #if $metadata.has_key('Configure')
 #set $Configure = $metadata.Configure
+#######
 #else
 ## default
 #set $Configure = 'noconfigure'
 #end if
-
+#######
 #if $Configure == 'autogen'
 %autogen --disable-static#slurp
 #else if $Configure == 'configure'
@@ -248,13 +266,14 @@ make
 $Builder
 #end if
 #end if ## Builder == python
-
+############################
 # >> build post
 #if $extra.content.has_key("build") and  $extra.content.build.has_key("post")
 $str_newline.join($extra.content.build.post)
 #end if
 # << build post
 
+############################ installation scripts
 %install
 # >> install pre
 #if $extra.content.has_key("install") and  $extra.content.install.has_key("pre")
@@ -286,7 +305,6 @@ $metadata.ExtraInstall
 $str_newline.join($extra.content.install.post)
 #end if
 # << install post
-
 #if $metadata.has_key("LocaleName")
 #if $metadata.has_key("LocaleOptions")
 %find_lang ${metadata.LocaleName}  ${metadata.LocaleOptions}
@@ -295,10 +313,11 @@ $str_newline.join($extra.content.install.post)
 #end if
 #end if
 
+############################ clean scripts
 %clean
 rm -rf %{buildroot}
 
-## Pre
+############################ Pre
 #if $extra.Schema
 %pre
 if [ "$1" -gt 1 ]; then
@@ -310,8 +329,8 @@ if [ "$1" -gt 1 ]; then
 #end for
 fi
 #end if
-## PreUn
 
+############################ PreUn
 #if $extra.Schema
 %preun
 ## TODO: confirm? if [ "$1" -gt 1 ]; then
@@ -325,7 +344,7 @@ if [ "$1" -gt 0 ]; then
 fi
 #end if
 
-## Post
+############################ Post
 #if $extra.Info or $extra.Lib or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts')
 #if $extra.Lib
 %post -p /sbin/ldconfig
@@ -358,7 +377,7 @@ $metadata.PostScripts
 #end if
 #end if ## need post
 
-## PostUn
+############################ PostUn
 #if $extra.Info or $extra.Lib
 #if $extra.Lib
 %postun -p /sbin/ldconfig
@@ -366,9 +385,11 @@ $metadata.PostScripts
 %postun
 #end if
 #if $extra.Info
+if [ $1 = 0 ] ;then
 #for $inf in $extra.Infos
 %install_info_delete $inf /usr/share/info/dir
 #end for
+fi
 #end if
 #end if ## need postun
 
@@ -410,9 +431,11 @@ gconftool-2 --makefile-install-rule \
 %postun $sp.Name
 #end if
 #if $sub_extra.Info
+if [ $1 = 0 ] ;then
 #for $inf in $sub_extra.Infos
 %install_info_delete $inf /usr/share/info/dir
 #end for
+fi
 #end if ## Info
 #end if ## need postun
 #end for ## per subpackage
