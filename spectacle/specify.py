@@ -235,8 +235,8 @@ class RPMWriter():
                         pkg_extra['Infos'].append(item)
 
     def parse_existing(self, spec_fpath):
-        sin = re.compile("^# >> ([^\s]+) (.*)")
-        sout = re.compile("^# << ([^\s]+) (.*)")
+        sin = re.compile("^# >> ([^\s]+)\s*(.*)")
+        sout = re.compile("^# << ([^\s]+)\s*(.*)")
         recording = []
         record = False
         files = {}

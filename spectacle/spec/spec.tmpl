@@ -3,11 +3,11 @@
 # spectacle version ${metadata.MyVersion}
 # ###############################################
 #set $str_newline = '\n'
-# >> macros 
+# >> macros
 #if $extra.content.has_key("macros")
 $str_newline.join($extra.content.macros)
 #end if
-# << macros 
+# << macros
 #if $metadata.has_key('Builder')
 #set $Builder = $metadata.Builder
 #else
@@ -319,7 +319,7 @@ $str_newline.join($extra.content.install.post)
 #if $metadata.has_key("LocaleOptions")
 %find_lang ${metadata.LocaleName}  ${metadata.LocaleOptions}
 #else
-%find_lang ${metadata.LocaleName}  
+%find_lang ${metadata.LocaleName}
 #end if
 #end if
 
@@ -464,11 +464,11 @@ fi
 %doc $doc
 #end for
 #end if
-# >> files 
+# >> files
 #if $extra.content.has_key("files") and $extra.content.files.has_key("main")
 $str_newline.join($extra.content.files.main)
 #end if
-# << files 
+# << files
 
 #if $metadata.has_key("AutoSubPackages")
 #for $sp in $metadata.AutoSubPackages
@@ -500,8 +500,8 @@ $str_newline.join($extra.content.files[$sp.Name])
 
 #end for
 #end if
-# >> extra_sections 
+# >> extra_sections
 #if $extra.content.has_key("extra_sections")
 $str_newline.join($extra.content.extra_sections)
 #end if
-# << extra_sections 
+# << extra_sections
