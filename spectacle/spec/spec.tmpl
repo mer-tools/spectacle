@@ -4,8 +4,8 @@
 # ###############################################
 #set $str_newline = '\n'
 # >> macros 
-#if $extra.content.has_key("macros") and $extra.content.macros.has_key("main")
-$str_newline.join($extra.content.macros.main)
+#if $extra.content.has_key("macros")
+$str_newline.join($extra.content.macros)
 #end if
 # << macros 
 #if $metadata.has_key('Builder')
@@ -227,6 +227,7 @@ Description: %{summary}
 $str_newline.join($extra.content.build.pre)
 #end if
 # << build pre
+
 ############################
 #if $Builder == 'python'
 %{__python} setup.py build
@@ -274,6 +275,7 @@ $Builder
 #end if
 #end if ## Builder == python
 ############################
+
 # >> build post
 #if $extra.content.has_key("build") and  $extra.content.build.has_key("post")
 $str_newline.join($extra.content.build.post)
@@ -287,6 +289,7 @@ $str_newline.join($extra.content.build.post)
 $str_newline.join($extra.content.install.pre)
 #end if
 # << install pre
+
 rm -rf %{buildroot}
 #if $Builder == 'python'
 %if 0%{?suse_version}
@@ -497,3 +500,8 @@ $str_newline.join($extra.content.files[$sp.Name])
 
 #end for
 #end if
+# >> extra_sections 
+#if $extra.content.has_key("extra_sections")
+$str_newline.join($extra.content.extra_sections)
+#end if
+# << extra_sections 

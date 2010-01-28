@@ -242,7 +242,8 @@ class RPMWriter():
         files = {}
         install = {}
         build = {}
-        macros = {}
+        macros = []         # private macros
+        extra_sections = [] # extra headers
         for i in file(spec_fpath).read().split("\n"):
             matchin = sin.match(i)
             matchout = sout.match(i)
@@ -265,16 +266,25 @@ class RPMWriter():
                 elif matchout.group(1) == "build":
                     build[matchout.group(2)] = recording
                 elif matchout.group(1) == "macros":
-                    macros['main'] = recording
+                    macros = recording
+                elif matchout.group(1) == "extra_sections":
+                    extra_sections = recording
 
             if record:
                 recording.append(i)
 
-        return { "files" : files,
-                 "install": install,
-                 "build" : build,
-                 "macros" : macros
-               }
+        content= { "files" : files,
+                   "install": install,
+                   "build" : build,
+                 }
+
+        if macros:
+           content["macros"] = macros
+
+        if extra_sections:
+           content["extra_sections"] = extra_sections
+
+        return content
 
     def process(self, extra_content):
         specfile = self.specfile
