@@ -361,6 +361,7 @@ def download_sources(pkg, rev, sources):
 
     for s in sources:
         if s.startswith('http://') or s.startswith('ftp://'):
+            # TODO support https://
             target = s.replace('%{name}', pkg)
             target = target.replace('%{version}', rev)
             f_name = os.path.basename(target)

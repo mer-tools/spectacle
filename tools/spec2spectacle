@@ -328,7 +328,7 @@ class SpecParser(object):
 
         comment = re.compile('^#.*')
         directive = re.compile('^([\w()]+):[ \t]*(.*)')
-        define_re = re.compile('^%define\W+(\w+)\W+(.*)')
+        define_re = re.compile('^%define\s+(\w+)\s+(.*)')
         header_re = re.compile('^%(prep|build|install|clean|postun|post|files|changelog|package|description)\s*(.*)')
 
         state = ST_DEFINE
@@ -434,28 +434,35 @@ class SpecParser(object):
             if k in SKIPS or k in HEADERS or k == 'SubPackages':
                 continue
 
-            nv = []
-            for vi in v:
-                nvi = vi
-                # check for macro replacing
-                for m in macro_re.finditer(vi):
-                    macro, name = m.group(0, 1)
-                    if name in self.table:
-                        nvi = nvi.replace(macro, self.table[name])
+            if self.table:
+                # macro replacing
+                nv = []
+                for vi in v:
+                    while macro_re.search(vi):
+                        nvi = vi
+                        for m in macro_re.finditer(vi):
+                            macro, name = m.group(0, 1)
+                            if name in self.table:
+                                nvi = nvi.replace(macro, self.table[name])
+                        if vi == nvi:
+                            break # break to exit 'while' loop
+                        vi = nvi
 
-                nv.append(nvi)
+                    # now nvi is the replaced string
+                    nv.append(vi)
+                v = nv
 
-                if k in SINGLES:
-                    # special case for Release
-                    if k == 'Release':
-                        m = re.match('(\S+)%{\?dist}', nv[0])
-                        if m: ck_items[k] = m.group(1)
-                        else: ck_items[k] = nv[0]
-                    else:
-                        ck_items[k] = nv[0]
-
+            if k in SINGLES:
+                # special case for Release
+                if k == 'Release':
+                    m = re.match('(\S+)%{\?dist}', v[0])
+                    if m: ck_items[k] = m.group(1)
+                    else: ck_items[k] = v[0]
                 else:
-                    ck_items[k] = nv
+                    ck_items[k] = v[0]
+
+            else:
+                ck_items[k] = v
 
         # handle all sectinos with header, IN-ORDER
         for hdr in HEADERS:
