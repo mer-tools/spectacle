@@ -37,5 +37,5 @@ for yaml_fpath in sys.argv[1:]:
     if newspec:
         print "Creating new spec file: %s" % spec_fpath
     else:
-        print "File exists, patching %s ..." % spec_fpath
+        print "Old spec file exists, patching %s ..." % spec_fpath
 

@@ -64,6 +64,7 @@ SINGLES = ( 'Summary',
             'URL',
             'Url',
             'Group',
+            'BuildArch',
             'License' )
 SKIPS   = ( 'BuildRoot',)
 

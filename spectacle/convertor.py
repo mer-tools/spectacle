@@ -44,6 +44,7 @@ ORDER_ENTRIES = ['Name',
                  'Configure',
                  'ConfigOptions',
                  'Builder',
+                 'BuildArch',
                  'LocaleName',
                 ]
 
