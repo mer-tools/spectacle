@@ -237,13 +237,17 @@ class RPMWriter():
     def parse_existing(self, spec_fpath):
         sin = re.compile("^# >> ([^\s]+)\s*(.*)")
         sout = re.compile("^# << ([^\s]+)\s*(.*)")
+
+        # temp vars
         recording = []
         record = False
+
         files = {}
         install = {}
         build = {}
-        macros = []         # private macros
+        macros = {}         # global macros
         extra_sections = [] # extra headers
+
         for i in file(spec_fpath).read().split("\n"):
             matchin = sin.match(i)
             matchout = sout.match(i)
@@ -266,7 +270,7 @@ class RPMWriter():
                 elif matchout.group(1) == "build":
                     build[matchout.group(2)] = recording
                 elif matchout.group(1) == "macros":
-                    macros = recording
+                    macros['main'] = recording
                 elif matchout.group(1) == "extra_sections":
                     extra_sections = recording
 

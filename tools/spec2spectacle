@@ -97,7 +97,7 @@ class SpecConvertor(Convertor):
 class SpecParser(object):
     """ Parser of SPEC file of rpm package """
 
-    def __init__(self):
+    def __init__(self, replace_macro = False):
         # runtime variables
         self.items = {}
         self.table = {}
@@ -105,6 +105,9 @@ class SpecParser(object):
 
         self._Builder = None
         self._Configure = None
+
+        self.replace_macro = replace_macro
+        self.macros = []
 
     def __switch_subpkg(self, subpkg):
         if 'SubPackages' not in self.items:
@@ -338,8 +341,12 @@ class SpecParser(object):
             if state == ST_DEFINE:
                 m = define_re.match(line.strip())
                 if m:
-                    self.table[m.group(1)] = m.group(2)
-                    continue
+                    if self.replace_macro:
+                        self.table[m.group(1)] = m.group(2)
+                    else:
+                        self.macros.append(line.strip())
+
+                    continue #short-cut
                 else:
                     state = ST_MAIN
 
@@ -422,6 +429,7 @@ class SpecParser(object):
         #import pprint
         #pprint.pprint( items )
         #pprint.pprint( self.table )
+        #pprint.pprint( self.macros )
 
         # pattern of macros
         macro_re = re.compile('%{(\w+)}')
@@ -484,6 +492,10 @@ class SpecParser(object):
         for key, default in MUSTHAVE.iteritems():
             if key not in ck_items:
                 ck_items[key] = default
+
+        # check for global macros
+        if self.macros:
+            ck_items['extra']['macros'] = self.macros
 
         #pprint.pprint( ck_items )
         return ck_items
