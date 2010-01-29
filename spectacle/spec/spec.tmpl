@@ -240,7 +240,7 @@ Description: %{summary}
 ############################ prep scripts
 %prep
 #if $metadata.has_key("Sources")
-%setup -q -n $metadata.BuildingPath
+%setup -q -n $metadata.SourcePrefix
 #end if
 ## Patches
 #if $metadata.has_key("Patches")

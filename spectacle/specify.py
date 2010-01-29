@@ -51,7 +51,6 @@ class RPMWriter():
         YAML, and transfered to tmpl:
             MyVersion:    version of spectacle
             ExtraInstall: extra install script for 'ExtraSources'
-            BuildingPath: path for rpm 'setup' macro
 
     """
 
@@ -159,13 +158,14 @@ class RPMWriter():
         else:
             self.appendix = 'gz'
 
-        # sometime cannot rely on the "name-version" presume, better to use the name
-        # of source package
-        try:
-            dirname, ignore = os.path.basename(self.metadata['Sources'][0]).split('.tar.')
-            self.metadata['BuildingPath'] = dirname
-        except:
-            self.metadata['BuildingPath'] = self.metadata['Name']
+        if 'SourcePrefix' not in self.metadata:
+            # sometime cannot rely on the "name-version" presume, better to use the name
+            # of source package
+            try:
+                dirname, ignore = os.path.basename(self.metadata['Sources'][0]).split('.tar.')
+                self.metadata['SourcePrefix'] = dirname
+            except:
+                self.metadata['SourcePrefix'] = self.metadata['Name']
 
         # handling old spec file
         if os.path.exists(self.specfile):

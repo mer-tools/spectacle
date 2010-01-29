@@ -72,6 +72,7 @@ All available directives for spectacle are listed as the following:
 * LocaleOptions: **string**, *optional*
 * Description: **text**, *optional*
 * Sources: **list** of **string**
+* SourcePrefix: **string**, *optional*, specify the prefix path in source package
 * ExtraSources: **list** of **string**, *optional*
 * Patches: **list** of **string**
 * Requires: **list** of **string**
