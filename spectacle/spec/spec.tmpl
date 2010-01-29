@@ -24,6 +24,9 @@ Version:    ${metadata.Version}
 Release:    ${metadata.Release}%{?dist}
 #if $metadata.has_key("Epoch")
 Epoch:      ${metadata.Epoch}
+#set $auto_depend = "%{epoch}:%{version}-%{release}"
+#else
+#set $auto_depend = "%{version}-%{release}"
 #end if
 Group:      ${metadata.Group}
 License:    ${metadata.License}
@@ -139,12 +142,18 @@ Description: %{summary}
 %package $sp
 Summary: Development files for %{name}
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: %{name} = $auto_depend
 %description $sp
 Development files for %{name}
 
 #end for
 #end if
+
+# >> extra_sections
+#if $extra.content.has_key("extra_sections")
+$str_newline.join($extra.content.extra_sections)
+#end if
+# << extra_sections
 
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
@@ -156,7 +165,7 @@ Group: $sp.Group
 #else
 Group: ${metadata.Group}
 #end if
-Requires: %{name} = %{version}-%{release}
+Requires: %{name} = $auto_depend
 #if $sp.has_key("Requires")
 #for $req in $sp.Requires
 Requires: $req
@@ -528,8 +537,3 @@ $str_newline.join($extra.content.files[$sp.Name])
 
 #end for
 #end if
-# >> extra_sections
-#if $extra.content.has_key("extra_sections")
-$str_newline.join($extra.content.extra_sections)
-#end if
-# << extra_sections
