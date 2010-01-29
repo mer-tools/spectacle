@@ -474,6 +474,8 @@ fi
 %files -f ${metadata.LocaleName}.lang
 #else if $metadata.has_key('Builder') and $metadata.Builder == 'python'
 %files -f PY_INSTALLED_FILES
+#else if $metadata.has_key('FilesInput')
+%files -f $metadata.FilesInput
 #else
 %files
 #end if
@@ -504,7 +506,11 @@ $str_newline.join($extra.content.files[$sp])
 
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
+#if $sp.has_key('FilesInput')
+%files $sp.Name -f $sp.FilesInput
+#else
 %files $sp.Name
+#end if
 %defattr(-,root,root,-)
 #if $sp.has_key("Documents")
 #for $doc in $sp.Documents

@@ -91,6 +91,7 @@ All available directives for spectacle are listed as the following:
   **python**, **no-builder**<br>
   **If not specified, the deault value ``make`` will be used. If do not want a
   automatic builder, please use ``no-builder``.**
+* FilesInput: **string**, *optional*, extra input source for %files
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
 * SubPackages: **list** of **dict**, the **dict** item is the lower level
 directives for sub packages:
@@ -99,6 +100,7 @@ directives for sub packages:
     * Description, *optional*
     * Group, *optional*
     * Requires, *optional*
+    * FilesInput, *optional*
     * etc.
 
 **CAUTION**: The following cases of value string have special meaning in YAML:
