@@ -84,8 +84,13 @@ All available directives for spectacle are listed as the following:
 * Provides: **list** of **string**
 * Conflicts: **list** of **string**
 * Obsoletes: **list** of **string**
-* Configure: **string**, *optional*, valid values: autogen, configure, reconfigure
-* Builder: **string**, *optional*, valid values: make, single-make, python
+* Configure: **string**, *optional*, valid values: **autogen**, **configure**,
+  **reconfigure**<br>
+  **If not specified, no automatic configure instructions generated.**
+* Builder: **string**, *optional*, valid values: **make**, **single-make**,
+  **python**, **no-builder**<br>
+  **If not specified, the deault value ``make`` will be used. If do not want a
+  automatic builder, please use ``no-builder``.**
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
 * SubPackages: **list** of **dict**, the **dict** item is the lower level
 directives for sub packages:

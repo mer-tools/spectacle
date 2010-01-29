@@ -202,7 +202,7 @@ class SpecParser(object):
             # means match failed
 
             # make sure no 'make' generated auto
-            items['Builder'] = 'no-make'
+            items['Builder'] = 'no-builder'
 
             # put all script to 'post install'
             items['extra']['PostMakeExtras'] = \

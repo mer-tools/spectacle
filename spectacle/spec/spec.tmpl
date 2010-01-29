@@ -270,7 +270,7 @@ make %{?jobs:-j%jobs}
 #else if $Builder == 'single-make'
 # Call make instruction
 make
-#else if $Builder != 'no-make'
+#else if $Builder != 'no-make' and $Builder != 'no-builder'
 $Builder
 #end if
 #end if ## Builder == python
