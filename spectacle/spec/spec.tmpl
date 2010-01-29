@@ -22,6 +22,9 @@ Name:       ${metadata.Name}
 Summary:    ${metadata.Summary}
 Version:    ${metadata.Version}
 Release:    ${metadata.Release}%{?dist}
+#if $metadata.has_key("Epoch")
+Epoch:      ${metadata.Epoch}
+#end if
 Group:      ${metadata.Group}
 License:    ${metadata.License}
 #if $metadata.has_key("BuildArch")
