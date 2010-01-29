@@ -99,12 +99,13 @@ class SpecConvertor(Convertor):
 class SpecParser(object):
     """ Parser of SPEC file of rpm package """
 
-    def __init__(self, replace_macros = False):
+    def __init__(self, replace_macros, builder_parsing):
         # runtime variables
         self.items = {}
         self.table = {}
         self.cur_pkg = 'main'
 
+        self.builder_parsing = builder_parsing
         self._Builder = None
         self._Configure = None
 
@@ -132,9 +133,21 @@ class SpecParser(object):
             trying to find out the most of the generic cases
         """
 
+        def __save_raw_in_post(items, lines):
+            # make sure no 'make' generated auto
+            items['Builder'] = 'no-builder'
+            # put all script to 'post install'
+            items['extra']['PostMakeExtras'] = \
+                    ['# all build scripts in origin specfile as the following:'] + lines
+
+        ### Sub START
         lines = v.split('\n')
         if lines[0].startswith('-'):
             lines.pop(0)
+
+        if not self.builder_parsing:
+            __save_raw_in_post(items, lines)
+            return
 
         # parts of build script
         (PRE, POST_CFG, POST_BUILD) = range(3)
@@ -205,14 +218,7 @@ class SpecParser(object):
 
         if cur_part == PRE:
             # means match failed
-
-            # make sure no 'make' generated auto
-            items['Builder'] = 'no-builder'
-
-            # put all script to 'post install'
-            items['extra']['PostMakeExtras'] = \
-                    ['# all build scripts in origin specfile as the following:'] + lines
-
+            __save_raw_in_post(items, lines)
         else:
             if self._Configure:
                 items['Configure'] = self._Configure
@@ -514,6 +520,9 @@ def parse_options(args):
     parser.add_option("-r", "--replace-macros", action="store_true",
                       dest="replace_macros", default=False,
                       help="To replace self-defined macros in spec file")
+    parser.add_option("",   "--no-builder-parsing", action="store_false",
+                      dest="builder_parsing", default=True,
+                      help="Do NOT try to parse build/install scripts")
 
     (options, args) = parser.parse_args()
     if not args:
@@ -545,7 +554,9 @@ if __name__ == '__main__':
         sys.exit(1)
 
     """Read the input file"""
-    spec_parser = SpecParser(replace_macros = options.replace_macros)
+    spec_parser = SpecParser(replace_macros = options.replace_macros,
+                             builder_parsing = options.builder_parsing
+                            )
     try:
         spec_parser.read(spec_fpath)
     except SpecFormatError, e:
