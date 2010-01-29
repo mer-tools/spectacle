@@ -196,6 +196,25 @@ Requires(post):  /sbin/chkconfig
 Requires(postun): /sbin/service
 Requires(postun): /sbin/chkconfig
 #end if
+## Provides
+#if $sp.has_key("Provides")
+#for $prd in $sp.Provides
+Provides:   $prd
+#end for
+#end if
+## Conflicts
+#if $sp.has_key("Conflicts")
+#for $cfl in $sp.Conflicts
+Conflicts:   $cfl
+#end for
+#end if
+## Obsoletes
+#if $sp.has_key("Obsoletes")
+#for $obs in $sp.Obsoletes
+Obsoletes:   $obs
+#end for
+#end if
+
 %description $sp.Name
 #if $sp.has_key('Description')
 $sp.Description
