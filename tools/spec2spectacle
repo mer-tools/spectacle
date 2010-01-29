@@ -448,7 +448,7 @@ class SpecParser(object):
                 if k in SINGLES:
                     # special case for Release
                     if k == 'Release':
-                        m = re.match('(\d+)%{\?dist}', nv[0])
+                        m = re.match('(\S+)%{\?dist}', nv[0])
                         if m: ck_items[k] = m.group(1)
                         else: ck_items[k] = nv[0]
                     else:
