@@ -364,6 +364,13 @@ class SpecParser(object):
                 if dm:
                     key = dm.group(1)
                     val = dm.group(2)
+
+                    # special case for Source and Patch
+                    if key.startswith('Source'):
+                        key = 'Sources'
+                    elif key.startswith('Patch'):
+                        key = 'Patches'
+
                     if key not in items:
                         items[key] = [val]
                     else:
@@ -423,9 +430,6 @@ class SpecParser(object):
         if pkg_name != 'main':
             ck_items['Name'] = pkg_name
 
-        sources = []
-        patches = []
-
         for k, v in items.iteritems():
             if k in SKIPS or k in HEADERS or k == 'SubPackages':
                 continue
@@ -450,19 +454,8 @@ class SpecParser(object):
                     else:
                         ck_items[k] = nv[0]
 
-                # special case for Source and Patch
-                elif k.startswith('Source'):
-                    sources.extend(nv)
-                elif k.startswith('Patch'):
-                    patches.extend(nv)
-
                 else:
                     ck_items[k] = nv
-
-        if sources:
-            ck_items['Sources'] = sources
-        if patches:
-            ck_items['Patches'] = patches
 
         # handle all sectinos with header, IN-ORDER
         for hdr in HEADERS:
