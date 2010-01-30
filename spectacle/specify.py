@@ -228,9 +228,11 @@ class RPMWriter():
                     pkg_extra['Static'] = True
                 if re.match('.*etc/rc.d/init.d.*', l) or re.match('.*etc/init.d.*', l):
                     pkg_extra['Service'] = True
-                if re.match('.*(%{_libdir}|%{_lib}).*', l) and re.match('.*\.so.*', l) and pkg_name != 'devel':
-                    # 'devel' sub pkgs should not set Lib flags
-                    pkg_extra['Lib'] = True
+                if re.match('.*(%{_libdir}|%{_lib}).*', l) and re.match('.*\.so.*', l) or \
+                   re.match('.*(/ld.so.conf.d/).*', l):
+                    if pkg_name != 'devel':
+                        # 'devel' sub pkgs should not set Lib flags
+                        pkg_extra['Lib'] = True
                 if re.match('.*\.schema.*', l):
                     pkg_extra['Schema'] = True
                     pkg_extra['Schemas'].append(l)
