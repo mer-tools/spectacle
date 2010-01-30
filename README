@@ -46,7 +46,15 @@ Several methods available for spectacle installation:
 ### ini2spectacle
     ini2spectacle <pkg_name.ini>
 ### spec2spectacle
-    spec2spectacle <pkg_name.spec>
+    Usage: spec2spectacle [options] <spec-path>
+
+    Options:
+      --version             show program's version number and exit
+      -h, --help            show this help message and exit
+      -o OUTFILE_PATH, --output=OUTFILE_PATH
+                            Path of output yaml file
+      -r, --replace-macros  To replace self-defined macros in spec file
+      --no-builder-parsing  Do NOT try to parse build/install scripts
 
 ## Syntax of spectacle YAML
 The syntax of YAML can be refered here: <http://www.yaml.org/spec/>
@@ -61,41 +69,71 @@ code:
 All available directives for spectacle are listed as the following:
 
 * Name: **string**
+
 * Summary: **string**
+
 * Version: **string**, version string (not version NUMBER)
+
 * Release: **string**
+
 * Group: **string**
+
 * License: **string**
+
 * URL: **string**
+
 * BuildArch: **string**, *optional*
+
 * LocaleName: **string**, *optional*
+
 * LocaleOptions: **string**, *optional*
+
 * Description: **text**, *optional*
+
 * Sources: **list** of **string**
+
 * SourcePrefix: **string**, *optional*, specify the prefix path in source package
+
 * ExtraSources: **list** of **string**, *optional*
-* Patches: **list** of **string**
+
+* Patches: **list** of **string**, please see **NOTE1** blow
+
 * Requires: **list** of **string**
+
 * RequiresPre: **list** of **string**
+
 * RequiresPreUn: **list** of **string**
+
 * RequiresPost: **list** of **string**
+
 * RequiresPostUn: **list** of **string**
+
 * PkgBR: **list** of **string**, packages required by build, or BuildRequires
+
 * PkgConfigBR: **list** of **string**, pkg-config requires by build
+
 * Provides: **list** of **string**
+
 * Conflicts: **list** of **string**
+
 * Obsoletes: **list** of **string**
+
 * Configure: **string**, *optional*, valid values: **autogen**, **configure**,
   **reconfigure**<br>
   **If not specified, no automatic configure instructions generated.**
+
 * Builder: **string**, *optional*, valid values: **make**, **single-make**,
   **python**, **no-builder**<br>
   **If not specified, the deault value ``make`` will be used. If do not want a
   automatic builder, please use ``no-builder``.**
+
 * FilesInput: **string**, *optional*, extra input source for %files
+
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
+
 * SubPackages: **list** of **dict**, the **dict** item is the lower level
 directives for sub packages:
+
     * Name
     * Summary
     * Description, *optional*
@@ -104,14 +142,20 @@ directives for sub packages:
     * FilesInput, *optional*
     * etc.
 
+**NOTE1**: If the patch need other options of ``patch``, instead of ``-p1``,
+we can write the patch item as the following formats:
+
+        - patch_need_p0: -p0
+        - [patch_need_p0, -p0, -z, -E]
+
 **CAUTION**: The following cases of value string have special meaning in YAML:
 
 * string with leading '%' charactor
 * string contains ':' charactor and one or more spaces after ':'
 
-**Then these string values need to be quoted by ``'``(single-quote) or ``"``
-(double-quote), and the choice of quote char should not conflict with the value
-string self.**
+    **Then these string values need to be quoted by ``'``(single-quote) or ``"``
+    (double-quote), and the choice of quote char should not conflict with the value
+    string self.**
 
 ## Customizations in spec
 Generated spec files by specify will have many placeholders for customizations,
