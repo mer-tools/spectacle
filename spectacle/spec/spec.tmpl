@@ -326,7 +326,7 @@ rm -rf %{buildroot}
 %if 0%{?suse_version}
 %{__python} setup.py install --root=%{buildroot} --prefix=%{_prefix} --record-rpm=PY_INSTALLED_FILES
 %else
-%{__python} setup.py install --root=%{buildroot} -O1 --record=PY_INSTALLED_FILES
+%{__python} setup.py install --root=%{buildroot} -O1
 %endif
 #else if $Builder == 'make' or $Builder == 'single-make'
 %if 0%{?moblin_version}
@@ -484,8 +484,6 @@ fi
 
 #if $metadata.has_key("LocaleName")
 %files -f ${metadata.LocaleName}.lang
-#else if $metadata.has_key('Builder') and $metadata.Builder == 'python'
-%files -f PY_INSTALLED_FILES
 #else if $metadata.has_key('FilesInput')
 %files -f $metadata.FilesInput
 #else
