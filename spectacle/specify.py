@@ -124,7 +124,7 @@ class RPMWriter():
 
         # handling 'ExtraSources', extra separated files which need to be install
         # specific paths
-        if self.metadata.has_key("ExtraSources"):
+        if "ExtraSources" in self.metadata:
             extra_srcs = []
             extra_install = ''
             count = len(self.metadata['Sources'])
@@ -145,19 +145,36 @@ class RPMWriter():
             self.metadata['Sources'].extend(extra_srcs)
             self.metadata['ExtraInstall'] = extra_install
 
-        if self.metadata.has_key("SCM"):
+        if "SCM" in self.metadata:
             self.scm = self.metadata['SCM']
 
-        supported_archive = ['bzip2', 'gzip']
-        if self.metadata.has_key("Archive"):
-            self.archive = self.metadata['Archive']
-            if self.archive not in supported_archive:
-                self.archive = 'bzip2'
-        if self.archive == 'bzip2':
-            self.appendix = 'bz2'
-        else:
-            self.appendix = 'gz'
+            if "Archive" in self.metadata:
+                self.archive = self.metadata['Archive']
+                if self.archive not in ('bzip2', 'gzip'):
+                    self.archive = 'bzip2'
+            if self.archive == 'bzip2':
+                self.appendix = 'bz2'
+            else:
+                self.appendix = 'gz'
 
+        # handle patches with extra options
+        if "Patches" in self.metadata:
+            patches = self.metadata['Patches']
+
+            self.metadata['Patches']   = []
+            self.metadata['PatchOpts'] = []
+            for patch in patches:
+                if isinstance(patch, str):
+                    self.metadata['Patches'].append(patch)
+                    self.metadata['PatchOpts'].append('-p1')
+                elif isinstance(patch, dict):
+                    self.metadata['Patches'].append(patch.keys()[0])
+                    self.metadata['PatchOpts'].append(patch.values()[0])
+                elif isinstance(patch, list):
+                    self.metadata['Patches'].append(patch[0])
+                    self.metadata['PatchOpts'].append(' '.join(patch[1:]))
+
+        # confirm 'SourcePrefix' is valid
         if 'SourcePrefix' not in self.metadata:
             # sometime cannot rely on the "name-version" presume, better to use the name
             # of source package
@@ -181,7 +198,7 @@ class RPMWriter():
             else:
                 self.newspec = False
 
-        if self.metadata.has_key("SubPackages"):
+        if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 self.extra['subpkgs'][sp['Name']] = copy.deepcopy(self.extra_per_pkg)
 

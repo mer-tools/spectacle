@@ -18,8 +18,9 @@ ExtraSources: # optional
     - file2     # path2 default to '/'
 
 Patches:
-    - li0
-    - li1
+    - li0: -p0  # patch -p0
+    - li1       # default to -p1
+    - [li2, -p0, -z, -E]      # even can be a list
 
 Requires:
     - li0
@@ -81,7 +82,8 @@ SubPackages:
     - Name: string
       Summary: string
       Description: |
-            Text
+        Text
+        Text line2
     - Name: string
       Summary: string
       Description: |

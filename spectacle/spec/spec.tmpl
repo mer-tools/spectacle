@@ -242,11 +242,11 @@ Description: %{summary}
 #if $metadata.has_key("Sources")
 %setup -q -n $metadata.SourcePrefix
 #end if
-## Patches
-#if $metadata.has_key("Patches")
+## Applying patches
+#if $metadata.has_key("PatchOpts")
 #set $idx = 0
-#for $patch in $metadata.Patches
-%patch${idx} -p1
+#for $patch_opt in $metadata.PatchOpts
+%patch${idx} $patch_opt
 #set $idx = $idx + 1
 #end for
 #end if
