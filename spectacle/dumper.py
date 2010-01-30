@@ -71,7 +71,11 @@ class SpectacleDumper(object):
 
     def __esc_value(self, val):
         # ESC for leading '%', for yaml syntax
-        if val.startswith('%') or ': ' in val:
+        if val.startswith('%') or \
+           val.startswith('*') or \
+           ": " in val or \
+           ":\t" in val:
+
             if '"' in val:
                 quote_char = '\''
             else:

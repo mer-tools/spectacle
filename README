@@ -150,12 +150,13 @@ we can write the patch item as the following formats:
 
 **CAUTION**: The following cases of value string have special meaning in YAML:
 
-* string with leading '%' charactor
-* string contains ':' charactor and one or more spaces after ':'
+* string with leading **``%``** charactor
+* string with leading **``*``** charactor
+* string contains **``:``** charactor and one or more spaces/tabs after **``:``**
 
-    **Then these string values need to be quoted by ``'``(single-quote) or ``"``
-    (double-quote), and the choice of quote char should not conflict with the value
-    string self.**
+**Then these string values need to be quoted by ``'``(single-quote) or ``"``
+(double-quote), and the choice of quote char should not conflict with the value
+string self.**
 
 ## Customizations in spec
 Generated spec files by specify will have many placeholders for customizations,

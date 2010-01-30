@@ -425,7 +425,7 @@ class SpecParser(object):
 
                 else:
                     # unparsed line
-                    print 'Unkown spec line skipped:', line
+                    print >> sys.stderr, 'Warning: un-parsed spec line skipped:', line
 
     def cooked_items(self):
         """ return all items, cooked to the input of convertor """
