@@ -176,13 +176,7 @@ class RPMWriter():
 
         # confirm 'SourcePrefix' is valid
         if 'SourcePrefix' not in self.metadata:
-            # sometime cannot rely on the "name-version" presume, better to use the name
-            # of source package
-            try:
-                dirname, ignore = os.path.basename(self.metadata['Sources'][0]).split('.tar.')
-                self.metadata['SourcePrefix'] = dirname
-            except:
-                self.metadata['SourcePrefix'] = self.metadata['Name']
+            self.metadata['SourcePrefix'] = '%{name}-%{version}'
 
         # handling old spec file
         if os.path.exists(self.specfile):
