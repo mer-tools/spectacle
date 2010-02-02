@@ -219,7 +219,7 @@ class RPMWriter():
                 pkg_extra = self.extra['subpkgs'][pkg_name]
 
             for l in v:
-                if re.match('.*\.info.*', l) and re.match('.*(usr/share/info|%{_infodir}).*', l):
+                if re.match('.*\.info.*', l) or re.match('.*(usr/share/info|%{_infodir}).*', l):
                     pkg_extra['Infos'].append(l)
                     pkg_extra['Info'] = True
                 if re.match('.*\.desktop$', l):
@@ -248,7 +248,7 @@ class RPMWriter():
 
             for l in v:
                 for item in l.split(' '):
-                    if re.match('.*\.info.*', item) and \
+                    if re.match('.*\.info.*', item) or \
                        re.match('.*(usr/share/info|%{_infodir}).*', item):
                         pkg_extra['Info'] = True
                         pkg_extra['Infos'].append(item)
