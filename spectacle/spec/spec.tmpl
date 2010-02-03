@@ -149,12 +149,6 @@ Development files for %{name}
 #end for
 #end if
 
-# >> extra_sections
-#if $extra.content.has_key("extra_sections")
-$str_newline.join($extra.content.extra_sections)
-#end if
-# << extra_sections
-
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
 #set $sub_extra = $extra.subpkgs[$sp.Name]
@@ -312,6 +306,16 @@ $Builder
 $str_newline.join($extra.content.build.post)
 #end if
 # << build post
+
+############################ optional check scripts
+#if $metadata.has_key("NeedCheckSection")
+%check
+# >> check_scriptlets
+#if $extra.content.has_key("check_scriptlets")
+$str_newline.join($extra.content.check_scriptlets)
+#end if
+# << check_scriptlets
+#end if
 
 ############################ installation scripts
 %install

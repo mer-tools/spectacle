@@ -129,6 +129,8 @@ All available directives for spectacle are listed as the following:
 
 * FilesInput: **string**, *optional*, extra input source for %files
 
+* NeedCheckSection: **boolean**, whether need ``%check`` section in spec
+
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
 
 * SubPackages: **list** of **dict**, the **dict** item is the lower level
@@ -213,15 +215,18 @@ Totally 7 places with placeholders in spec can be customized:
 
         # >> files [sub-package]
         # << files [sub-package]
-**NOTE**: "sub-packge" stands for the name of sub-packge, and it is optional.
+**NOTE**: "sub-packge" stands for the name of sub-package, and it is optional.
 If no sub-package name specified, it means the files of **main** package.
 
-* Extra-Sections, other spec sections that spectacle does not covered
+* Scriptlets for %check section
 
     With placeholder:
 
-        # >> extra_sections
-        # << extra_sections
+        # >> check_scriptlets
+        # << check_scriptlets
+
+**NOTE**: Only when *NeedCheckSection* specified as TRUE, these placeholder can
+be written to generated spec and the content between them can be recorded.
 
 ## Internal Implementation
 Spectacle uses cheetah templates to generate the spec file, based the metadata

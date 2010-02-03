@@ -178,6 +178,11 @@ class RPMWriter():
         if 'SourcePrefix' not in self.metadata:
             self.metadata['SourcePrefix'] = '%{name}-%{version}'
 
+        # check the bool value of NeedCheckSection
+        if 'NeedCheckSection' in self.metadata and \
+                not self.metadata['NeedCheckSection']:
+                del self.metadata['NeedCheckSection']
+
         # handling old spec file
         if os.path.exists(self.specfile):
             if self.clean_old:
@@ -259,7 +264,7 @@ class RPMWriter():
         install = {}
         build = {}
         macros = {}         # global macros
-        extra_sections = [] # extra headers
+        check_scriptlets = [] # extra headers
 
         for i in file(spec_fpath).read().split("\n"):
             matchin = sin.match(i)
@@ -284,8 +289,8 @@ class RPMWriter():
                     build[matchout.group(2)] = recording
                 elif matchout.group(1) == "macros":
                     macros['main'] = recording
-                elif matchout.group(1) == "extra_sections":
-                    extra_sections = recording
+                elif matchout.group(1) == "check_scriptlets":
+                    check_scriptlets = recording
 
             if record:
                 recording.append(i)
@@ -298,8 +303,8 @@ class RPMWriter():
         if macros:
            content["macros"] = macros
 
-        if extra_sections:
-           content["extra_sections"] = extra_sections
+        if check_scriptlets and 'NeedCheckSection' in self.metadata:
+           content["check_scriptlets"] = check_scriptlets
 
         return content
 

@@ -13,6 +13,7 @@ Description: |
 Sources:
     - li0
     - li1
+SourcePrefix: pkgname-%{version} # optional, the prefix path of source tarball
 ExtraSources: # optional
     - file1;path1
     - file2     # path2 default to '/'
@@ -75,6 +76,8 @@ LocaleOptions: string # optional
 Documents:
     - doc1
     - doc2
+
+NeedCheckSection: yes # boolean options, use "yes"/"no" for true/false
 
 AutoSubPackages:
     - devel
