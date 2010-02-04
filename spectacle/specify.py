@@ -70,7 +70,6 @@ class RPMWriter():
         self.yaml_fpath = yaml_fpath
         self.metadata = {'MyVersion': __version__.version}
         self.scm = None
-        self.archive = 'bzip2'
         self.pkg = None
         self.version = None
         self.release = None
@@ -148,15 +147,6 @@ class RPMWriter():
         if "SCM" in self.metadata:
             self.scm = self.metadata['SCM']
 
-            if "Archive" in self.metadata:
-                self.archive = self.metadata['Archive']
-                if self.archive not in ('bzip2', 'gzip'):
-                    self.archive = 'bzip2'
-            if self.archive == 'bzip2':
-                self.appendix = 'bz2'
-            else:
-                self.appendix = 'gz'
-
         # handle patches with extra options
         if "Patches" in self.metadata:
             patches = self.metadata['Patches']
@@ -182,20 +172,6 @@ class RPMWriter():
         if 'NeedCheckSection' in self.metadata and \
                 not self.metadata['NeedCheckSection']:
                 del self.metadata['NeedCheckSection']
-
-        # handling old spec file
-        if os.path.exists(self.specfile):
-            if self.clean_old:
-                # backup original file
-                bak_spec_fpath = self.specfile + '.orig'
-                if os.path.exists(bak_spec_fpath):
-                    repl = raw_input('%s will be overwritten by the backup, continue?(Y/n) ' % bak_spec_fpath)
-                    if repl == 'n':
-                        sys.exit(1)
-
-                os.rename(self.specfile, bak_spec_fpath)
-            else:
-                self.newspec = False
 
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
@@ -309,6 +285,24 @@ class RPMWriter():
         return content
 
     def process(self, extra_content):
+        """ Read in old spec and record all customized stuff,
+            And auto-detect extra infos from %files list
+        """
+
+        # backup old spec file if needed
+        if os.path.exists(self.specfile):
+            if self.clean_old:
+                # backup original file
+                bak_spec_fpath = self.specfile + '.orig'
+                if os.path.exists(bak_spec_fpath):
+                    repl = raw_input('%s will be overwritten by the backup, continue?(Y/n) ' % bak_spec_fpath)
+                    if repl == 'n':
+                        sys.exit(1)
+
+                os.rename(self.specfile, bak_spec_fpath)
+            else:
+                self.newspec = False
+
         specfile = self.specfile
         if not self.newspec:
             self.extra['content'] = self.parse_existing(specfile)
@@ -352,23 +346,46 @@ class RPMWriter():
         file.write(spec_content)
         file.close()
 
-def get_scm_latest_release(rpm):
-    scm = GitAccess(rpm.scm)
+def get_scm_latest_release(rpm_writer):
+
+    if "Archive" in rpm_writer.metadata:
+        archive = rpm_writer.metadata['Archive']
+        if archive not in ('bzip2', 'gzip'):
+            archive = 'bzip2'
+    else:
+        archive = 'bzip2'
+
+    if archive == 'bzip2':
+        appendix = 'bz2'
+    else:
+        appendix = 'gz'
+
+    scm_url = rpm_writer.metadata['SCM']
+
+    scm = GitAccess(scm_url)
     print "Getting tags from SCM..."
     tags = scm.gettags()
     if len(tags) > 0:
-        rpm.version = sorted(tags.keys())[-1]
-        rpm.metadata['Version'] = rpm.version
+        rpm_writer.version = sorted(tags.keys())[-1]
+        rpm_writer.metadata['Version'] = rpm_writer.version
         tmp = tempfile.mkdtemp()
         pwd = os.getcwd()
-        if os.path.exists("%s/%s-%s.tar.%s" %(pwd, rpm.pkg, rpm.version, rpm.appendix )):
+        if os.path.exists("%s/%s-%s.tar.%s" %(pwd, rpm_writer.pkg, rpm_writer.version, appendix )):
             print "Archive already exists, will not creating a new one"
         else:
-            print "Creating archive %s/%s-%s.tar.%s ..." %( pwd, rpm.pkg, rpm.version, rpm.appendix )
+            print "Creating archive %s/%s-%s.tar.%s ..." %( pwd, rpm_writer.pkg, rpm_writer.version, appendix )
             os.chdir(tmp)
-            os.system('git clone %s' %rpm.scm)
-            os.chdir( "%s/%s" %(tmp, rpm.pkg))
-            os.system(' git archive --format=tar --prefix=%s-%s/ %s | %s  > %s/%s-%s.tar.%s' %(rpm.pkg, rpm.version, rpm.version, rpm.archive, pwd, rpm.pkg, rpm.version, rpm.appendix ))
+            os.system('git clone %s' % scm_url)
+            os.chdir( "%s/%s" %(tmp, rpm_writer.pkg))
+            os.system(' git archive --format=tar --prefix=%s-%s/ %s | %s  > %s/%s-%s.tar.%s' \
+                    % (rpm_writer.pkg,
+                       rpm_writer.version,
+                       rpm_writer.version,
+                       archive,
+                       pwd,
+                       rpm_writer.pkg,
+                       rpm_writer.version,
+                       appendix ))
         shutil.rmtree(tmp)
         os.chdir(pwd)
 
@@ -400,16 +417,16 @@ def download_sources(pkg, rev, sources):
                 """
 
 def generate_rpm(yaml_fpath, clean_old = False, extra_content = None):
-    rpm = RPMWriter(yaml_fpath, clean_old)
-    rpm.parse()
+    rpm_writer = RPMWriter(yaml_fpath, clean_old)
+    rpm_writer.parse()
 
     # update to SCM latest release
-    if rpm.scm is not None:
-        get_scm_latest_release(rpm)
+    if 'SCM' in rpm_writer.metadata:
+        get_scm_latest_release(rpm_writer)
 
     # if no srcpkg with yaml.version exists in cwd, trying to download
-    download_sources(rpm.pkg, rpm.version, rpm.metadata['Sources'])
+    download_sources(rpm_writer.pkg, rpm_writer.version, rpm_writer.metadata['Sources'])
 
-    rpm.process(extra_content)
+    rpm_writer.process(extra_content)
 
-    return rpm.specfile, rpm.newspec
+    return rpm_writer.specfile, rpm_writer.newspec
