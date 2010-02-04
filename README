@@ -96,7 +96,7 @@ All available directives for spectacle are listed as the following:
 
 * ExtraSources: **list** of **string**, *optional*
 
-* Patches: **list** of **string**, please see **NOTE1** blow
+* Patches: **list** of **string**, all patches need to be in 'p1' level
 
 * Requires: **list** of **string**
 
@@ -143,12 +143,6 @@ directives for sub packages:
     * Requires, *optional*
     * FilesInput, *optional*
     * etc.
-
-**NOTE1**: If the patch need other options of ``patch``, instead of ``-p1``,
-we can write the patch item as the following formats:
-
-        - patch_need_p0: -p0
-        - [patch_need_p0, -p0, -z, -E]
 
 **CAUTION**: The following cases of value string have special meaning in YAML:
 
