@@ -23,7 +23,7 @@ for yaml_fpath in sys.argv[1:]:
     if yaml_fpath == '--version':
         try:
             import spectacle.__version__
-            version = spectacle.__version__.version
+            version = spectacle.__version__.VERSION
         except ImportError:
             version = 'Unkown'
         print 'spectacle tools version', version

@@ -68,7 +68,7 @@ class RPMWriter():
 
     def __init__(self, yaml_fpath, clean_old = False):
         self.yaml_fpath = yaml_fpath
-        self.metadata = {'MyVersion': __version__.version}
+        self.metadata = {'MyVersion': __version__.VERSION}
         self.scm = None
         self.pkg = None
         self.version = None

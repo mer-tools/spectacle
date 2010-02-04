@@ -7,7 +7,7 @@ try:
     # first line should be the version number
     version = open(version_path).readline().strip()
     ver_file = open('spectacle/__version__.py', 'w')
-    ver_file.write("version = \"%s\"\n" % version)
+    ver_file.write("VERSION = \"%s\"\n" % version)
     ver_file.close()
 except IOError:
     print 'WARNING: Cannot write version number file'

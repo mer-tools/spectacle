@@ -513,7 +513,7 @@ def parse_options(args):
     import spectacle.__version__
 
     usage = "Usage: %prog [options] <spec-path>"
-    parser = optparse.OptionParser(usage, version=spectacle.__version__.version)
+    parser = optparse.OptionParser(usage, version=spectacle.__version__.VERSION)
 
     parser.add_option("-o", "--output", type="string",
                       dest="outfile_path", default=None,
