@@ -1,0 +1,106 @@
+#!/usr/bin/python -tt
+# vim: ai ts=4 sts=4 et sw=4
+
+#    Copyright (c) 2009 Intel Corporation
+#
+#    This program is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by the Free
+#    Software Foundation; version 2 of the License
+#
+#    This program is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#    for more details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with this program; if not, write to the Free Software Foundation, Inc., 59
+#    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+import os,sys
+import re
+import optparse
+import spectacle.specify as specify
+import urlgrabber
+
+def check_scm(scm_url):
+    print 'TODO: check git latest tags'
+    pass
+
+def check_src(pkg, cur_version, src_url):
+    print pkg,cur_version,src_url
+
+def parse_options(args):
+    import spectacle.__version__
+
+    usage = "Usage: %prog [options] <spec-path>"
+    parser = optparse.OptionParser(usage, version=spectacle.__version__.VERSION)
+
+    parser.add_option("-v", "--verbose", action="store_true",
+                      dest="verbose", default=False,
+                      help="Print verbose messages")
+    parser.add_option("-u", "--update-yaml", action="store_true",
+                      dest="update_yaml", default=False,
+                      help="Update the YAML file when newer version found")
+    parser.add_option("-d", "--download", action="store_true",
+                      dest="download", default=False,
+                      help="Download the source package when newer version found")
+    parser.add_option("", "--skip-scm", action="store_true",
+                      dest="skip_scm", default=False,
+                      help="Skip the checking of SCM links")
+
+    (options, args) = parser.parse_args()
+    if not args:
+        parser.error('Must specify path of yaml file')
+        sys.exit(1)
+
+    return options, args
+
+if __name__ == '__main__':
+    """ Main Function """
+
+    (options, args) = parse_options(sys.argv[1:])
+
+    yaml_fpath = args[0]
+
+    # Check if the input file exists
+    if not os.path.exists(yaml_fpath):
+        # input file does not exist
+        print "%s: File does not exist" % yaml_fpath
+        sys.exit(1)
+
+    if yaml_fpath.find('/') != -1 and os.path.dirname(yaml_fpath) != os.path.curdir:
+        print 'This tool need to be run in package dir, skip %s' % yaml_fpath
+        sys.exit(1)
+
+    rpm_writer = specify.RPMWriter(yaml_fpath)
+    rpm_writer.parse()
+
+    pkg_name = rpm_writer.pkg
+    cur_version = rpm_writer.pkg
+
+    if 'SCM' in rpm_writer.metadata:
+        scm_url = rpm_writer.metadata['SCM']
+    else:
+        scm_url = None
+
+    src_url = None
+    for src in rpm_writer.metadata['Sources']:
+        if re.match('^(http|https|ftp):\/\/.+', src):
+            src_url = src
+            break # use the 1st valid url
+
+    if not scm_url and not src_url:
+        print 'No valid upstream url for source packages, quit'
+        sys.exit(1)
+
+    if scm_url:
+        if options.skip_scm:
+            print 'Skip checking for SCM:', scm_url
+        else:
+            print 'Checking for SCM tags:', scm_url
+            check_scm(scm_url)
+
+    if src_url:
+        print 'Checking for released source pkgs at:', src_url
+        check_src(pkg_name, cur_version, src_url)
+
