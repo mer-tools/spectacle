@@ -19,15 +19,116 @@
 import os,sys
 import re
 import optparse
-import spectacle.specify as specify
+import distutils.version as _V
 import urlgrabber
+from HTMLParser import HTMLParser
+
+import spectacle.specify as specify
+
+class Pkg:
+    def __init__(self, name, ver, url):
+        self.name = name
+        self.cur_ver = ver
+        self.src_url_raw = url
+
+        self.src_url = self.__replace_macros()
+
+    def __replace_macros(self):
+        r_url = self.src_url_raw
+
+        if '%{name}' in r_url:
+            r_url = r_url.replace('%{name}', self.name)
+        if '%{version}' in r_url:
+            r_url = r_url.replace('%{version}', self.cur_ver)
+
+        return r_url
+
+    def upper_url(self):
+        import urlparse
+        return urlparse.urljoin(self.src_url, './')
+
+    def link_regex(self):
+        regex = os.path.basename(self.src_url_raw)
+        if '%{name}' in regex:
+            regex = regex.replace('%{name}', self.name)
+        if '%{version}' in regex:
+            regex = regex.replace('%{version}', '(\S+)')
+
+        return regex
+
+    def guess_next_ver(self):
+        v = _V.LooseVersion(self.cur_ver)
+
+        changed = False
+        v.version.reverse()
+        for i, d in enumerate(v.version):
+            if isinstance(d, int):
+                v.version[i] = d + 1
+                changed = True
+                break
+
+        if changed:
+            v.version.reverse()
+            return '.'.join(v.version)
+        else:
+            return None
+
+
+
+class MyHTMLParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.links = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'a':
+            self.links.append(dict(attrs).get('href'))
 
 def check_scm(scm_url):
     print 'TODO: check git latest tags'
     pass
 
-def check_src(pkg, cur_version, src_url):
-    print pkg,cur_version,src_url
+def check_src(pkg, cur_ver, src_url):
+
+    def _validate_url(url):
+        """ try to open the link to verify """
+        try:
+            f = urlgrabber.urlopen(url)
+        except urlgrabber.URLGrabberError, e:
+            if e.errno == 14: # HTTPError
+                return False
+            else:
+                raise e
+
+        f.close()
+        return True
+
+    if re.search('%{.*}', cur_ver):
+        print 'There are macros in version string, please replace them and try again.'
+        return
+
+    pkg = Pkg(pkg, cur_ver, src_url)
+
+    guess_dir_link = pkg.upper_url()
+    if _validate_url(guess_dir_link):
+        parser = MyHTMLParser()
+        parser.feed(urlgrabber.urlread(guess_dir_link))
+        links = filter(lambda l: pkg.name in l, parser.links)
+
+        regex = re.compile(pkg.link_regex())
+        vers = []
+        for link in links:
+            m = regex.match(os.path.basename(link))
+            if m:
+                vers.append(_V.LooseVersion(m.group(1)))
+        if vers:
+            vers.sort()
+            if vers[-1] > _V.LooseVersion(pkg.cur_ver):
+                return vers[-1]
+
+    # Cannot find newer version
+    return None
+
 
 def parse_options(args):
     import spectacle.__version__
@@ -76,7 +177,7 @@ if __name__ == '__main__':
     rpm_writer.parse()
 
     pkg_name = rpm_writer.pkg
-    cur_version = rpm_writer.pkg
+    cur_ver = rpm_writer.version
 
     if 'SCM' in rpm_writer.metadata:
         scm_url = rpm_writer.metadata['SCM']
@@ -102,5 +203,10 @@ if __name__ == '__main__':
 
     if src_url:
         print 'Checking for released source pkgs at:', src_url
-        check_src(pkg_name, cur_version, src_url)
+        new_ver = check_src(pkg_name, cur_ver, src_url)
+
+        if new_ver:
+            print 'Found newer version:', new_ver
+        else:
+            print 'No newer version found'
 
