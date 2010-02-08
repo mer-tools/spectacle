@@ -391,10 +391,15 @@ fi
 
 ############################ Post
 #if $extra.Info or $extra.Lib or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts')
-#if $extra.Lib
+#set $only_Lib = $extra.Lib and not ($extra.Info or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts'))
+#if $only_Lib
 %post -p /sbin/ldconfig
 #else
 %post
+#end if
+## -Lib
+#if $extra.Lib and not $only_Lib
+/sbin/ldconfig
 #end if
 ## -Schema
 #if $extra.Schema
@@ -424,10 +429,14 @@ $metadata.PostScripts
 
 ############################ PostUn
 #if $extra.Info or $extra.Lib
-#if $extra.Lib
+#set $only_Lib = $extra.Lib and not $extra.Info
+#if $only_Lib
 %postun -p /sbin/ldconfig
 #else
 %postun
+#end if
+#if $extra.Lib and not $only_Lib
+/sbin/ldconfig
 #end if
 #if $extra.Info
 if [ $1 = 0 ] ;then
@@ -443,10 +452,15 @@ fi
 #for $sp in $metadata.SubPackages
 #set $sub_extra = $extra.subpkgs[$sp.Name]
 #if $sub_extra.Info or $sub_extra.Lib or $sub_extra.Schema ### TODO  $metadata.has_key('PostScripts')
-#if $sub_extra.Lib
+#set $only_Lib = $sub_extra.Lib and not ($sub_extra.Info or $sub_extra.Schema)
+#if $only_Lib
 %post $sp.Name -p /sbin/ldconfig
 #else
 %post $sp.Name
+#end if
+## -Lib
+#if $sub_extra.Lib and not $only_Lib
+/sbin/ldconfig
 #end if
 ## -Schema
 #if $sub_extra.Schema
@@ -470,10 +484,14 @@ gconftool-2 --makefile-install-rule \
 
 ## PostUn for SubPackages
 #if $sub_extra.Info or $sub_extra.Lib
-#if $sub_extra.Lib
+#set $only_Lib = $sub_extra.Lib and not $sub_extra.Info
+#if $only_Lib
 %postun $sp.Name -p /sbin/ldconfig
 #else
 %postun $sp.Name
+#end if
+#if $sub_extra.Lib and not $only_Lib
+/sbin/ldconfig
 #end if
 #if $sub_extra.Info
 if [ $1 = 0 ] ;then
