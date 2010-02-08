@@ -138,8 +138,7 @@ class SpecParser(object):
             # make sure no 'make' generated auto
             items['Builder'] = 'no-builder'
             # put all script to 'post install'
-            items['extra']['PostMakeExtras'] = \
-                    ['# all build scripts in origin specfile as the following:'] + lines
+            items['extra']['PostMakeExtras'] = lines
 
         ### Sub START
         lines = v.split('\n')
@@ -233,14 +232,10 @@ class SpecParser(object):
             if self._Builder:
                 items['Builder'] = self._Builder
 
-            items['extra']['PreMakeExtras'] = \
-                    ['# The followings are the origin script in this spec file'] + \
-                    map(lambda s: '# >> ' + s, lines)
-
             if parts['pre']:
-                items['extra']['PreMakeExtras'].extend(['', '# splitted pre-build part by auto-parsing'] + parts['pre'])
+                items['extra']['PreMakeExtras'] = parts['pre']
             if parts['post']:
-                items['extra']['PostMakeExtras'] = ['# splitted post-build part by auto-parsing'] + parts['post']
+                items['extra']['PostMakeExtras'] = parts['post']
 
     def _do_install(self, items, pkg, v):
         """ to handle install script:
@@ -289,19 +284,15 @@ class SpecParser(object):
                     parts['post'].append(line)
 
             if found_insaller:
-                items['extra']['PreMakeInstallExtras'] = \
-                        ['# The followings are the origin script in this spec file'] + \
-                        map(lambda s: '# >> ' + s, lines)
-
                 if parts['pre']:
-                    items['extra']['PreMakeInstallExtras'].extend(['', '# splitted pre-install part by auto-parsing'] + parts['pre'])
+                    items['extra']['PreMakeInstallExtras'] = parts['pre']
                 if parts['post']:
-                    items['extra']['PostMakeInstallExtras'] = ['# splitted post-install part by auto-parsing'] + parts['post']
+                    items['extra']['PostMakeInstallExtras'] = parts['post']
 
                 return
 
         # false safe case
-        items['extra']['PostMakeInstallExtras'] = ['# all install scripts in origin specfile as the following:'] + lines
+        items['extra']['PostMakeInstallExtras'] = lines
 
     def _do_clean(self, items, pkg, v):
         # skip
