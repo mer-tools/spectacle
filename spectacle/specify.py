@@ -170,8 +170,14 @@ class RPMWriter():
 
         # check the bool value of NeedCheckSection
         if 'NeedCheckSection' in self.metadata and \
-                not self.metadata['NeedCheckSection']:
-                del self.metadata['NeedCheckSection']
+            not self.metadata['NeedCheckSection']:
+            del self.metadata['NeedCheckSection']
+
+        # check the bool value of NeedCheckSection
+        if 'SupportOtherDistros' in self.metadata and \
+            not self.metadata['SupportOtherDistros']:
+            del self.metadata['SupportOtherDistros']
+
 
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:

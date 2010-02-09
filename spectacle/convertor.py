@@ -46,6 +46,8 @@ ORDER_ENTRIES = ['Name',
                  'Builder',
                  'BuildArch',
                  'LocaleName',
+                 'NeedCheckSection',
+                 'SupportOtherDistros',
                 ]
 
 EXTRA_ENTRIES = ['Files',

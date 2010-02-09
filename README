@@ -131,6 +131,8 @@ All available directives for spectacle are listed as the following:
 
 * NeedCheckSection: **boolean**, whether need ``%check`` section in spec
 
+* SupportOtherDistros: **boolean**, whether need to check for other distros (besides Moblin)
+
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
 
 * SubPackages: **list** of **dict**, the **dict** item is the lower level
