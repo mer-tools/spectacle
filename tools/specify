@@ -17,21 +17,38 @@
 #    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import os,sys
+import optparse
 import spectacle.specify
 
-for yaml_fpath in sys.argv[1:]:
-    if yaml_fpath == '--version':
-        try:
-            import spectacle.__version__
-            version = spectacle.__version__.VERSION
-        except ImportError:
-            version = 'Unkown'
-        print 'spectacle tools version', version
-        sys.exit(0)
+def parse_options(args):
+    import spectacle.__version__
 
+    usage = "Usage: %prog [options] <yaml-path>"
+    parser = optparse.OptionParser(usage, version=spectacle.__version__.VERSION)
+    (options, args) = parser.parse_args()
+    if not args:
+        parser.error('Must specify path of yaml file')
+        sys.exit(1)
+
+    return options, args
+
+if __name__ == '__main__':
+    """ Main Function """
+
+    (options, args) = parse_options(sys.argv[1:])
+
+    yaml_fpath = args[0]
+
+    # check if the input file exists
+    if not os.path.exists(yaml_fpath):
+        # input file does not exist
+        print "%s: File does not exist" % yaml_fpath
+        sys.exit(1)
+
+    # check the working path
     if yaml_fpath.find('/') != -1 and os.path.dirname(yaml_fpath) != os.path.curdir:
         print 'This tool need to be run in package dir, skip %s' % yaml_fpath
-        continue
+        os.exit(1)
 
     spec_fpath, newspec = spectacle.specify.generate_rpm(yaml_fpath)
     if newspec:

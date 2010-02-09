@@ -27,6 +27,7 @@ import os
 import sys
 import re
 import shutil
+import optparse
 from ConfigParser import RawConfigParser
 
 # spectacle modules
@@ -197,19 +198,32 @@ class SBConfigParser(RawConfigParser):
         """ return all items, cooked to the input of convertor """
         return self.__cook_config()
 
+def parse_options(args):
+    import spectacle.__version__
+
+    usage = "Usage: %prog [options] <ini-path>"
+    parser = optparse.OptionParser(usage, version=spectacle.__version__.VERSION)
+
+    parser.add_option("-o", "--output", type="string",
+                      dest="outfile_path", default=None,
+                      help="Path of output yaml file")
+
+    (options, args) = parser.parse_args()
+    if not args:
+        parser.error('Must specify path of ini file')
+        sys.exit(1)
+
+    return options, args
+
 if __name__ == '__main__':
     """ Main Function """
 
-    # Check to see if an argument was passed.
-    if len(sys.argv) < 2:
-        # If no arguments were passed, print the usage and exit.
-        print "Usage: ini2spectacle <inifile_path> [outfile_path]"
-        sys.exit(1)
+    (options, args) = parse_options(sys.argv[1:])
 
-    ini_fpath = sys.argv[1]
+    ini_fpath = args[0]
 
-    if len(sys.argv) > 2:
-        out_fpath = sys.argv[2]
+    if options.outfile_path:
+        out_fpath = options.outfile_path
     else:
         if ini_fpath.endswith('.ini'):
             out_fpath = ini_fpath[:-3] + 'yaml'
