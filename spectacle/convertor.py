@@ -117,34 +117,15 @@ class Convertor(object):
             items.append((k, v))
 
         if extra:
-            # pick '%doc' out
-            if 'Files' in extra:
-                docs_elem = set() # for mutli items in single line
-                docs = [] # %doc lines
-                files = []
-                for line in extra['Files']:
-                    # Check if any line has %doc mentioned, to be handled seperatly
-                    if line.startswith("%doc"):
-                        doc_entry = line[4:].strip().split()
-                        if len(doc_entry) == 1:
-                            docs.append(doc_entry[0])
-                        else:
-                            docs_elem.update(doc_entry)
-                    else:
-                        line = line.strip()
-                        if line:
-                            files.append(line)
-
-                if docs_elem:
-                    docs = [' '.join(sorted(list(docs_elem)))] + docs
-
-                if docs:
-                    items.append(('Documents', docs))
-
+            try:
+                # clean up empty lines
+                files = [s.strip() for s in extra['Files'] if s.strip()]
                 if files:
                     extra['Files'] = files
                 else:
                     del extra['Files']
+            except KeyError:
+                pass
 
             if extra: # check it again
                 items.append(('extra', extra))

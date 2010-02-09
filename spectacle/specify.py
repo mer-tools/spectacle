@@ -328,6 +328,10 @@ class RPMWriter():
                     if 'Documents' in sp:
                         docs[sp['Name']] = sp['Documents']
 
+            # TODO, cleanup docs handling when all pkgs need not, include spec.tmpl
+            if docs:
+                print >> sys.stderr, 'Warning: please move "Docments" values to %files section in .spec!'
+
             self.parse_files(self.extra['content']['files'], docs)
         except KeyError:
             pass
