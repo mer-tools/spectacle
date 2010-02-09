@@ -523,6 +523,24 @@ def parse_options(args):
 
     return options, args
 
+def check_ini_file(spec_fpath):
+    import glob
+
+    specDir = os.path.dirname(spec_fpath)
+    if not specDir:
+        specDir = os.path.curdir
+
+    ini_s = glob.glob('*.ini')
+    if ini_s:
+        repl = raw_input(
+"""
+*.ini file(s) exists in working dir: %s
+If being spec-builder file(s), please use ini2spectacle for convert!
+Continue? (N/y) """  % ' '.join(ini_s))
+
+        if repl.upper() != 'Y':
+            sys.exit(1)
+
 if __name__ == '__main__':
     """ Main Function """
 
@@ -533,11 +551,13 @@ if __name__ == '__main__':
     if options.outfile_path:
         out_fpath = options.outfile_path
     else:
-        out_fpath = spec_fpath.rstrip('.spec') + '.yaml'
         if spec_fpath.endswith('.spec'):
             out_fpath = spec_fpath[:-4] + 'yaml'
         else:
             out_fpath = spec_fpath + '.yaml'
+
+    # Check if spec-build's INI file exists
+    check_ini_file(spec_fpath)
 
     # Check if the input file exists
     if not os.path.exists(spec_fpath):
