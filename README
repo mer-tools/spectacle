@@ -42,9 +42,21 @@ Several methods available for spectacle installation:
 
 ## Usage
 ### specify
-    specify <pkg_name.yaml>
+    Usage: specify [options] <yaml-path>
+
+    Options:
+      --version   show program's version number and exit
+      -h, --help  show this help message and exit
+
 ### ini2spectacle
-    ini2spectacle <pkg_name.ini>
+    Usage: ini2spectacle [options] <ini-path>
+
+    Options:
+      --version             show program's version number and exit
+      -h, --help            show this help message and exit
+      -o OUTFILE_PATH, --output=OUTFILE_PATH
+                        Path of output yaml file
+
 ### spec2spectacle
     Usage: spec2spectacle [options] <spec-path>
 
@@ -233,3 +245,18 @@ from yaml file. But the end users need not tackle it.
 * If to upgrade the pkg to a newer version, you can just edit the version str
   in yaml, and when you run ``specify``, it will download the needed files for
   you automatically.
+
+* In most original spec-builder packages, *LocaleName* will be specified in
+  spite whether they need it. After converted to spectacle, we will check it
+  carefully, improper setting will block the rpm packaging. So please add or
+  remove this key according the buildlog.
+
+* When using spec2spectacle/ini2spectacle to generate spectacle, the following
+  problems should be checked **manually**:
+
+     * Remove '%{name} = %{version}-%{release}' in sub-packages' Requires,
+       which will be added automatically.
+     * Remove "--disable-static" in ConfigOptions if present.
+     * Remove duplicate Requires(include pre/post/preun/postun) which were
+       added automatically based on the analysis of file list.
+
