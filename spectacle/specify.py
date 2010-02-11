@@ -201,7 +201,9 @@ class RPMWriter():
 
             for l in v:
                 if re.match('.*\.info.*', l) or re.match('.*(usr/share/info|%{_infodir}).*', l):
-                    pkg_extra['Infos'].append(l)
+                    p1 = re.compile('^%doc\s+(.*)')
+                    l1 = p1.sub(r'\1', l)
+                    pkg_extra['Infos'].append(l1)
                     pkg_extra['Info'] = True
                 if re.match('.*\.desktop$', l):
                     pkg_extra['Desktop'] = True

@@ -387,7 +387,7 @@ fi
 #if $extra.Schema
 %preun
 ## TODO: confirm? if [ "$1" -gt 1 ]; then
-if [ "$1" -gt 0 ]; then
+if [ "$1" -eq 0 ]; then
 #for $schema in $extra.Schemas
   export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
   gconftool-2 --makefile-uninstall-rule \
@@ -424,7 +424,9 @@ $metadata.PostScripts
 ## -Info
 #if $extra.Info
 #for $inf in $extra.Infos
-%install_info $inf /usr/share/info/dir
+if [ -e $inf ]; then
+    /sbin/install-info --quiet --info-dir=%{_infodir} $inf || : 
+fi
 #end for
 #end if
 ## -Icon
@@ -449,7 +451,9 @@ $metadata.PostScripts
 #if $extra.Info
 if [ $1 = 0 ] ;then
 #for $inf in $extra.Infos
-%install_info_delete $inf /usr/share/info/dir
+    if [ -e $inf ]; then
+       /sbin/install-info --quiet --info-dir=%{_infodir} --delete $inf || :
+    fi
 #end for
 fi
 #end if
@@ -485,7 +489,9 @@ gconftool-2 --makefile-install-rule \
 ## -Info
 #if $sub_extra.Info
 #for $inf in $sub_extra.Infos
-%install_info $inf /usr/share/info/dir
+if [ -e $inf ]; then
+    /sbin/install-info --quiet --info-dir=%{_infodir} $inf || : 
+fi
 #end for
 #end if ## Info
 #end if ## need post
@@ -504,7 +510,9 @@ gconftool-2 --makefile-install-rule \
 #if $sub_extra.Info
 if [ $1 = 0 ] ;then
 #for $inf in $sub_extra.Infos
-%install_info_delete $inf /usr/share/info/dir
+    if [ -e $inf ]; then
+        /sbin/install-info --quiet --info-dir=%{_infodir} $inf || : 
+    fi
 #end for
 fi
 #end if ## Info
