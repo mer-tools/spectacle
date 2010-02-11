@@ -109,6 +109,9 @@ BuildRequires:  pkgconfig($br_comps[0])
 BuildRequires:  $br
 #end for
 #end if
+#if $metadata.has_key("RunFdupes")
+BuildRequires:  fdupes
+#end if
 ## Provides
 #if $metadata.has_key("Provides")
 #for $prd in $metadata.Provides
@@ -365,7 +368,10 @@ $str_newline.join($extra.content.install.post)
 %find_lang ${metadata.LocaleName}
 #end if
 #end if
-
+############################ run fdupes
+#if $metadata.has_key("RunFdupes")
+%fdupes  %{buildroot}/${metadata.RunFdupes}
+#end if
 ############################ clean scripts
 %clean
 rm -rf %{buildroot}
