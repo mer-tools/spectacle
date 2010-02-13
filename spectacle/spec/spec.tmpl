@@ -21,7 +21,7 @@ $str_newline.join($extra.content.macros.main)
 Name:       ${metadata.Name}
 Summary:    ${metadata.Summary}
 Version:    ${metadata.Version}
-Release:    ${metadata.Release}%{?dist}
+Release:    ${metadata.Release}
 #if $metadata.has_key("Epoch")
 Epoch:      ${metadata.Epoch}
 #set $auto_depend = "%{epoch}:%{version}-%{release}"
@@ -322,13 +322,12 @@ $str_newline.join($extra.content.check_scriptlets)
 
 ############################ installation scripts
 %install
+rm -rf %{buildroot}
 # >> install pre
 #if $extra.content.has_key("install") and  $extra.content.install.has_key("pre")
 $str_newline.join($extra.content.install.pre)
 #end if
 # << install pre
-
-rm -rf %{buildroot}
 #if $Builder == 'python'
 #if 'SupportOtherDistros' in $metadata
 %if 0%{?suse_version}
