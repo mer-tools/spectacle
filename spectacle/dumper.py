@@ -53,6 +53,7 @@ class SpectacleDumper(object):
             #                ^^ None means to use <pkg_name>
             'Files': ('files', None),
             'macros': ('macros', None),
+            'setup': ('setup', None),
             'PostMakeInstallExtras': ('install', 'post'),
             'PreMakeInstallExtras': ('install', 'pre'),
             'PostMakeExtras': ('build', 'post'),

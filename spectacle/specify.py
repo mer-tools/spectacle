@@ -248,6 +248,7 @@ class RPMWriter():
         install = {}
         build = {}
         macros = {}         # global macros
+        setup = {}
         check_scriptlets = [] # extra headers
 
         for i in file(spec_fpath).read().split("\n"):
@@ -273,6 +274,8 @@ class RPMWriter():
                     build[matchout.group(2)] = recording
                 elif matchout.group(1) == "macros":
                     macros['main'] = recording
+                elif matchout.group(1) == "setup":
+                    setup['main'] = recording
                 elif matchout.group(1) == "check_scriptlets":
                     check_scriptlets = recording
 
@@ -286,6 +289,8 @@ class RPMWriter():
 
         if macros:
            content["macros"] = macros
+        if setup:
+           content["setup"] = setup
 
         if check_scriptlets and 'NeedCheckSection' in self.metadata:
            content["check_scriptlets"] = check_scriptlets

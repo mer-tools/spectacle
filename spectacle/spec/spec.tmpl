@@ -236,8 +236,14 @@ Description: %{summary}
 
 ############################ prep scripts
 %prep
-#if $metadata.has_key("Sources")
-%setup -q -n $metadata.SourcePrefix
+#if $metadata.has_key("Sources") 
+#if $metadata.has_key("NoSetup") and $metadata.NoSetup
+# No setup
+#else if $metadata.has_key("SetupOptions") 
+%setup $metadata.SetupOptions
+#else
+# No Setup
+#end if
 #end if
 ## Applying patches
 #if $metadata.has_key("PatchOpts")
@@ -247,6 +253,11 @@ Description: %{summary}
 #set $idx = $idx + 1
 #end for
 #end if
+# >> setup
+#if $extra.content.has_key("setup") and $extra.content.setup.has_key("main")
+$str_newline.join($extra.content.setup.main)
+#end if
+# << setup
 
 ############################ build scripts
 %build
