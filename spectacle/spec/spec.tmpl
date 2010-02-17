@@ -242,7 +242,7 @@ Description: %{summary}
 #else if $metadata.has_key("SetupOptions") 
 %setup $metadata.SetupOptions
 #else
-# No Setup
+%setup -q -n $metadata.SourcePrefix
 #end if
 #end if
 ## Applying patches
