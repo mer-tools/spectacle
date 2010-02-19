@@ -1,0 +1,42 @@
+Topic
+- [ ] LocaleName: iso-codes --all-name (Parsing is still not perfect)
+- [ ] devel requires base package (Duplicates..)
+- [ ] %defattr(-,root,root,-) duplication
+- [ ] Support series.conf file to list and maintain patches with patch
+      descriptions. It should put the description on to of the patch
+      tag in the spec file
+- [ ] When converting from ini, also delete the Makefile and put a new
+      makefile that supports spectacle
+- [ ] calling specify without any arguments should look if there is one
+      yaml file and use it
+- [ ] calling ini2spectacle should look for a single ini file and
+      convert it, no need to specify anything as argument
+- [ ] Check for invalid keywords and complain about them
+- [ ] Check if all mandatory keywords are present
+- [ ] Maintain a list of RPM Groups (to be provided ) and check if the
+      rpm group in the yaml/spec is valid and if it is one of those
+      supported in MeeGo
+- [ ] Same for licenses (list of licenses TBD)
+- [ ] Calling specify in a directory with no yaml file should open an
+      editor ($EDITOR) with a template of mandatory keywords that can
+      be filled to create a new yaml file. Probably calling specify
+      with --new <pkg name> or even --source <tarball>... specify then
+      will do quick guess on the package name and verion etc. (See
+      speculate tool description)
+- [ ] Speculate:
+    - [ ] This is a tool that basically helps generate yaml files
+    - [ ] Point it to a tar ball and maybe some other hints and it will
+          create a basic yaml file from the data it can extract from
+          the tar and other web services like freshmeat
+    - [ ] From the tar:
+        - [ ] Examine configure scripts and look for pkgconfig
+              dependencies and add them for BuildRequire
+        - [ ] Extract name of package version from tar file
+        - [ ] Examine other files in the tar that can provide
+              additional data, for example from doc/
+        - [ ] Guess file list
+    - [ ] Web services (Freshmeat, sourceforge , etc.)
+        - [ ] Check web service for the package and its descriptions,
+              category, license etc.
+        - [ ] Other data can be extracted from the web...
+        - [ ]
