@@ -345,7 +345,7 @@ class RPMWriter():
             not self.metadata['NeedCheckSection']:
             del self.metadata['NeedCheckSection']
 
-        # check the bool value of NeedCheckSection
+        # check the bool value of SupportOtherDistros
         if 'SupportOtherDistros' in self.metadata and \
             not self.metadata['SupportOtherDistros']:
             del self.metadata['SupportOtherDistros']
