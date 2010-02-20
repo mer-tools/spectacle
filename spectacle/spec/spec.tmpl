@@ -105,8 +105,12 @@ BuildRequires:  pkgconfig($br_comps[0])
 #end if
 #end for
 #end if
+#set $br_locale = ""
 #if $metadata.has_key("PkgBR")
 #for $br in $metadata.PkgBR
+#if $br == 'intltool' or $br == 'gettext' and not $metadata.has_key("LocaleName")
+#set $br_locale = $metadata.Name
+#end if
 BuildRequires:  $br
 #end for
 #end if
@@ -278,7 +282,7 @@ CFLAGS="\$RPM_OPT_FLAGS" %{__python} setup.py build
 #######
 #else
 ## default
-#set $Configure = 'noconfigure'
+#set $Configure = 'configure'
 #end if
 #######
 #if $Configure == 'autogen'
@@ -378,6 +382,8 @@ $str_newline.join($extra.content.install.post)
 #else
 %find_lang ${metadata.LocaleName}
 #end if
+#else if $br_locale != ""
+%find_lang $br_locale
 #end if
 ############################ run fdupes
 #if $metadata.has_key("RunFdupes")
@@ -539,6 +545,8 @@ fi
 
 #if $metadata.has_key("LocaleName")
 %files -f ${metadata.LocaleName}.lang
+#else if $br_locale != ""
+%files -f ${br_locale}.lang
 #else if $metadata.has_key('FilesInput')
 %files -f $metadata.FilesInput
 #else
