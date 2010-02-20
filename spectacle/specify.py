@@ -22,6 +22,8 @@ import tempfile
 import shutil
 import copy
 import distutils.version as _V
+import datetime
+
 
 # third-party modules
 import yaml
@@ -78,7 +80,8 @@ class RPMWriter():
 
     def __init__(self, yaml_fpath, clean_old = False):
         self.yaml_fpath = yaml_fpath
-        self.metadata = {'MyVersion': __version__.VERSION}
+        now = datetime.datetime.now()
+        self.metadata = {'MyVersion': __version__.VERSION, 'Date': now.strftime("%Y-%m-%d")}
         self.pkg = None
         self.version = None
         self.release = None
@@ -375,7 +378,7 @@ class RPMWriter():
                 pkg_extra = self.extra['subpkgs'][pkg_name]
 
             for l in v:
-                if re.match('.*\.info.*', l) or re.match('.*(usr/share/info|%{_infodir}).*', l):
+                if re.match('.*\.info\..*', l) or re.match('.*(usr/share/info|%{_infodir}).*info.gz$', l):
                     p1 = re.compile('^%doc\s+(.*)')
                     l1 = p1.sub(r'\1', l)
                     pkg_extra['Infos'].append(l1)
@@ -392,6 +395,9 @@ class RPMWriter():
                         # 'devel' sub pkgs should not set Lib flags
                         pkg_extra['Lib'] = True
                 if re.match('.*\.schema.*', l):
+                    comp = l.split()
+                    if len(comp) > 1:
+                        l = comp[1]
                     pkg_extra['Schema'] = True
                     pkg_extra['Schemas'].append(l)
                 if re.match('.*\/icons\/.*', l):
