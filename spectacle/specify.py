@@ -334,7 +334,10 @@ class RPMWriter():
                         prefix = member.name
                         break
                 tf.close()
-
+                if not prefix:
+                    prefix, ignore = os.path.basename(tarball).split('.tar.')
+                #print "Prefix: %s" %prefix
+                #print '%s-%s' % (self.pkg, self.version)
                 if prefix and prefix != '%s-%s' % (self.pkg, self.version):
                     prefix = prefix.replace(self.pkg, '%{name}')
                     prefix = prefix.replace(self.version, '%{version}')
