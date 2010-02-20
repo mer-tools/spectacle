@@ -104,6 +104,12 @@ class RPMWriter():
                 return False
             return True
 
+        def _check_listkey(metadata, key):
+            """ sub-routine for LIST typed keys checking """
+            if key in metadata and not isinstance(metadata[key], list):
+                return False
+            return True
+
         # checking for mandatory keys
         mandatory_keys = ('Name', 'Version', 'Release')
         for key in mandatory_keys:
@@ -121,7 +127,24 @@ class RPMWriter():
             for sp in self.metadata["SubPackages"]:
                 if not _check_desc(sp):
                     print >> sys.stderr, \
-                        'Warning: Sub-package: %s has no qualified "Description" directive' % sp['Name']
+                    'Warning: Sub-package: %s has no qualified "Description" directive' % sp['Name']
+
+        # checking for LIST expected keys
+        list_keys = ('Sources', 'ExtraSources', 'Patches',
+                     'Requires', 'RequiresPre', 'RequiresPreUn',
+                     'RequiresPost', 'RequiresPostUn', 'PkgBR',
+                     'PkgConfigBR', 'Provides', 'Conflicts',
+                     'Obsoletes', 'AutoSubPackages')
+        for key in list_keys:
+            if not _check_listkey(self.metadata, key):
+                print >> sys.stderr, 'Warning: the value of "%s" in Main package is expected as list typed' % key
+                self.metadata[key] = [self.metadata[key]]
+            if "SubPackages" in self.metadata:
+                for sp in self.metadata["SubPackages"]:
+                    if not _check_listkey(sp, key):
+                        print >> sys.stderr, \
+                        'Warning: the value of "%s" in %s sub-package is expected as list typed' % (key, sp['Name'])
+                        sp[key] = [sp[key]]
 
     def parse(self):
 
