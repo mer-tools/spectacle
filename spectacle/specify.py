@@ -95,6 +95,34 @@ class RPMWriter():
     def dump(self):
         print yaml.dump(yaml.load(self.stream))
 
+    def sanity_check(self):
+
+        def _check_desc(metadata):
+            """ sub-routine for 'description' checking """
+            if 'Description' not in metadata or \
+                metadata['Description'] == '%{summary}':
+                return False
+            return True
+
+        # checking for mandatory keys
+        mandatory_keys = ('Name', 'Version', 'Release')
+        for key in mandatory_keys:
+            if key not in self.metadata:
+                print 'Invalid yaml file %s without %s directive' % (self.yaml_fpath, key)
+                sys.exit(1)
+
+        # checking for unexpected keys
+        # TODO
+
+        # checking for validation of 'Description'
+        if not _check_desc(self.metadata):
+            print >> sys.stderr, 'Warning: Main package has no qualified "Description" directive'
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                if not _check_desc(sp):
+                    print >> sys.stderr, \
+                        'Warning: Sub-package: %s has no qualified "Description" directive' % sp['Name']
+
     def parse(self):
 
         # customized Resolver for Loader, in PyYAML
@@ -108,18 +136,19 @@ class RPMWriter():
                     if tp[0] == u'tag:yaml.org,2002:int':
                         yaml.loader.Loader.yaml_implicit_resolvers.get(ch).remove(tp)
 
+        # loading data from YAML
         self.metadata.update(yaml.load(self.stream))
 
-        try:
-            self.pkg = self.metadata['Name']
-            self.version = self.metadata['Version']
-            self.release = self.metadata['Release']
+        # verifying the sanity
+        self.sanity_check()
 
-            self.specfile = "%s.spec" % self.pkg
-            self.newspec = True
-        except KeyError:
-            print 'Invalid yaml file %s without "Name" or "Version" directive' % self.yaml_fpath
-            sys.exit(1)
+        # for convenience
+        self.pkg = self.metadata['Name']
+        self.version = self.metadata['Version']
+        self.release = self.metadata['Release']
+
+        self.specfile = "%s.spec" % self.pkg
+        self.newspec = True
 
         # handling 'ExtraSources', extra separated files which need to be install
         # specific paths
