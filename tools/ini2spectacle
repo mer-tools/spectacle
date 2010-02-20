@@ -114,7 +114,8 @@ class SBConfigParser(RawConfigParser):
             self.record_used_files.append(filename)
             return file(filename).read().strip()
         else:
-            raise "Missing file: %s" % filename
+            print >> sys.stderr, "Warning: missing expected file %s" % filename
+            return None
 
     def __cook_config(self):
         """ Helper function to update fields for spec-builder specific ones
@@ -149,11 +150,15 @@ class SBConfigParser(RawConfigParser):
                 if key in items:
                     content = self.__expand_single(
                                     os.path.join(self.ini_dir, items[key]))
-                    if key == 'Files':
-                        # 'Files' need split to list
-                        self.set(section, key, content.split('\n'))
+                    if content:
+                        if key == 'Files':
+                            # 'Files' need split to list
+                            self.set(section, key, content.split('\n'))
+                        else:
+                            self.set(section, key, content)
                     else:
-                        self.set(section, key, content)
+                        # if file empty or file not exists, remove the empty key
+                        del items[key]
 
             # move extra keys to 'extra' key
             extra = {}
