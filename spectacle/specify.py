@@ -218,7 +218,32 @@ class RPMWriter():
 
         # confirm 'SourcePrefix' is valid
         if 'SourcePrefix' not in self.metadata:
+            import tarfile
+
+            # setting the default value firstly
             self.metadata['SourcePrefix'] = '%{name}-%{version}'
+
+            tarball = None
+            for uri in self.metadata['Sources']:
+                fpath = os.path.basename(uri)
+                fpath = fpath.replace('%{name}', self.pkg)
+                fpath = fpath.replace('%{version}', self.version)
+                if os.path.exists(fpath) and tarfile.is_tarfile(fpath):
+                    tarball = fpath
+                    break
+            if tarball:
+                tf = tarfile.open(tarball, 'r:*')
+                prefix = None
+                for member in tf.getmembers():
+                    if member.type == tarfile.DIRTYPE:
+                        prefix = member.name
+                        break
+                tf.close()
+
+                if prefix and prefix != '%s-%s' % (self.pkg, self.version):
+                    prefix = prefix.replace(self.pkg, '%{name}')
+                    prefix = prefix.replace(self.version, '%{version}')
+                    self.metadata['SourcePrefix'] = prefix
 
         # check the bool value of NeedCheckSection
         if 'NeedCheckSection' in self.metadata and \
