@@ -214,8 +214,7 @@ class RPMWriter():
         sources = self.metadata['Sources']
 
         for s in sources:
-            if s.startswith('http://') or s.startswith('ftp://'):
-                # TODO support https://
+            if s.startswith('http://') or s.startswith('https://') or s.startswith('ftp://'):
                 target = s.replace('%{name}', pkg)
                 target = target.replace('%{version}', rev)
                 f_name = os.path.basename(target)
@@ -224,8 +223,15 @@ class RPMWriter():
                     if repl == 'n': break
 
                     print 'Downloading latest source package from:', target
-                    import urllib
-                    urllib.urlretrieve(target, f_name, reporthook = _dl_progress)
+                    import urlgrabber
+                    from urlgrabber.progress import text_progress_meter
+                    try:
+                        urlgrabber.urlgrab(target, f_name, progress_obj = text_progress_meter())
+                    except urlgrabber.grabber.URLGrabError, e:
+                        if e.errno == 14: # HTTPError
+                            print >> sys.stderr, 'Warning: Invalid source URL'
+                        else:
+                            raise e
                     """
                     for ext in ('.md5', '.gpg', '.sig', '.sha1sum'):
                         urllib.urlretrieve(target + ext, f_name + ext)
