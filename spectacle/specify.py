@@ -21,6 +21,7 @@ import re
 import tempfile
 import shutil
 import copy
+import distutils.version as _V
 
 # third-party modules
 import yaml
@@ -32,7 +33,8 @@ import spec
 class GitAccess():
     def __init__(self, path):
         self.path = path
-    def gettags(self):
+
+    def _gettags(self):
           tags = {}
           fh = os.popen('git ls-remote --tags "%s" 2>/dev/null' % self.path)
           prefix = 'refs/tags/'
@@ -44,6 +46,14 @@ class GitAccess():
               tagx = tag[len(prefix):len(tag)]
               tags[tagx] = node
           return tags
+
+    def get_toptag(self):
+        vers = [_V.LooseVersion(tag) for tag in self._gettags()]
+        if vers:
+            vers.sort()
+            return str(vers[-1])
+
+        return None
 
 class RPMWriter():
     """
@@ -69,7 +79,6 @@ class RPMWriter():
     def __init__(self, yaml_fpath, clean_old = False):
         self.yaml_fpath = yaml_fpath
         self.metadata = {'MyVersion': __version__.VERSION}
-        self.scm = None
         self.pkg = None
         self.version = None
         self.release = None
@@ -146,6 +155,82 @@ class RPMWriter():
                         'Warning: the value of "%s" in %s sub-package is expected as list typed' % (key, sp['Name'])
                         sp[key] = [sp[key]]
 
+    def __get_scm_latest_release(self):
+
+        if "Archive" in self.metadata:
+            archive = self.metadata['Archive']
+            if archive not in ('bzip2', 'gzip'):
+                archive = 'bzip2'
+        else:
+            archive = 'bzip2'
+
+        if archive == 'bzip2':
+            appendix = 'bz2'
+        else:
+            appendix = 'gz'
+
+        scm_url = self.metadata['SCM']
+
+        scm = GitAccess(scm_url)
+        print "Getting tags from SCM..."
+        top = scm.get_toptag()
+        if top and top != self.version:
+            print >> sys.stderr, 'Warning: Version in YAML shoud be updated according SCM tags'
+            self.version = top
+            self.metadata['Version'] = self.version
+
+            pwd = os.getcwd()
+            if os.path.exists("%s/%s-%s.tar.%s" %(pwd, self.pkg, self.version, appendix )):
+                print "Archive already exists, will not creating a new one"
+            else:
+                print "Creating archive %s/%s-%s.tar.%s ..." %( pwd, self.pkg, self.version, appendix )
+                tmp = tempfile.mkdtemp()
+                os.chdir(tmp)
+                os.system('git clone %s' % scm_url)
+                os.chdir( "%s/%s" %(tmp, self.pkg))
+                os.system(' git archive --format=tar --prefix=%s-%s/ %s | %s  > %s/%s-%s.tar.%s' \
+                        % (self.pkg,
+                           self.version,
+                           self.version,
+                           archive,
+                           pwd,
+                           self.pkg,
+                           self.version,
+                           appendix ))
+                shutil.rmtree(tmp)
+
+            os.chdir(pwd)
+
+    def __download_sources(self):
+        def _dl_progress(count, s_block, s_total):
+            percent = int(count * s_block*100 / s_total)
+            if percent > 100: percent = 100
+            sys.stdout.write('\r... %d%%' % percent)
+            if percent == 100: print ' Done.'
+            sys.stdout.flush()
+
+        pkg = self.pkg
+        rev = self.version
+        sources = self.metadata['Sources']
+
+        for s in sources:
+            if s.startswith('http://') or s.startswith('ftp://'):
+                # TODO support https://
+                target = s.replace('%{name}', pkg)
+                target = target.replace('%{version}', rev)
+                f_name = os.path.basename(target)
+                if not os.path.isfile(f_name):
+                    repl = raw_input('Need to download source package: %s ?(Y/n) ' % f_name)
+                    if repl == 'n': break
+
+                    print 'Downloading latest source package from:', target
+                    import urllib
+                    urllib.urlretrieve(target, f_name, reporthook = _dl_progress)
+                    """
+                    for ext in ('.md5', '.gpg', '.sig', '.sha1sum'):
+                        urllib.urlretrieve(target + ext, f_name + ext)
+                    """
+
     def parse(self):
 
         # customized Resolver for Loader, in PyYAML
@@ -196,8 +281,12 @@ class RPMWriter():
             self.metadata['Sources'].extend(extra_srcs)
             self.metadata['ExtraInstall'] = extra_install
 
+        # update to SCM latest release
         if "SCM" in self.metadata:
-            self.scm = self.metadata['SCM']
+            self.__get_scm_latest_release()
+
+        # if no srcpkg with yaml.version exists in cwd, trying to download
+        self.__download_sources()
 
         # handle patches with extra options
         if "Patches" in self.metadata:
@@ -440,87 +529,9 @@ class RPMWriter():
         file.write(spec_content)
         file.close()
 
-def get_scm_latest_release(rpm_writer):
-
-    if "Archive" in rpm_writer.metadata:
-        archive = rpm_writer.metadata['Archive']
-        if archive not in ('bzip2', 'gzip'):
-            archive = 'bzip2'
-    else:
-        archive = 'bzip2'
-
-    if archive == 'bzip2':
-        appendix = 'bz2'
-    else:
-        appendix = 'gz'
-
-    scm_url = rpm_writer.metadata['SCM']
-
-    scm = GitAccess(scm_url)
-    print "Getting tags from SCM..."
-    tags = scm.gettags()
-    if len(tags) > 0:
-        rpm_writer.version = sorted(tags.keys())[-1]
-        rpm_writer.metadata['Version'] = rpm_writer.version
-        tmp = tempfile.mkdtemp()
-        pwd = os.getcwd()
-        if os.path.exists("%s/%s-%s.tar.%s" %(pwd, rpm_writer.pkg, rpm_writer.version, appendix )):
-            print "Archive already exists, will not creating a new one"
-        else:
-            print "Creating archive %s/%s-%s.tar.%s ..." %( pwd, rpm_writer.pkg, rpm_writer.version, appendix )
-            os.chdir(tmp)
-            os.system('git clone %s' % scm_url)
-            os.chdir( "%s/%s" %(tmp, rpm_writer.pkg))
-            os.system(' git archive --format=tar --prefix=%s-%s/ %s | %s  > %s/%s-%s.tar.%s' \
-                    % (rpm_writer.pkg,
-                       rpm_writer.version,
-                       rpm_writer.version,
-                       archive,
-                       pwd,
-                       rpm_writer.pkg,
-                       rpm_writer.version,
-                       appendix ))
-        shutil.rmtree(tmp)
-        os.chdir(pwd)
-
-def download_sources(pkg, rev, sources):
-    def _dl_progress(count, s_block, s_total):
-        percent = int(count * s_block*100 / s_total)
-        if percent > 100: percent = 100
-        sys.stdout.write('\r... %d%%' % percent)
-        if percent == 100: print ' Done.'
-
-        sys.stdout.flush()
-
-    for s in sources:
-        if s.startswith('http://') or s.startswith('ftp://'):
-            # TODO support https://
-            target = s.replace('%{name}', pkg)
-            target = target.replace('%{version}', rev)
-            f_name = os.path.basename(target)
-            if not os.path.isfile(f_name):
-                repl = raw_input('Need to download source package: %s ?(Y/n) ' % f_name)
-                if repl == 'n': break
-
-                print 'Downloading latest source package from:', target
-                import urllib
-                urllib.urlretrieve(target, f_name, reporthook = _dl_progress)
-                """
-                for ext in ('.md5', '.gpg', '.sig', '.sha1sum'):
-                    urllib.urlretrieve(target + ext, f_name + ext)
-                """
-
 def generate_rpm(yaml_fpath, clean_old = False, extra_content = None):
     rpm_writer = RPMWriter(yaml_fpath, clean_old)
     rpm_writer.parse()
-
-    # update to SCM latest release
-    if 'SCM' in rpm_writer.metadata:
-        get_scm_latest_release(rpm_writer)
-
-    # if no srcpkg with yaml.version exists in cwd, trying to download
-    download_sources(rpm_writer.pkg, rpm_writer.version, rpm_writer.metadata['Sources'])
-
     rpm_writer.process(extra_content)
 
     return rpm_writer.specfile, rpm_writer.newspec
