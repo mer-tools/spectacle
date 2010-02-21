@@ -147,7 +147,7 @@ class RPMWriter():
                      'Requires', 'RequiresPre', 'RequiresPreUn',
                      'RequiresPost', 'RequiresPostUn', 'PkgBR',
                      'PkgConfigBR', 'Provides', 'Conflicts',
-                     'Obsoletes', 'AutoSubPackages')
+                     'Obsoletes', 'AutoSubPackages', 'LocaleOptions')
         for key in list_keys:
             if not _check_listkey(self.metadata, key):
                 print >> sys.stderr, 'Warning: the value of "%s" in Main package is expected as list typed' % key
