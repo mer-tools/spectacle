@@ -19,11 +19,21 @@ Development/Libraries
 Development/System
 Development/Tools
 Documentation
-System Environment/Base
-System Environment/Daemons
-System Environment/Kernel
-System Environment/Libraries
-System Environment/Shells
-User Interface/Desktops
-User Interface/X
-User Interface/X Hardware Support
+System/Boot
+System/Console
+System/I18n/Chinese
+System/I18n/Japanese
+System/I18n/Korean 
+System/Packages
+System/Base
+System/Daemons
+System/Kernel
+System/Libraries
+System/Shells
+System/X11
+System/X11/Fonts
+System/X11/Icons
+System/GUI/XFCE
+System/GUI/Other
+System/GUI/GNOME
+
