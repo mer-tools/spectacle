@@ -282,6 +282,9 @@ $str_newline.join($extra.content.setup.main)
 
 ############################ build scripts
 %build
+#if 'UseAsNeeded' in $metadata and not $metadata.UseAsNeeded
+unset LD_AS_NEEDED
+#end if
 # >> build pre
 #if $extra.content.has_key("build") and $extra.content.build.has_key("pre")
 $str_newline.join($extra.content.build.pre)
@@ -324,11 +327,6 @@ CFLAGS="\$RPM_OPT_FLAGS" %{__python} setup.py build
 #end for
 #end if ## ConfigOptions
 
-#if 'UseAsNeeded' in $metadata
-export LD_AS_NEEDED=1
-#else
-unset LD_AS_NEEDED
-#end if
 #if $Builder == 'make'
 # Call make instruction with smp support
 make %{?jobs:-j%jobs}
