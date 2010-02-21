@@ -252,7 +252,12 @@ class SpecParser(object):
             if line.startswith('%find_lang'):
                 m = re.compile('^%find_lang\s+(.*)\s*').match(line)
                 if m:
-                    items['LocaleName'] = m.group(1)
+                    parts = m.group(1).split()
+                    if '||' in parts:
+                        parts = parts[:parts.index('||')]
+                    items['LocaleName'] = parts.pop(0)
+                    if parts:
+                        items['LocaleOptions'] = parts
                     continue
 
             filter_lines.append(line)

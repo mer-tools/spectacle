@@ -385,7 +385,7 @@ $str_newline.join($extra.content.install.post)
 # << install post
 #if $metadata.has_key("LocaleName")
 #if $metadata.has_key("LocaleOptions")
-%find_lang ${metadata.LocaleName}  ${metadata.LocaleOptions}
+%find_lang ${metadata.LocaleName} ${metadata.LocaleOptions}
 #else
 %find_lang ${metadata.LocaleName}
 #end if
