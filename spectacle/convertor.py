@@ -50,6 +50,8 @@ ORDER_ENTRIES = ['Name',
                  'NeedCheckSection',
                  'SupportOtherDistros',
                  'UseAsNeeded',
+                 'NoAutoReq',
+                 'NoAutoProv',
                 ]
 
 EXTRA_ENTRIES = ['Files',

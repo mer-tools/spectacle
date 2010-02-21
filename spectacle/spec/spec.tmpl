@@ -58,6 +58,9 @@ Patch${idx}:     $patch
 #set $idx = $idx + 1
 #end for
 #end if
+#if 'NoAutoReq' in $metadata
+AutoReq: 0
+#end if
 ## Requires
 #if $metadata.has_key("Requires")
 #for $req in $metadata.Requires
@@ -124,6 +127,9 @@ BuildRequires:  $br
 #if $metadata.has_key("RunFdupes")
 BuildRequires:  fdupes
 #end if
+#if 'NoAutoProv' in $metadata
+AutoProv: 0
+#end if
 ## Provides
 #if $metadata.has_key("Provides")
 #for $prd in $metadata.Provides
@@ -173,6 +179,9 @@ Summary: $sp.Summary
 Group: $sp.Group
 #else
 Group: ${metadata.Group}
+#end if
+#if 'NoAutoReq' in $metadata
+AutoReq: 0
 #end if
 Requires: %{name} = $auto_depend
 #if $sp.has_key("Requires")

@@ -351,7 +351,10 @@ class RPMWriter():
         # to reflect the bool value
         for bopt in ('NeedCheckSection',
                      'SupportOtherDistros',
-                     'UseAsNeeded'):
+                     'UseAsNeeded',
+                     'NoAutoReq',
+                     'NoAutoProv',
+                    ):
             if bopt in self.metadata and not self.metadata[bopt]:
                 del self.metadata[bopt]
 
