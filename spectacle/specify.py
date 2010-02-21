@@ -183,7 +183,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
                      'Requires', 'RequiresPre', 'RequiresPreUn',
                      'RequiresPost', 'RequiresPostUn', 'PkgBR',
                      'PkgConfigBR', 'Provides', 'Conflicts',
-                     'Obsoletes', 'AutoSubPackages', 'LocaleOptions')
+                     'Obsoletes', 'AutoSubPackages')
         for key in list_keys:
             if not _check_listkey(self.metadata, key):
                 print >> sys.stderr, 'Warning: the value of "%s" in Main package is expected as list typed' % key
@@ -377,7 +377,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
                         prefix = member.name
                         break
                 tf.close()
-                if not prefix:
+                if not prefix or prefix == '.':
                     prefix, ignore = os.path.basename(tarball).split('.tar.')
                 #print "Prefix: %s" %prefix
                 #print '%s-%s' % (self.pkg, self.version)
