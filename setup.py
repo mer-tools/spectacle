@@ -21,5 +21,7 @@ setup(name='spectacle',
       url='http://moblin.org/',
       scripts=['tools/specify', 'tools/ini2spectacle', 'tools/spec2spectacle'],
       packages=['spectacle', 'spectacle.spec', 'spectacle.dsc'],
+      package_data={'sepctacle': ['data/*.csv']},
+
      )
 

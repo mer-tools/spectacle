@@ -23,6 +23,7 @@ import shutil
 import copy
 import distutils.version as _V
 import datetime
+import csv
 
 
 # third-party modules
@@ -87,6 +88,7 @@ class RPMWriter():
         self.version = None
         self.release = None
         self.specfile = None
+        self.packages = {}
 
         self.clean_old = clean_old
 
@@ -108,7 +110,20 @@ class RPMWriter():
     def dump(self):
         print yaml.dump(yaml.load(self.stream))
 
+            
     def sanity_check(self):
+
+        def _check_pkgconfig():
+            pkgcfg = csv.reader(open('/usr/share/spectacle/pkgconfig-provides.csv'), delimiter=',')
+            for row in pkgcfg:
+                pc = re.search('pkgconfig\(([^)]+)\)', row[1])
+                m = pc.group(1)
+                if self.packages.has_key(row[0]):
+                    ll = self.packages[row[0]] 
+                    ll.append(m)
+                    self.packages[row[0]] = ll
+                else:
+                    self.packages[row[0]] = [m]
 
         def _check_desc(metadata):
             """ sub-routine for 'description' checking """
@@ -129,6 +144,14 @@ class RPMWriter():
             if key not in self.metadata:
                 print 'Invalid yaml file %s without %s directive' % (self.yaml_fpath, key)
                 sys.exit(1)
+
+        if self.metadata.has_key("PkgBR"):
+            _check_pkgconfig()
+            for p in self.metadata['PkgBR']:
+                if self.packages.has_key(p):
+                     print >> sys.stderr, """Info: Use one of
+ - %s 
+in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
 
         # checking for unexpected keys
         # TODO
