@@ -148,6 +148,10 @@ class SBConfigParser(RawConfigParser):
                             map(lambda s: '--'+s,
                                 [opt for opt in map(str.strip, items['ConfigOptions'].split('--')) if opt]))
 
+            # special cases for 'LocaleOptions'
+            if 'LocaleOptions' in items and 'LocaleName' not in items:
+                self.set(section, 'LocaleName', '%{name}')
+
             # Convert keys which need expanding from external file
             for key in self.expand_keys:
                 if key in items:

@@ -46,6 +46,7 @@ ORDER_ENTRIES = ['Name',
                  'Builder',
                  'BuildArch',
                  'LocaleName',
+                 'LocaleOptions',
                  'NeedCheckSection',
                  'SupportOtherDistros',
                 ]
