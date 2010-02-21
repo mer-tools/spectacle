@@ -28,7 +28,6 @@ import sys
 import re
 import shutil
 import optparse
-import glob
 from ConfigParser import RawConfigParser
 
 # spectacle modules
@@ -231,6 +230,7 @@ if __name__ == '__main__':
 
     if not args:
         # no ini-path specified, search in CWD
+        import glob
         inils = glob.glob('*.ini')
         if not inils:
             print 'Cannot find valid spec-builder file(*.ini) in current directory, please specify one.'
