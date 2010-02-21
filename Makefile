@@ -23,3 +23,4 @@ install: all
 	python setup.py install
 	install -d ${DESTDIR}/usr/share/spectacle/
 	install -m 644 data/*csv ${DESTDIR}/usr/share/spectacle/
+	install -m 644 data/GROUPS ${DESTDIR}/usr/share/spectacle/
