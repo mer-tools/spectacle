@@ -161,9 +161,9 @@ Description: %{summary}
 #if $metadata.has_key("AutoSubPackages")
 #for $sp in $metadata.AutoSubPackages
 %package $sp
-Summary: Development files for %{name}
-Group: Development/Libraries
-Requires: %{name} = $auto_depend
+Summary:    Development files for %{name}
+Group:      Development/Libraries
+Requires:   %{name} = $auto_depend
 %description $sp
 Development files for %{name}
 
@@ -174,19 +174,19 @@ Development files for %{name}
 #for $sp in $metadata.SubPackages
 #set $sub_extra = $extra.subpkgs[$sp.Name]
 %package $sp.Name
-Summary: $sp.Summary
+Summary:    $sp.Summary
 #if $sp.has_key("Group")
-Group: $sp.Group
+Group:      $sp.Group
 #else
-Group: ${metadata.Group}
+Group:      ${metadata.Group}
 #end if
 #if 'NoAutoReq' in $metadata
-AutoReq: 0
+AutoReq:    0
 #end if
-Requires: %{name} = $auto_depend
+Requires:   %{name} = $auto_depend
 #if $sp.has_key("Requires")
 #for $req in $sp.Requires
-Requires: $req
+Requires:   $req
 #end for
 #end if
 #if $sp.has_key("RequiresPre")

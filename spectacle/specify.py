@@ -113,6 +113,17 @@ class RPMWriter():
             
     def sanity_check(self):
 
+        def _check_group(metadata):
+            if metadata.has_key("Group"):
+                warn = True
+                for line in open("/usr/share/spectacle/GROUPS"):
+                    if metadata['Group'] in line:
+                        warn = False
+                        break
+                if warn:
+                    print 'Group \'%s\' is not in the list of approved groups. See /usr/share/spectacle/GROUPS for the complete list.' % (metadata['Group'])
+                    sys.exit(1)
+
         def _check_pkgconfig():
             pkgcfg = csv.reader(open('/usr/share/spectacle/pkgconfig-provides.csv'), delimiter=',')
             for row in pkgcfg:
@@ -145,16 +156,6 @@ class RPMWriter():
                 print 'Missing %s Tag. Add it and rettry...' % (key)
                 sys.exit(1)
 
-        if self.metadata.has_key("Group"):
-            warn = True
-            for line in open("/usr/share/spectacle/GROUPS"):
-                if self.metadata['Group'] in line:
-                    warn = False
-                    break
-            if warn:
-                print 'Group \'%s\' is not in the list of approved groups. See /usr/share/spectacle/GROUPS for the complete list.' % (self.metadata['Group'])
-                sys.exit(1)
-
         if self.metadata.has_key("PkgBR"):
             _check_pkgconfig()
             for p in self.metadata['PkgBR']:
@@ -165,6 +166,8 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
 
         # checking for unexpected keys
         # TODO
+
+        _check_group(self.metadata)
 
         # checking for validation of 'Description'
         if not _check_desc(self.metadata):
@@ -191,6 +194,9 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
                         print >> sys.stderr, \
                         'Warning: the value of "%s" in %s sub-package is expected as list typed' % (key, sp['Name'])
                         sp[key] = [sp[key]]
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                _check_group(sp)
 
     def __get_scm_latest_release(self):
 
