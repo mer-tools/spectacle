@@ -49,6 +49,9 @@ ORDER_ENTRIES = ['Name',
                  'LocaleOptions',
                  'NeedCheckSection',
                  'SupportOtherDistros',
+                 'UseAsNeeded',
+                 'NoAutoReq',
+                 'NoAutoProv',
                 ]
 
 EXTRA_ENTRIES = ['Files',

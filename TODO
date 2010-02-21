@@ -1,16 +1,9 @@
 Topic
-- [ ] LocaleName: iso-codes --all-name (Parsing is still not perfect)
-- [ ] devel requires base package (Duplicates..)
-- [ ] %defattr(-,root,root,-) duplication
 - [ ] Support series.conf file to list and maintain patches with patch
       descriptions. It should put the description on to of the patch
       tag in the spec file
 - [ ] When converting from ini, also delete the Makefile and put a new
       makefile that supports spectacle
-- [ ] calling specify without any arguments should look if there is one
-      yaml file and use it
-- [ ] calling ini2spectacle should look for a single ini file and
-      convert it, no need to specify anything as argument
 - [ ] Check for invalid keywords and complain about them
 - [ ] Check if all mandatory keywords are present
 - [ ] Maintain a list of RPM Groups (to be provided ) and check if the
