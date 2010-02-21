@@ -78,8 +78,37 @@ class Convertor(object):
                 dict[v] = dict[k]
                 del dict[k]
 
+    def _remove_duplicate(self, dict):
+        # check duplicate default configopts
+        dup = '--disable-static'
+        if 'ConfigOptions' in dict and dup in dict['ConfigOptions']:
+            dict['ConfigOptions'].remove(dup)
+            if not dict['ConfigOptions']:
+                del dict['ConfigOptions']
+
+        # check duplicate requires for base package
+        if "SubPackages" in dict:
+            if 'Epoch' in dict:
+                autodep = "%{name} = %{epoch}:%{version}-%{release}"
+            else:
+                autodep = "%{name} = %{version}-%{release}"
+
+            for sp in dict["SubPackages"]:
+                if 'Requires' in sp and autodep in sp['Requires']:
+                    sp['Requires'].remove(autodep)
+                    if not sp['Requires']:
+                        del sp['Requires']
+
+        # check duplicate '%defattr' for files list
+        if 'extra' in dict and 'Files' in dict['extra']:
+            try:
+                dict['extra']['Files'].remove('%defattr(-,root,root,-)')
+            except ValueError:
+                pass
+
     def convert(self, dict, need_break = True):
         self._replace_keys(dict)
+        self._remove_duplicate(dict)
 
         items = []
         for entry in ORDER_ENTRIES:

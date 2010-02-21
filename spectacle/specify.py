@@ -356,15 +356,36 @@ class RPMWriter():
             not self.metadata['SupportOtherDistros']:
             del self.metadata['SupportOtherDistros']
 
+        # check duplicate default configopts
+        dup = '--disable-static'
+        if 'ConfigOptions' in self.metadata and dup in self.metadata['ConfigOptions']:
+            print >> sys.stderr, 'Warning: found duplicate configure options: "%s", please remove it' % dup
+            self.metadata['ConfigOptions'].remove(dup)
+            if not self.metadata['ConfigOptions']:
+                del self.metadata['ConfigOptions']
 
+        # check duplicate requires for base package
+        if "SubPackages" in self.metadata:
+            if 'Epoch' in self.metadata:
+                autodep = "%{name} = %{epoch}:%{version}-%{release}"
+            else:
+                autodep = "%{name} = %{version}-%{release}"
+
+            for sp in self.metadata["SubPackages"]:
+                if 'Requires' in sp and autodep in sp['Requires']:
+                    print >> sys.stderr, 'Warning: found duplicate Requires for %s in sub-pkg:%s, please remove it' %(autodep, sp['Name'])
+                    sp['Requires'].remove(autodep)
+                    if not sp['Requires']:
+                        del sp['Requires']
+
+        # initialize extra flags for subpkgs
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 self.extra['subpkgs'][sp['Name']] = copy.deepcopy(self.extra_per_pkg)
 
+
         """ NOTE
         we need NOT to do the following checking:
-         * whether '%{name} = %{version}-%{release}' in subpackages' requires
-         * whether --disable-static in ConfigOptions
          * whether auto-added Requires(include pre/post/preun/postun) duplicated
 
         They should be checked by users manually.
@@ -475,6 +496,13 @@ class RPMWriter():
 
         if check_scriptlets and 'NeedCheckSection' in self.metadata:
            content["check_scriptlets"] = check_scriptlets
+
+        # try to remove duplicate '%defattr' in files list
+        dup = '%defattr(-,root,root,-)'
+        for key in content['files']:
+            if dup in content['files'][key]:
+                print >> sys.stderr, 'Warning: found duplicate "%s" in file list, removed!' % dup
+                content['files'][key].remove(dup)
 
         return content
 

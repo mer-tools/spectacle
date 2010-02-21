@@ -317,10 +317,6 @@ class SpecParser(object):
         if files[0].startswith('-'):
             files.pop(0)
 
-        try:
-            files.remove('%defattr(-,root,root,-)')
-        except ValueError:
-            pass
         items['extra']['Files'] = files
 
     def _do_description(self, items, pkg, v):
