@@ -9,6 +9,12 @@
 $str_newline.join($extra.content.macros.main)
 #end if
 # << macros
+#if $extra.has_key("HasStatic") and $extra.HasStatic
+%define keepstatic 1
+#set $cfgstatic = ""
+#else
+#set $cfgstatic = "--disable-static"
+#end if
 #if $metadata.has_key('Builder')
 #set $Builder = $metadata.Builder
 #else
@@ -287,11 +293,11 @@ CFLAGS="\$RPM_OPT_FLAGS" %{__python} setup.py build
 #end if
 #######
 #if $Configure == 'autogen'
-%autogen --disable-static#slurp
+%autogen $cfgstatic#slurp
 #else if $Configure == 'configure'
-%configure --disable-static#slurp
+%configure $cfgstatic#slurp
 #else if $Configure == 'reconfigure'
-%reconfigure --disable-static#slurp
+%reconfigure $cfgstatic#slurp
 #end if
 ## any other values fall thru to 'noconfigure'
 #if $Configure != 'noconfigure' and $metadata.has_key("ConfigOptions")

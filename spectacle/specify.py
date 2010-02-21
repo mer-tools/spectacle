@@ -72,6 +72,7 @@ class RPMWriter():
                         'Schema': False,
                         'Schemas': [],
                         'Lib': False,
+                        'HasStatic': False,
                         'Icon': False,
                         'Service': False,
                         'Info': False,
@@ -415,6 +416,9 @@ class RPMWriter():
                     if pkg_name != 'devel':
                         # 'devel' sub pkgs should not set Lib flags
                         pkg_extra['Lib'] = True
+                if re.match('.*(%{_libdir}|%{_lib}).*', l) and re.match('.*\.a$', l):
+                    # if *.a found, set 'HasStatic' flag for MAIN pkg
+                    self.extra['HasStatic'] = True
                 if re.match('.*\.schema.*', l):
                     comp = l.split()
                     if len(comp) > 1:
