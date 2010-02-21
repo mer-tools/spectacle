@@ -26,23 +26,23 @@ Patches:
 Requires:
     - li0
     - li1
-    
+
 RequiresPre:
     - li0
     - li1
-    
+
 RequiresPreUn:
     - li0
     - li1
-    
+
 RequiresPost:
     - li0
     - li1
-    
+
 RequiresPostUn:
     - li0
     - li1
-    
+
 PkgBR:
     - li0
     - li1
@@ -54,15 +54,15 @@ PkgConfigBR:
 Provides:
     - li0
     - li1
-    
+
 Conflicts:
     - li0
     - li1
-    
+
 Obsoletes:
     - li0
     - li1
-    
+
 Configure: string # autogen, configure, reconfigure, etc, optional
 ConfigOptions:
     - li0
@@ -71,13 +71,19 @@ ConfigOptions:
 Builder: make  # make, single-make, python, or other special builder, optional
 
 LocaleName: string # optional
-LocaleOptions: string # optional
+LocaleOptions: # optional
+    - opt1
+    - opt2
 
 Documents:
     - doc1
     - doc2
 
-NeedCheckSection: yes # boolean options, use "yes"/"no" for true/false
+# boolean options, use "yes"/"no" for TRUE/FALSE
+# all optional, if not specified, it means FALSE
+NeedCheckSection: yes       # %check in spec
+SupportOtherDistros: yes    # for distros other than moblin/meego
+UseAsNeeded: yes            # 'export LD_AS_NEEDED=1' in spec
 
 AutoSubPackages:
     - devel

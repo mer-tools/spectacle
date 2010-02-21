@@ -347,15 +347,13 @@ class RPMWriter():
                     prefix = prefix.replace(self.version, '%{version}')
                     self.metadata['SourcePrefix'] = prefix
 
-        # check the bool value of NeedCheckSection
-        if 'NeedCheckSection' in self.metadata and \
-            not self.metadata['NeedCheckSection']:
-            del self.metadata['NeedCheckSection']
-
-        # check the bool value of SupportOtherDistros
-        if 'SupportOtherDistros' in self.metadata and \
-            not self.metadata['SupportOtherDistros']:
-            del self.metadata['SupportOtherDistros']
+        # cleanup all boolean type options, make 'exists' status
+        # to reflect the bool value
+        for bopt in ('NeedCheckSection',
+                     'SupportOtherDistros',
+                     'UseAsNeeded'):
+            if bopt in self.metadata and not self.metadata[bopt]:
+                del self.metadata[bopt]
 
         # check duplicate default configopts
         dup = '--disable-static'

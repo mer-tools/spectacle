@@ -145,6 +145,8 @@ All available directives for spectacle are listed as the following:
 
 * SupportOtherDistros: **boolean**, whether need to check for other distros (besides Moblin)
 
+* UseAsNeeded: **boolean**, whether export LD_AS_NEEDED=1 env when building
+
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
 
 * SubPackages: **list** of **dict**, the **dict** item is the lower level
