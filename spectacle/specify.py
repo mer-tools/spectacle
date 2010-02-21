@@ -139,10 +139,20 @@ class RPMWriter():
             return True
 
         # checking for mandatory keys
-        mandatory_keys = ('Name', 'Version', 'Release')
+        mandatory_keys = ('Name', 'Version', 'Release', 'Group', 'URL', 'License')
         for key in mandatory_keys:
             if key not in self.metadata:
-                print 'Invalid yaml file %s without %s directive' % (self.yaml_fpath, key)
+                print 'Missing %s Tag. Add it and rettry...' % (key)
+                sys.exit(1)
+
+        if self.metadata.has_key("Group"):
+            warn = True
+            for line in open("/usr/share/spectacle/GROUPS"):
+                if self.metadata['Group'] in line:
+                    warn = False
+                    break
+            if warn:
+                print 'Group \'%s\' is not in the list of approved groups. See /usr/share/spectacle/GROUPS for the complete list.' % (self.metadata['Group'])
                 sys.exit(1)
 
         if self.metadata.has_key("PkgBR"):
@@ -158,12 +168,12 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
 
         # checking for validation of 'Description'
         if not _check_desc(self.metadata):
-            print >> sys.stderr, 'Warning: Main package has no qualified "Description" directive'
+            print >> sys.stderr, 'Warning: Main package has no qualified "Description" keyword'
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 if not _check_desc(sp):
                     print >> sys.stderr, \
-                    'Warning: Sub-package: %s has no qualified "Description" directive' % sp['Name']
+                    'Warning: Sub-package: %s has no qualified "Description" keyword' % sp['Name']
 
         # checking for LIST expected keys
         list_keys = ('Sources', 'ExtraSources', 'Patches',
