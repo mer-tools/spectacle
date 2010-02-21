@@ -74,6 +74,13 @@ class SBConfigParser(RawConfigParser):
                     'PostMakeInstallExtras',
                    )
 
+    # boolean keys
+    bool_keys =  ('UseAsNeeded',
+                  'NoAutoReq',
+                  'NoAutoProv',
+                  'AddCheck',
+                 )
+
     # keys need to be placed to 'extra'
     extra_keys =  ('Files',
                    'PostMakeExtras',
@@ -152,6 +159,14 @@ class SBConfigParser(RawConfigParser):
             # special cases for 'LocaleOptions'
             if 'LocaleOptions' in items and 'LocaleName' not in items:
                 self.set(section, 'LocaleName', '%{name}')
+
+            # Convert boolean keys
+            for key in self.bool_keys:
+                if key in items:
+                    if items[key].upper() in ('NO', 'FALSE', '0'):
+                        del items[key]
+                    else:
+                        self.set(section, key, 'yes')
 
             # Convert keys which need expanding from external file
             for key in self.expand_keys:
