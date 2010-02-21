@@ -22,6 +22,7 @@
 import os
 import sys
 import re
+import glob
 import optparse
 
 # spectacle modules
@@ -504,7 +505,7 @@ class SpecParser(object):
 def parse_options(args):
     import spectacle.__version__
 
-    usage = "Usage: %prog [options] <spec-path>"
+    usage = "Usage: %prog [options] [spec-path]"
     parser = optparse.OptionParser(usage, version=spectacle.__version__.VERSION)
 
     parser.add_option("-o", "--output", type="string",
@@ -517,16 +518,26 @@ def parse_options(args):
                       dest="builder_parsing", default=True,
                       help="Do NOT try to parse build/install scripts")
 
-    (options, args) = parser.parse_args()
-    if not args:
-        parser.error('Must specify path of spec file')
-        sys.exit(1)
+    return parser.parse_args()
 
-    return options, args
+def check_yaml_file(spec_fpath):
+    specDir = os.path.dirname(spec_fpath)
+    if not specDir:
+        specDir = os.path.curdir
+
+    yaml_s = glob.glob('*.yaml')
+    if yaml_s:
+        repl = raw_input(
+"""
+*.yaml file(s) exists in working dir: %s
+If being spec-builder file(s), please use ini2spectacle for convert!
+Maybe this package has been converted to spectacle enabled one.
+Continue? (N/y) """  % ' '.join(yaml_s))
+
+        if repl.upper() != 'Y':
+            sys.exit(1)
 
 def check_ini_file(spec_fpath):
-    import glob
-
     specDir = os.path.dirname(spec_fpath)
     if not specDir:
         specDir = os.path.curdir
@@ -547,7 +558,18 @@ if __name__ == '__main__':
 
     (options, args) = parse_options(sys.argv[1:])
 
-    spec_fpath = args[0]
+    if not args:
+        # no spec-path specified, search in CWD
+        specls = glob.glob('*.spec')
+        if not specls:
+            print 'Cannot find valid spec file in current directory, please specify one.'
+            sys.exit(1)
+        elif len(specls) > 1:
+            print 'Find multiple spec files in current directory, please specify one.'
+            sys.exit(1)
+        spec_fpath = specls[0]
+    else:
+        spec_fpath = args[0]
 
     if options.outfile_path:
         out_fpath = options.outfile_path
@@ -556,6 +578,9 @@ if __name__ == '__main__':
             out_fpath = spec_fpath[:-4] + 'yaml'
         else:
             out_fpath = spec_fpath + '.yaml'
+
+    # Check if YAML file exists
+    check_yaml_file(spec_fpath)
 
     # Check if spec-build's INI file exists
     check_ini_file(spec_fpath)
