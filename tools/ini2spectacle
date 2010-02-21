@@ -28,6 +28,7 @@ import sys
 import re
 import shutil
 import optparse
+import glob
 from ConfigParser import RawConfigParser
 
 # spectacle modules
@@ -214,26 +215,32 @@ class SBConfigParser(RawConfigParser):
 def parse_options(args):
     import spectacle.__version__
 
-    usage = "Usage: %prog [options] <ini-path>"
+    usage = "Usage: %prog [options] [ini-path]"
     parser = optparse.OptionParser(usage, version=spectacle.__version__.VERSION)
 
     parser.add_option("-o", "--output", type="string",
                       dest="outfile_path", default=None,
                       help="Path of output yaml file")
 
-    (options, args) = parser.parse_args()
-    if not args:
-        parser.error('Must specify path of ini file')
-        sys.exit(1)
-
-    return options, args
+    return parser.parse_args()
 
 if __name__ == '__main__':
     """ Main Function """
 
     (options, args) = parse_options(sys.argv[1:])
 
-    ini_fpath = args[0]
+    if not args:
+        # no ini-path specified, search in CWD
+        inils = glob.glob('*.ini')
+        if not inils:
+            print 'Cannot find valid spec-builder file(*.ini) in current directory, please specify one.'
+            sys.exit(1)
+        elif len(inils) > 1:
+            print 'Find multiple spec-builder files(*.ini) in current directory, please specify one.'
+            sys.exit(1)
+        ini_fpath = inils[0]
+    else:
+        ini_fpath = args[0]
 
     if options.outfile_path:
         out_fpath = options.outfile_path
