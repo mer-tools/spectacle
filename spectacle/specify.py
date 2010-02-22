@@ -32,7 +32,8 @@ import yaml
 # internal modules
 import __version__
 import spec
-import logger
+import logging  as logger
+
 
 class GitAccess():
     def __init__(self, path):
@@ -122,7 +123,7 @@ class RPMWriter():
                         warn = False
                         break
                 if warn:
-                    print 'Group \'%s\' is not in the list of approved groups. See /usr/share/spectacle/GROUPS for the complete list.' % (metadata['Group'])
+                    logger.error('Group \'%s\' is not in the list of approved groups. See /usr/share/spectacle/GROUPS for the complete list.' % (metadata['Group']))
                     sys.exit(1)
 
         def _check_pkgconfig():
