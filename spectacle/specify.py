@@ -159,6 +159,8 @@ class RPMWriter():
         if self.metadata.has_key("PkgBR"):
             _check_pkgconfig()
             for p in self.metadata['PkgBR']:
+                p = p.split(" ")[0]
+                print p
                 if self.packages.has_key(p):
                      print >> sys.stderr, """Info: Use one of
  - %s 
