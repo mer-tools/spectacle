@@ -18,6 +18,9 @@
 
 import sys
 
+# internal module
+import logger
+
 ORDER_ENTRIES = ['Name',
                  'Summary',
                  'Version',
@@ -52,11 +55,6 @@ ORDER_ENTRIES = ['Name',
                  'UseAsNeeded',
                  'NoAutoReq',
                  'NoAutoProv',
-                ]
-
-EXTRA_ENTRIES = ['Files',
-                 'PostMakeExtras',
-                 'PostMakeInstallExtras',
                 ]
 
 class Convertor(object):
@@ -137,18 +135,25 @@ class Convertor(object):
             pass
 
         extra = {}
+        """
+        EXTRA_ENTRIES = ['Files',
+                         'PostMakeExtras',
+                         'PostMakeInstallExtras',
+                        ]
+
         for entry in EXTRA_ENTRIES:
             if entry in dict:
-                print >> sys.stderr, 'Warning: need to remove this key to extra', entry
+                logger.warning('need to remove key "%s" to extra' % entry)
                 extra[entry] = dict[entry]
                 del dict[entry]
+        """
 
         if 'extra' in dict:
             extra.update(dict['extra'])
             del dict['extra']
 
         for k, v in dict.iteritems():
-            print >> sys.stderr, 'Warning: un-ordered entry: %s\n' % (k)
+            logger.warning('un-ordered entry: %s' % k)
             items.append((k, v))
 
         if extra:

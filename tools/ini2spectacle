@@ -33,6 +33,7 @@ from ConfigParser import RawConfigParser
 # spectacle modules
 from spectacle.convertor import *
 from spectacle.dumper import *
+from spectacle import logger
 
 class SBConvertor(Convertor):
     """ Convertor for SpecBuild ini files """
@@ -125,7 +126,7 @@ class SBConfigParser(RawConfigParser):
             self.record_used_files.append(filename)
             return file(filename).read().strip()
         else:
-            print >> sys.stderr, "Warning: missing expected file %s" % filename
+            logger.warning("Warning: missing expected file %s" % filename)
             return None
 
     def __cook_config(self):

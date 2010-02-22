@@ -32,6 +32,7 @@ import yaml
 # internal modules
 import __version__
 import spec
+import logger
 
 class GitAccess():
     def __init__(self, path):
@@ -161,9 +162,9 @@ class RPMWriter():
             for p in self.metadata['PkgBR']:
                 p = p.split(" ")[0]
                 if self.packages.has_key(p):
-                     print >> sys.stderr, """Info: Use one of
+                    logger.info("""Use one of
  - %s 
-in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
+in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
 
         # checking for unexpected keys
         # TODO
@@ -172,12 +173,11 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
 
         # checking for validation of 'Description'
         if not _check_desc(self.metadata):
-            print >> sys.stderr, 'Warning: Main package has no qualified "Description" keyword'
+            logger.warning('main package has no qualified "Description" tag')
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 if not _check_desc(sp):
-                    print >> sys.stderr, \
-                    'Warning: Sub-package: %s has no qualified "Description" keyword' % sp['Name']
+                    logger.warning('sub-pkg: %s has no qualified "Description" tag' % sp['Name'])
 
         # checking for LIST expected keys
         list_keys = ('Sources', 'ExtraSources', 'Patches',
@@ -187,13 +187,12 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
                      'Obsoletes', 'AutoSubPackages')
         for key in list_keys:
             if not _check_listkey(self.metadata, key):
-                print >> sys.stderr, 'Warning: the value of "%s" in Main package is expected as list typed' % key
+                logger.warning('the value of "%s" in main package is expected as list typed' % key)
                 self.metadata[key] = [self.metadata[key]]
             if "SubPackages" in self.metadata:
                 for sp in self.metadata["SubPackages"]:
                     if not _check_listkey(sp, key):
-                        print >> sys.stderr, \
-                        'Warning: the value of "%s" in %s sub-package is expected as list typed' % (key, sp['Name'])
+                        logger.warning('the value of "%s" in %s sub-package is expected as list typed' % (key, sp['Name']))
                         sp[key] = [sp[key]]
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
@@ -219,7 +218,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
         print "Getting tags from SCM..."
         top = scm.get_toptag()
         if top and top != self.version:
-            print >> sys.stderr, 'Warning: Version in YAML shoud be updated according SCM tags'
+            logger.warning('Version in YAML shoud be updated according SCM tags')
             self.version = top
             self.metadata['Version'] = self.version
 
@@ -273,7 +272,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
                         urlgrabber.urlgrab(target, f_name, progress_obj = text_progress_meter())
                     except urlgrabber.grabber.URLGrabError, e:
                         if e.errno == 14: # HTTPError
-                            print >> sys.stderr, 'Warning: Invalid source URL'
+                            logger.warning('Invalid source URL')
                         else:
                             raise e
                     """
@@ -405,7 +404,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
         # check duplicate default configopts
         dup = '--disable-static'
         if 'ConfigOptions' in self.metadata and dup in self.metadata['ConfigOptions']:
-            print >> sys.stderr, 'Warning: found duplicate configure options: "%s", please remove it' % dup
+            logger.warning('found duplicate configure options: "%s", please remove it' % dup)
             self.metadata['ConfigOptions'].remove(dup)
             if not self.metadata['ConfigOptions']:
                 del self.metadata['ConfigOptions']
@@ -419,7 +418,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
 
             for sp in self.metadata["SubPackages"]:
                 if 'Requires' in sp and autodep in sp['Requires']:
-                    print >> sys.stderr, 'Warning: found duplicate Requires for %s in sub-pkg:%s, please remove it' %(autodep, sp['Name'])
+                    logger.warning('found duplicate Requires for %s in sub-pkg:%s, please remove it' %(autodep, sp['Name']))
                     sp['Requires'].remove(autodep)
                     if not sp['Requires']:
                         del sp['Requires']
@@ -550,7 +549,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
         dup = '%defattr(-,root,root,-)'
         for key in content['files']:
             if dup in content['files'][key]:
-                print >> sys.stderr, 'Warning: found duplicate "%s" in file list, removed!' % dup
+                logger.warning('found duplicate "%s" in file list, removed!' % dup)
                 content['files'][key].remove(dup)
 
         return content
@@ -601,7 +600,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
 
             # TODO, cleanup docs handling when all pkgs need not, include spec.tmpl
             if docs:
-                print >> sys.stderr, 'Warning: please move "Docments" values to %files section in .spec!'
+                logger.warning('please move "Docments" values to %files section in .spec!')
 
             self.parse_files(self.extra['content']['files'], docs)
         except KeyError:
