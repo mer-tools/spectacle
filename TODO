@@ -13,7 +13,7 @@ Topic
       makefile that supports spectacle
 - [ ] Check for invalid keywords and complain about them
 - [ ] Check if all mandatory keywords are present
-- [ ] Maintain a list of RPM Groups (to be provided ) and check if the
+- [X] Maintain a list of RPM Groups (to be provided ) and check if the
       rpm group in the yaml/spec is valid and if it is one of those
       supported in MeeGo
 - [ ] Same for licenses (list of licenses TBD)
