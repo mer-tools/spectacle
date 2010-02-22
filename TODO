@@ -1,4 +1,11 @@
 Topic
+- [X] LocaleName: iso-codes --all-name (Parsing is still not perfect)
+- [X] devel requires base package (Duplicates..)
+- [X] %defattr(-,root,root,-) duplication
+- [X] calling specify without any arguments should look if there is one
+      yaml file and use it
+- [X] calling ini2spectacle should look for a single ini file and
+      convert it, no need to specify anything as argument
 - [ ] Support series.conf file to list and maintain patches with patch
       descriptions. It should put the description on to of the patch
       tag in the spec file
@@ -32,4 +39,3 @@ Topic
         - [ ] Check web service for the package and its descriptions,
               category, license etc.
         - [ ] Other data can be extracted from the web...
-        - [ ]
