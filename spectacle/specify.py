@@ -387,15 +387,19 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p)
                     prefix = prefix.replace(self.version, '%{version}')
                     self.metadata['SourcePrefix'] = prefix
 
-        # cleanup all boolean type options, make 'exists' status
-        # to reflect the bool value
+        # clean up all boolean type options, remove redundant ones
+        #   for keys with default value FALSE
         for bopt in ('NeedCheckSection',
                      'SupportOtherDistros',
-                     'UseAsNeeded',
                      'NoAutoReq',
                      'NoAutoProv',
                     ):
             if bopt in self.metadata and not self.metadata[bopt]:
+                del self.metadata[bopt]
+        #   for keys with default value TRUE
+        for bopt in ('UseAsNeeded',
+                    ):
+            if bopt in self.metadata and self.metadata[bopt]:
                 del self.metadata[bopt]
 
         # check duplicate default configopts
