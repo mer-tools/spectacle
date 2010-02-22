@@ -137,7 +137,8 @@ class SpecParser(object):
 
         def __save_raw_in_post(items, lines):
             # make sure no 'make' generated auto
-            items['Builder'] = 'no-builder'
+            items['Configure'] = 'none'
+            items['Builder'] = 'none'
             # put all script to 'post install'
             items['extra']['PostMakeExtras'] = lines
 
@@ -160,8 +161,8 @@ class SpecParser(object):
             if cont_line:
                 whole_line = whole_line + ' ' + line.strip()
             else:
-                if not line.strip():
-                    # empty line, skip
+                if not line.strip() or line.startswith('#'):
+                    # empty line or comment line, skip
                     continue
 
                 whole_line = line.strip()
@@ -229,6 +230,9 @@ class SpecParser(object):
                         items['ConfigOptions'] = [opt]
                     else:
                         items['ConfigOptions'].append(opt)
+            else:
+                # no configure found, only need builder
+                items['Configure'] = 'none'
 
             if self._Builder:
                 items['Builder'] = self._Builder
