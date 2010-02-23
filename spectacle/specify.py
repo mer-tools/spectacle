@@ -458,7 +458,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
                     pkg_extra['Service'] = True
                 if re.match('.*(%{_libdir}|%{_lib}).*', l) and re.match('.*\.so.*', l) or \
                    re.match('.*(/ld.so.conf.d/).*', l):
-                    if pkg_name != 'devel':
+                    if pkg_name != 'devel' and not pkg_name.endswith('-devel'):
                         # 'devel' sub pkgs should not set Lib flags
                         pkg_extra['Lib'] = True
                 if re.match('.*(%{_libdir}|%{_lib}).*', l) and re.match('.*\.a$', l):
