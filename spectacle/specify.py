@@ -375,7 +375,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
                 prefix = None
                 for member in tf.getmembers():
                     if member.type == tarfile.DIRTYPE:
-                        prefix = member.name
+                        prefix = member.name.rstrip('/')
                         break
                 tf.close()
                 if not prefix or prefix == '.':
