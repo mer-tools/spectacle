@@ -61,9 +61,12 @@ if __name__ == '__main__':
 
     yaml_fname = os.path.basename(yaml_fpath)
 
+    # check Makefile from packaging-tools
+    if not os.path.exists('Makefile'):
+        logger.warning('There is no "Makefile" for this package, please update it using packaging-tools')
+
     spec_fpath, newspec = specify.generate_rpm(yaml_fname)
     if newspec:
         logger.info("Creating new spec file: %s" % spec_fpath)
     else:
         logger.info("Old spec file exists, patching %s ..." % spec_fpath)
-

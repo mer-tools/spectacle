@@ -98,6 +98,20 @@ class SBConfigParser(RawConfigParser):
 
         self.record_used_files = []
 
+        self.__check_Makefile()
+
+    def __check_Makefile(self):
+        """ Check whether Makefile in working dir should be moved """
+        if os.path.exists('Makefile'):
+            try:
+                cont = file('Makefile').read()
+                if re.search('\s+spec-builder\s+', cont):
+                    # The Makefile is for spec-builder
+                    self.record_used_files.append('Makefile')
+            except:
+                pass
+
+
     def read(self, filenames):
         """ override super read to record input files """
 

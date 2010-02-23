@@ -9,8 +9,8 @@ Topic
 - [ ] Support series.conf file to list and maintain patches with patch
       descriptions. It should put the description on to of the patch
       tag in the spec file
-- [ ] When converting from ini, also delete the Makefile and put a new
-      makefile that supports spectacle
+- [X] When converting from ini, also delete the Makefile
+- [ ] and put a new makefile that supports spectacle
 - [ ] Check for invalid keywords and complain about them
 - [ ] Check if all mandatory keywords are present
 - [X] Maintain a list of RPM Groups (to be provided ) and check if the
