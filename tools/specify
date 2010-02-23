@@ -38,11 +38,10 @@ if __name__ == '__main__':
         import glob
         yamlls = glob.glob('*.yaml')
         if not yamlls:
-            print 'Cannot find valid spectacle file(*.yaml) in current directory, please specify one.'
-            sys.exit(1)
+            logger.error('Cannot find valid spectacle file(*.yaml) in current directory, please specify one.')
         elif len(yamlls) > 1:
-            print 'Find multiple spectacle files(*.yaml) in current directory, please specify one.'
-            sys.exit(1)
+            logger.error('Find multiple spectacle files(*.yaml) in current directory, please specify one.')
+
         yaml_fpath = yamlls[0]
     else:
         yaml_fpath = args[0]
@@ -50,17 +49,15 @@ if __name__ == '__main__':
     # check if the input file exists
     if not os.path.exists(yaml_fpath):
         # input file does not exist
-        print "%s: File does not exist" % yaml_fpath
-        sys.exit(1)
+        logger.error("%s: File does not exist" % yaml_fpath)
 
     # check the working path
     if yaml_fpath.find('/') != -1 and os.path.dirname(yaml_fpath) != os.path.curdir:
-        print 'This tool need to be run in package dir, skip %s' % yaml_fpath
-        os.exit(1)
+        logger.error('This tool need to be run in package dir, skip %s' % yaml_fpath)
 
     spec_fpath, newspec = spectacle.specify.generate_rpm(yaml_fpath)
     if newspec:
-        print "Creating new spec file: %s" % spec_fpath
+        logger.info("Creating new spec file: %s" % spec_fpath)
     else:
-        print "Old spec file exists, patching %s ..." % spec_fpath
+        logger.info("Old spec file exists, patching %s ..." % spec_fpath)
 

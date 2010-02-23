@@ -163,7 +163,7 @@ class SpectacleDumper(object):
             try:
                 fp = file(self.opath, 'w')
             except IOError:
-                print 'Cannot open file %s for writing' % self.opath
+                logger.warning('Cannot open file %s for writing' % self.opath)
                 # print out
                 pass
 

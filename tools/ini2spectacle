@@ -218,7 +218,7 @@ class SBConfigParser(RawConfigParser):
                     all_items['SubPackages'].append(dict(self.items(subpkg)))
                     all_items['SubPackages'][-1].update({'Name': subpkg})
                 except NoSectionError, e:
-                    print 'Needed section for sub-package %s not found' % subpkg
+                    logger.warning('Needed section for sub-package %s not found' % subpkg)
                     raise e
 
         return all_items
@@ -249,11 +249,9 @@ if __name__ == '__main__':
         import glob
         inils = glob.glob('*.ini')
         if not inils:
-            print 'Cannot find valid spec-builder file(*.ini) in current directory, please specify one.'
-            sys.exit(1)
+            logger.error('Cannot find valid spec-builder file(*.ini) in current directory, please specify one.')
         elif len(inils) > 1:
-            print 'Find multiple spec-builder files(*.ini) in current directory, please specify one.'
-            sys.exit(1)
+            logger.error('Find multiple spec-builder files(*.ini) in current directory, please specify one.')
         ini_fpath = inils[0]
     else:
         ini_fpath = args[0]
@@ -269,8 +267,7 @@ if __name__ == '__main__':
     # Check if the input file exists
     if not os.path.exists(ini_fpath):
         # input file does not exist
-        print "%s: File does not exist" % ini_fpath
-        sys.exit(1)
+        logger.error("%s: File does not exist" % ini_fpath)
 
     iniDir = os.path.dirname(ini_fpath)
     if not iniDir:
@@ -286,9 +283,9 @@ if __name__ == '__main__':
     dumper = SpectacleDumper(format='yaml', opath = out_fpath)
     spec_fpath = dumper.dump(convertor.convert(config.cooked_items()))
 
-    print 'Yaml file %s created' % out_fpath
+    logger.info('Yaml file %s created' % out_fpath)
     if spec_fpath:
-        print 'Spec file %s was created with extra data' % spec_fpath
+        logger.info('Spec file %s was created with extra data' % spec_fpath)
 
     # move old spec-builder files to backup dir
     backDir = os.path.join(iniDir, 'spec-builder.backup')
@@ -297,7 +294,7 @@ if __name__ == '__main__':
     except:
         pass
     if os.path.exists(backDir) and not os.path.isfile(backDir):
-        print 'The following used spec-builder files are moved to dir:', backDir
+        logger.info('The following used spec-builder files are moved to dir: %s' % backDir)
         for file in config.record_used_files:
-            print '\t', os.path.basename(file)
+            logger.info('\t' + os.path.basename(file))
             shutil.move(file, backDir)

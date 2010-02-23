@@ -106,12 +106,10 @@ class RPMWriter():
         try:
             self.stream = file(yaml_fpath, 'r')
         except IOError:
-            print 'Cannot read file: %s' % yaml_fpath
-            sys.exit(1)
+            logger.error('Cannot read file: %s' % yaml_fpath)
 
     def dump(self):
         print yaml.dump(yaml.load(self.stream))
-
             
     def sanity_check(self):
 
@@ -123,8 +121,7 @@ class RPMWriter():
                         warn = False
                         break
                 if warn:
-                    logger.error('Group \'%s\' is not in the list of approved groups. See /usr/share/spectacle/GROUPS for the complete list.' % (metadata['Group']))
-                    sys.exit(1)
+                    logger.warning('Group \'%s\' is not in the list of approved groups. See /usr/share/spectacle/GROUPS for the complete list.' % (metadata['Group']))
 
         def _check_pkgconfig():
             pkgcfg = csv.reader(open('/usr/share/spectacle/pkgconfig-provides.csv'), delimiter=',')
@@ -155,8 +152,7 @@ class RPMWriter():
         mandatory_keys = ('Name', 'Version', 'Release', 'Group', 'URL', 'License')
         for key in mandatory_keys:
             if key not in self.metadata:
-                print 'Missing %s Tag. Add it and rettry...' % (key)
-                sys.exit(1)
+                logger.error('Missing %s Tag. Add it and rettry...' % key)
 
         if self.metadata.has_key("PkgBR"):
             _check_pkgconfig()
@@ -164,8 +160,8 @@ class RPMWriter():
                 p = p.split(" ")[0]
                 if self.packages.has_key(p):
                     logger.info("""Use one of
- - %s 
-in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
+        - %s 
+      in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
 
         # checking for unexpected keys
         # TODO
@@ -216,7 +212,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
         scm_url = self.metadata['SCM']
 
         scm = GitAccess(scm_url)
-        print "Getting tags from SCM..."
+        logger.info("Getting tags from SCM...")
         top = scm.get_toptag()
         if top and top != self.version:
             logger.warning('Version in YAML shoud be updated according SCM tags')
@@ -225,9 +221,9 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
 
             pwd = os.getcwd()
             if os.path.exists("%s/%s-%s.tar.%s" %(pwd, self.pkg, self.version, appendix )):
-                print "Archive already exists, will not creating a new one"
+                logger.info("Archive already exists, will not creating a new one")
             else:
-                print "Creating archive %s/%s-%s.tar.%s ..." %( pwd, self.pkg, self.version, appendix )
+                logger.info("Creating archive %s/%s-%s.tar.%s ..." % (pwd, self.pkg, self.version, appendix))
                 tmp = tempfile.mkdtemp()
                 os.chdir(tmp)
                 os.system('git clone %s' % scm_url)
@@ -246,13 +242,6 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
             os.chdir(pwd)
 
     def __download_sources(self):
-        def _dl_progress(count, s_block, s_total):
-            percent = int(count * s_block*100 / s_total)
-            if percent > 100: percent = 100
-            sys.stdout.write('\r... %d%%' % percent)
-            if percent == 100: print ' Done.'
-            sys.stdout.flush()
-
         pkg = self.pkg
         rev = self.version
         sources = self.metadata['Sources']
@@ -266,7 +255,7 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
                     repl = raw_input('Need to download source package: %s ?(Y/n) ' % f_name)
                     if repl == 'n': break
 
-                    print 'Downloading latest source package from:', target
+                    logger.info('Downloading latest source package from: %s' % target)
                     import urlgrabber
                     from urlgrabber.progress import text_progress_meter
                     try:
@@ -380,8 +369,6 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
                 tf.close()
                 if not prefix or prefix == '.':
                     prefix, ignore = os.path.basename(tarball).split('.tar.')
-                #print "Prefix: %s" %prefix
-                #print '%s-%s' % (self.pkg, self.version)
                 if prefix and prefix != '%s-%s' % (self.pkg, self.version):
                     prefix = prefix.replace(self.pkg, '%{name}')
                     prefix = prefix.replace(self.version, '%{version}')
@@ -606,10 +593,6 @@ in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
             self.parse_files(self.extra['content']['files'], docs)
         except KeyError:
             pass
-
-        #import pprint
-        #pprint.pprint(self.metadata)
-        #pprint.pprint(self.extra)
 
         spec_content = str(
                 spec.spec(searchList=[{
