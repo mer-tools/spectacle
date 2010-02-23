@@ -32,7 +32,7 @@ import yaml
 # internal modules
 import __version__
 import spec
-import logging  as logger
+import logger
 
 
 class GitAccess():
