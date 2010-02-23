@@ -7,12 +7,14 @@ else
 	TAG = "HEAD"
 endif
 
-all:
-	cd spectacle/spec; $(MAKE)
-	cd spectacle/dsc; $(MAKE)
+all: tmpls
 	python setup.py build
 
-tag: 
+tmpls:
+	cd spectacle/spec; $(MAKE)
+	cd spectacle/dsc; $(MAKE)
+
+tag:
 	git tag $(VERSION)
 
 dist-bz2:
@@ -26,8 +28,10 @@ dist-gz:
 doc:
 	markdown README > README.html
 
-install: all
+install: all install-data
 	python setup.py install
+
+install-data:
 	install -d ${DESTDIR}/usr/share/spectacle/
 	install -m 644 data/*csv ${DESTDIR}/usr/share/spectacle/
 	install -m 644 data/GROUPS ${DESTDIR}/usr/share/spectacle/
