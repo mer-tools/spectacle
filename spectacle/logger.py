@@ -21,7 +21,7 @@ import sys
 # third-party modules
 from termcolor import colored
 
-__ALL__ = ['info', 'warning', 'error']
+__ALL__ = ['info', 'warning', 'error', 'ask']
 
 def info(msg):
     print >> sys.stderr, colored('Info:', 'green'), msg
@@ -32,4 +32,8 @@ def warning(msg):
 def error(msg):
     print >> sys.stderr, colored('Error:', 'red'), msg
     sys.exit(1)
+
+def ask(msg):
+    print >> sys.stdout, colored('Q:', 'blue'),
+    return raw_input(msg)
 
