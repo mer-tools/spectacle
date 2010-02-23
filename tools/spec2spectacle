@@ -195,7 +195,7 @@ class SpecParser(object):
                 if cfgr in pieces or '%'+cfgr in pieces:
                     found_cfgr = True
                     self._Configure = cfgr
-                    cfgr_line = whole_line
+                    cfgr_line = whole_line[len(cfgr)+1:].strip()
                     break
 
             # find builder in current line
@@ -237,11 +237,10 @@ class SpecParser(object):
             if self._Configure:
                 items['Configure'] = self._Configure
                 # parse the configure options
-                for opt in cfgr_line.split()[1:]:
-                    if 'ConfigOptions' not in items:
-                        items['ConfigOptions'] = [opt]
-                    else:
-                        items['ConfigOptions'].append(opt)
+                opts = map(lambda s: '--'+s,
+                             [opt for opt in map(str.strip, cfgr_line.split('--')) if opt])
+                if opts:
+                    items['ConfigOptions'] = opts
             else:
                 # no configure found, only need builder
                 items['Configure'] = 'none'
