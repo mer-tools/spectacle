@@ -423,7 +423,7 @@ class SpecParser(object):
 
                 else:
                     # unparsed line
-                    logger.warning('Warning: un-parsed spec line skipped:', line)
+                    logger.warning('Warning: un-parsed spec line skipped: %s' % line)
 
     def cooked_items(self):
         """ return all items, cooked to the input of convertor """
