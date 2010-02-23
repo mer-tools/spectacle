@@ -18,7 +18,9 @@
 
 import os,sys
 import optparse
-import spectacle.specify
+
+from spectacle import specify
+from spectacle import logger
 
 def parse_options(args):
     import spectacle.__version__
@@ -53,9 +55,13 @@ if __name__ == '__main__':
 
     # check the working path
     if yaml_fpath.find('/') != -1 and os.path.dirname(yaml_fpath) != os.path.curdir:
-        logger.error('This tool need to be run in package dir, skip %s' % yaml_fpath)
+        wdir = os.path.dirname(yaml_fpath)
+        logger.info('Changing to working dir: %s' % wdir)
+        os.chdir(wdir)
 
-    spec_fpath, newspec = spectacle.specify.generate_rpm(yaml_fpath)
+    yaml_fname = os.path.basename(yaml_fpath)
+
+    spec_fpath, newspec = specify.generate_rpm(yaml_fname)
     if newspec:
         logger.info("Creating new spec file: %s" % spec_fpath)
     else:

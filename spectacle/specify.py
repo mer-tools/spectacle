@@ -159,9 +159,9 @@ class RPMWriter():
             for p in self.metadata['PkgBR']:
                 p = p.split(" ")[0]
                 if self.packages.has_key(p):
-                    logger.info("""Use one of
-        - %s 
-      in PkgConfigBR instead of %s in PkgBR""" %('\n - '.join(self.packages[p]), p))
+                    logger.warning("""Please use one of the followings:
+           - %s
+         in PkgConfigBR instead of %s in PkgBR""" %('\n           - '.join(self.packages[p]), p))
 
         # checking for unexpected keys
         # TODO

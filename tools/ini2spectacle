@@ -93,13 +93,8 @@ class SBConfigParser(RawConfigParser):
                   'Configure': 'configure',
                  }
 
-    def __init__(self, ini_dir = None):
+    def __init__(self):
         RawConfigParser.__init__(self)
-
-        if ini_dir:
-            self.ini_dir = ini_dir
-        else:
-            self.ini_dir = os.path.curdir
 
         self.record_used_files = []
 
@@ -172,8 +167,7 @@ class SBConfigParser(RawConfigParser):
             # Convert keys which need expanding from external file
             for key in self.expand_keys:
                 if key in items:
-                    content = self.__expand_single(
-                                    os.path.join(self.ini_dir, items[key]))
+                    content = self.__expand_single(items[key])
                     if content:
                         if key == 'Files':
                             # 'Files' need split to list
@@ -252,30 +246,35 @@ if __name__ == '__main__':
             logger.error('Cannot find valid spec-builder file(*.ini) in current directory, please specify one.')
         elif len(inils) > 1:
             logger.error('Find multiple spec-builder files(*.ini) in current directory, please specify one.')
+
         ini_fpath = inils[0]
     else:
         ini_fpath = args[0]
-
-    if options.outfile_path:
-        out_fpath = options.outfile_path
-    else:
-        if ini_fpath.endswith('.ini'):
-            out_fpath = ini_fpath[:-3] + 'yaml'
-        else:
-            out_fpath = ini_fpath + '.yaml'
 
     # Check if the input file exists
     if not os.path.exists(ini_fpath):
         # input file does not exist
         logger.error("%s: File does not exist" % ini_fpath)
 
-    iniDir = os.path.dirname(ini_fpath)
-    if not iniDir:
-        iniDir = os.path.curdir
+    # check the working path
+    if ini_fpath.find('/') != -1 and os.path.dirname(ini_fpath) != os.path.curdir:
+        wdir = os.path.dirname(ini_fpath)
+        logger.info('Changing to working dir: %s' % wdir)
+        os.chdir(wdir)
+
+    ini_fname = os.path.basename(ini_fpath)
+
+    if options.outfile_path:
+        out_fpath = options.outfile_path
+    else:
+        if ini_fname.endswith('.ini'):
+            out_fpath = ini_fname[:-3] + 'yaml'
+        else:
+            out_fpath = ini_fname + '.yaml'
 
     """Read the input file"""
-    config = SBConfigParser(iniDir)
-    config.read(ini_fpath)
+    config = SBConfigParser()
+    config.read(ini_fname)
 
     convertor = SBConvertor()
 
@@ -288,7 +287,7 @@ if __name__ == '__main__':
         logger.info('Spec file %s was created with extra data' % spec_fpath)
 
     # move old spec-builder files to backup dir
-    backDir = os.path.join(iniDir, 'spec-builder.backup')
+    backDir = 'spec-builder.backup'
     try:
         os.mkdir(backDir)
     except:
