@@ -265,6 +265,8 @@ class RPMWriter():
                             logger.warning('Invalid source URL')
                         else:
                             raise e
+                    except KeyboardInterrupt:
+                        logger.info('Downloading is interrupted by ^C')
                     """
                     for ext in ('.md5', '.gpg', '.sig', '.sha1sum'):
                         urllib.urlretrieve(target + ext, f_name + ext)
