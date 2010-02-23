@@ -24,12 +24,12 @@ from termcolor import colored
 __ALL__ = ['info', 'warning', 'error']
 
 def info(msg):
-    print >> sys.stderr, colored('Info:', 'white', on_color='on_blue'), msg
+    print >> sys.stderr, colored('Info:', 'green'), msg
 
 def warning(msg):
-    print >> sys.stderr, colored('Warning:', 'yellow', on_color='on_blue'), msg
+    print >> sys.stderr, colored('Warning:', 'yellow'), msg
 
 def error(msg):
-    print >> sys.stderr, colored('Error:', 'red', on_color='on_blue'), msg
+    print >> sys.stderr, colored('Error:', 'red'), msg
     sys.exit(1)
 
