@@ -29,6 +29,9 @@ System/Base
 System/Daemons
 System/Kernel
 System/Libraries
+System/Libraries/Python
+System/Libraries/Perl
+System/Networking
 System/Shells
 System/X11
 System/X11/Fonts
