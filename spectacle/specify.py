@@ -551,12 +551,18 @@ class RPMWriter():
         if os.path.exists(self.specfile):
             if self.clean_old:
                 # backup original file
-                bak_spec_fpath = self.specfile + '.orig'
+                backdir = 'spec.backup'
+                try:
+                    os.mkdir(backdir)
+                except:
+                    pass
+                bak_spec_fpath = os.path.join(backdir, self.specfile)
                 if os.path.exists(bak_spec_fpath):
                     repl = logger.ask('%s will be overwritten by the backup, continue?(Y/n) ' % bak_spec_fpath)
                     if repl == 'n':
                         sys.exit(1)
 
+                logger.info('Old spec file is saved as "%s"' % bak_spec_fpath)
                 os.rename(self.specfile, bak_spec_fpath)
             else:
                 self.newspec = False
