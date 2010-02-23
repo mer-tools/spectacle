@@ -23,6 +23,7 @@ Topic
       with --new <pkg name> or even --source <tarball>... specify then
       will do quick guess on the package name and verion etc. (See
       speculate tool description)
+- [ ] Testing framework support
 - [ ] Speculate:
     - [ ] This is a tool that basically helps generate yaml files
     - [ ] Point it to a tar ball and maybe some other hints and it will

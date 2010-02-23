@@ -131,13 +131,13 @@ All available directives for spectacle are listed as the following:
 * Obsoletes: **list** of **string**
 
 * Configure: **string**, *optional*, valid values: **autogen**, **configure**,
-  **reconfigure**<br>
-  **If not specified, no automatic configure instructions generated.**
+  **reconfigure**, **none**<br>
+  **If not specified, the default value ``configure`` will be used**
 
 * Builder: **string**, *optional*, valid values: **make**, **single-make**,
-  **python**, **no-builder**<br>
+  **python**, **none**<br>
   **If not specified, the deault value ``make`` will be used. If do not want a
-  automatic builder, please use ``no-builder``.**
+  automatic builder, please use ``none``.**
 
 * FilesInput: **string**, *optional*, extra input source for %files
 
