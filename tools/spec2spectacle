@@ -418,8 +418,8 @@ class SpecParser(object):
                             items[cur_block] = ''
 
                             # options in header line as the first line
-                            if '-' in opt:
-                                items[cur_block] = opt[opt.index('-'):] + '\n'
+                            if ' -' in opt:
+                                items[cur_block] = opt[opt.index(' -'):] + '\n'
 
                 else:
                     # unparsed line
