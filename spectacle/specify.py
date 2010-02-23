@@ -356,9 +356,15 @@ class RPMWriter():
                 fpath = os.path.basename(uri)
                 fpath = fpath.replace('%{name}', self.pkg)
                 fpath = fpath.replace('%{version}', self.version)
-                if os.path.exists(fpath) and tarfile.is_tarfile(fpath):
-                    tarball = fpath
-                    break
+                if os.path.exists(fpath):
+                    try:
+                        if tarfile.is_tarfile(fpath):
+                            tarball = fpath
+                            break
+                    except:
+                        logger.warning('Corrupt tarball %s found!' % fpath)
+                        pass
+
             if tarball:
                 tf = tarfile.open(tarball, 'r:*')
                 prefix = None
