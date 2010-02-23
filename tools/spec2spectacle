@@ -68,6 +68,17 @@ SINGLES = ( 'Summary',
             'Group',
             'BuildArch',
             'License' )
+REQUIRES = ('BuildRequires',
+            'PreRequires',
+            'Requires',
+            'Requires(post)',
+            'Requires(postun)',
+            'Requires(pre)',
+            'Requires(preun)',
+            'Provides',
+            'Obsoletes',
+            'Conflicts',
+           )
 SKIPS   = ( 'BuildRoot',)
 
 # must have keys for 'main' package
@@ -476,6 +487,20 @@ class SpecParser(object):
                 else:
                     ck_items[k] = v[0]
 
+            elif k in REQUIRES:
+                nv = []
+                for vi in v:
+                    if 'pkgconfig' in v:
+                        nv.append(vi)
+                    elif ',' in vi:
+                        reqs = []
+                        for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', vi):
+                            reqs.append(entry.split(',')[0])
+                        nv += reqs
+                    else:
+                        nv.append(vi)
+                ck_items[k] = nv
+                print v, nv
             else:
                 ck_items[k] = v
 

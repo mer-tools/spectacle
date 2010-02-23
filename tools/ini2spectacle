@@ -58,7 +58,7 @@ class SBConfigParser(RawConfigParser):
                  )
 
     # keys whose value may have ver numbers
-    deps_keys =  ('BuildRequires',
+    reqs_keys =  ('BuildRequires',
                   'PreRequires',
                   'Requires',
                   'PostRequires',
@@ -144,7 +144,7 @@ class SBConfigParser(RawConfigParser):
                     self.set(section, key, map(str.strip, items[key].split()))
 
             # Convert dependent like entry to list
-            for key in self.deps_keys:
+            for key in self.reqs_keys:
                 if key in items:
                     reqs = []
                     for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', items[key]):
