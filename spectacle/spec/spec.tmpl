@@ -272,6 +272,7 @@ Description: %{summary}
 #if $metadata.has_key("PatchOpts")
 #set $idx = 0
 #for $patch_opt in $metadata.PatchOpts
+$metadata.PatchCmts[$idx]
 %patch${idx} $patch_opt
 #set $idx = $idx + 1
 #end for

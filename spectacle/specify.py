@@ -335,7 +335,10 @@ class RPMWriter():
 
             self.metadata['Patches']   = []
             self.metadata['PatchOpts'] = []
+            self.metadata['PatchCmts'] = []
             for patch in patches:
+                self.metadata['PatchCmts'].append('# ' + patch)
+
                 if isinstance(patch, str):
                     self.metadata['Patches'].append(patch)
                     self.metadata['PatchOpts'].append('-p1')
