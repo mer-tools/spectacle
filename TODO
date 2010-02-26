@@ -6,7 +6,7 @@ Topic
       yaml file and use it
 - [X] calling ini2spectacle should look for a single ini file and
       convert it, no need to specify anything as argument
-- [ ] Support series.conf file to list and maintain patches with patch
+- [X] Support series.conf file to list and maintain patches with patch
       descriptions. It should put the description on to of the patch
       tag in the spec file
 - [X] When converting from ini, also delete the Makefile
