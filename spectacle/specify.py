@@ -24,6 +24,7 @@ import copy
 import distutils.version as _V
 import datetime
 import csv
+import tarfile
 
 
 # third-party modules
@@ -156,12 +157,27 @@ class RPMWriter():
 
         if self.metadata.has_key("PkgBR"):
             _check_pkgconfig()
+            pcbr = []
+            br = self.metadata['PkgBR']
             for p in self.metadata['PkgBR']:
-                p = p.split(" ")[0]
-                if self.packages.has_key(p):
+                px = p.split(" ")[0]
+                pl = self.packages
+                if pl.has_key(px):
+                    if len(pl[px]) == 1:
+                        pcbr.append(pl[px][0])
+                        br.remove(p)
                     logger.warning("""Please use one of the followings:
            - %s
-         in PkgConfigBR instead of %s in PkgBR""" %('\n           - '.join(self.packages[p]), p))
+         in PkgConfigBR instead of %s in PkgBR""" %('\n           - '.join(pl[px]), px))
+            
+            if len(pcbr) > 0:
+                print """
+Proposal (multiple values skipped, please insert them manually):
+PkgBR: 
+    - %s
+PkgConfigBR:
+    - %s
+                    """ %('\n    - '.join(pcbr), '\n    - '.join(br))
 
         # checking for unexpected keys
         # TODO
@@ -272,6 +288,62 @@ class RPMWriter():
                         urllib.urlretrieve(target + ext, f_name + ext)
                     """
 
+
+    def analyze_source(self):
+        tarball = None
+        for uri in self.metadata['Sources']:
+            fpath = os.path.basename(uri)
+            fpath = fpath.replace('%{name}', self.pkg)
+            fpath = fpath.replace('%{version}', self.version)
+            if os.path.exists(fpath):
+                try:
+                    if tarfile.is_tarfile(fpath):
+                        tarball = fpath
+                        break
+                except:
+                    logger.warning('Corrupt tarball %s found!' % fpath)
+                    pass
+
+        def pc_files(members):
+            for tarinfo in members:
+                f = os.path.split(tarinfo.name)[1]
+                xx = f.split(".pc.")
+                if len(xx) > 1 and xx[1] == "in":
+                    extractfile
+                    buf = tarinfo.tobuf()
+                    print buf
+
+        prefix = None
+        if tarball:
+            tf = tarfile.open(tarball, 'r:*')
+            for member in tf.getmembers():
+                if member.type == tarfile.DIRTYPE:
+                    prefix = member.name.rstrip('/')
+                    break
+            
+            #analyze_path = tempfile.mkdtemp(dir=os.getcwd(), prefix=".spectacle_")
+            #tf.extractll(path=analyze_path, members=pc_files(tf))
+            for member in tf.getmembers():
+                f = os.path.split(member.name)[1]
+                xx = f.split(".pc.")
+                if len(xx) > 1 and xx[1] == "in":
+                    pc = tf.extractfile(member)
+                    # TODO
+            tf.close()
+
+
+        # confirm 'SourcePrefix' is valid
+        if 'SourcePrefix' not in self.metadata:
+            # setting the default value firstly
+            self.metadata['SourcePrefix'] = '%{name}-%{version}'
+            if not prefix or prefix == '.':
+                prefix, ignore = os.path.basename(tarball).split('.tar.')
+
+            if prefix and prefix != '%s-%s' % (self.pkg, self.version):
+                prefix = prefix.replace(self.pkg, '%{name}')
+                prefix = prefix.replace(self.version, '%{version}')
+                self.metadata['SourcePrefix'] = prefix
+
     def parse(self):
 
         # customized Resolver for Loader, in PyYAML
@@ -346,41 +418,8 @@ class RPMWriter():
                     self.metadata['Patches'].append(patch[0])
                     self.metadata['PatchOpts'].append(' '.join(patch[1:]))
 
-        # confirm 'SourcePrefix' is valid
-        if 'SourcePrefix' not in self.metadata:
-            import tarfile
 
-            # setting the default value firstly
-            self.metadata['SourcePrefix'] = '%{name}-%{version}'
-
-            tarball = None
-            for uri in self.metadata['Sources']:
-                fpath = os.path.basename(uri)
-                fpath = fpath.replace('%{name}', self.pkg)
-                fpath = fpath.replace('%{version}', self.version)
-                if os.path.exists(fpath):
-                    try:
-                        if tarfile.is_tarfile(fpath):
-                            tarball = fpath
-                            break
-                    except:
-                        logger.warning('Corrupt tarball %s found!' % fpath)
-                        pass
-
-            if tarball:
-                tf = tarfile.open(tarball, 'r:*')
-                prefix = None
-                for member in tf.getmembers():
-                    if member.type == tarfile.DIRTYPE:
-                        prefix = member.name.rstrip('/')
-                        break
-                tf.close()
-                if not prefix or prefix == '.':
-                    prefix, ignore = os.path.basename(tarball).split('.tar.')
-                if prefix and prefix != '%s-%s' % (self.pkg, self.version):
-                    prefix = prefix.replace(self.pkg, '%{name}')
-                    prefix = prefix.replace(self.version, '%{version}')
-                    self.metadata['SourcePrefix'] = prefix
+        self.analyze_source()
 
         # clean up all boolean type options, remove redundant ones
         #   for keys with default value FALSE

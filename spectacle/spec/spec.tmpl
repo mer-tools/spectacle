@@ -296,6 +296,10 @@ $str_newline.join($extra.content.build.pre)
 ############################
 #if $Builder == 'python'
 CFLAGS="\$RPM_OPT_FLAGS" %{__python} setup.py build
+#else if $Builder == 'qmake'
+#set $Configure = 'none'
+qmake-qt4 install_prefix=/usr
+make %{?jobs:-j%jobs}
 #else if $Builder == 'perl'
 if test -f Makefile.PL; then
 %{__perl} Makefile.PL INSTALLDIRS=vendor  
