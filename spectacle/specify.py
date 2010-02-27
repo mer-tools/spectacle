@@ -172,11 +172,13 @@ class RPMWriter():
          in PkgConfigBR instead of %s in PkgBR""" %('\n           - '.join(pl[px]), px))
             
             if len(pcbr) > 0:
+                if self.metadata.has_key('PkgConfigBR'):
+                    pcbr.extend(self.metadata['PkgConfigBR'])
                 print """
 Proposal (multiple values skipped, please insert them manually):
-PkgBR: 
+PkgConfigBR: 
     - %s
-PkgConfigBR:
+PkgBR:
     - %s
                     """ %('\n    - '.join(pcbr), '\n    - '.join(br))
 
