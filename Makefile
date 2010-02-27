@@ -35,3 +35,7 @@ install-data:
 	install -d ${DESTDIR}/usr/share/spectacle/
 	install -m 644 data/*csv ${DESTDIR}/usr/share/spectacle/
 	install -m 644 data/GROUPS ${DESTDIR}/usr/share/spectacle/
+
+clean:
+	rm -rf build/
+	rm -f README.html

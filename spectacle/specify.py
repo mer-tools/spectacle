@@ -35,6 +35,7 @@ import __version__
 import spec
 import logger
 
+SERIES_PATH = 'series.conf'
 
 class GitAccess():
     def __init__(self, path):
@@ -344,6 +345,19 @@ PkgConfigBR:
                 prefix = prefix.replace(self.version, '%{version}')
                 self.metadata['SourcePrefix'] = prefix
 
+    def __parse_series(self, patches, comments):
+        comment = ""
+        for line in file(SERIES_PATH):
+            if not line.strip():
+                continue
+            if line.startswith('#'):
+                comment += line
+            else:
+                line = line.strip()
+                patches.append(line)
+                comments.append(comment + '# ' + line)
+                comment = ''
+
     def parse(self):
 
         # customized Resolver for Loader, in PyYAML
@@ -407,7 +421,10 @@ PkgConfigBR:
 
             self.metadata['Patches']   = []
             self.metadata['PatchOpts'] = []
+            self.metadata['PatchCmts'] = []
             for patch in patches:
+                self.metadata['PatchCmts'].append('# ' + patch)
+
                 if isinstance(patch, str):
                     self.metadata['Patches'].append(patch)
                     self.metadata['PatchOpts'].append('-p1')
@@ -418,6 +435,15 @@ PkgConfigBR:
                     self.metadata['Patches'].append(patch[0])
                     self.metadata['PatchOpts'].append(' '.join(patch[1:]))
 
+        # detect 'series.conf' in current dir
+        if os.path.exists(SERIES_PATH):
+            if "Patches" in self.metadata:
+                logger.warning('Both "Patches" tag in yaml and series.conf exists, please use only one.')
+            else:
+                self.metadata['Patches'] = []
+                self.metadata['PatchCmts'] = []
+                self.__parse_series(self.metadata['Patches'],
+                                    self.metadata['PatchCmts'])
 
         self.analyze_source()
 
