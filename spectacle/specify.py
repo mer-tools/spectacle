@@ -159,17 +159,20 @@ class RPMWriter():
         if self.metadata.has_key("PkgBR"):
             _check_pkgconfig()
             pcbr = []
-            br = self.metadata['PkgBR']
+            br = []
+            print br
             for p in self.metadata['PkgBR']:
                 px = p.split(" ")[0]
+                px = px.strip()
                 pl = self.packages
                 if pl.has_key(px):
                     if len(pl[px]) == 1:
                         pcbr.append(pl[px][0])
-                        br.remove(p)
                     logger.warning("""Please use one of the followings:
            - %s
          in PkgConfigBR instead of %s in PkgBR""" %('\n           - '.join(pl[px]), px))
+                else:
+                    br.append(p)
             
             if len(pcbr) > 0:
                 if self.metadata.has_key('PkgConfigBR'):
