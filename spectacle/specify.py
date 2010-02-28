@@ -160,7 +160,6 @@ class RPMWriter():
             _check_pkgconfig()
             pcbr = []
             br = []
-            print br
             for p in self.metadata['PkgBR']:
                 px = p.split(" ")[0]
                 px = px.strip()
@@ -339,7 +338,7 @@ PkgBR:
 
 
         # confirm 'SourcePrefix' is valid
-        if 'SourcePrefix' not in self.metadata:
+        if 'SourcePrefix' not in self.metadata and 'NoSetup' not in self.metadata:
             # setting the default value firstly
             self.metadata['SourcePrefix'] = '%{name}-%{version}'
             if not prefix or prefix == '.':
