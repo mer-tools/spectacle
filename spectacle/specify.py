@@ -151,7 +151,7 @@ class RPMWriter():
             return True
 
         # checking for mandatory keys
-        mandatory_keys = ('Name', 'Version', 'Release', 'Group', 'URL', 'License')
+        mandatory_keys = ('Name', 'Version', 'Release', 'Group',  'License')
         for key in mandatory_keys:
             if key not in self.metadata:
                 logger.error('Missing %s Tag. Add it and rettry...' % key)

@@ -39,7 +39,9 @@ License:    ${metadata.License}
 #if $metadata.has_key("BuildArch")
 BuildArch:  ${metadata.BuildArch}
 #end if
+#if $metadata.has_key("URL")
 URL:        ${metadata.URL}
+#end if
 ## Sources
 #if $metadata.has_key("Sources")
 #set $idx = 0
@@ -97,14 +99,19 @@ Requires(postun):  /sbin/ldconfig
 Requires(post):  /bin/touch
 #end if
 #if $extra.has_key("Info") and $extra.Info
-Requires(post):  /sbin/install-info
+Requires(post): /sbin/install-info
 Requires(postun):  /sbin/install-info
 #end if
 #if $extra.Service
 Requires(post):  /sbin/service
+Requires(postun):  /sbin/service
 Requires(post):  /sbin/chkconfig
-Requires(postun): /sbin/service
-Requires(postun): /sbin/chkconfig
+Requires(postun):  /sbin/chkconfig
+#end if
+#if $extra.Schema
+Requires(post): GConf2
+Requires(preun): GConf2
+Requires(pre): GConf2
 #end if
 ## BuildRequires
 #if $metadata.has_key("PkgConfigBR")
@@ -123,8 +130,14 @@ BuildRequires:  pkgconfig($br_comps[0])
 #if $br == 'intltool' and not $metadata.has_key("LocaleName") and not $metadata.has_key("NoLocale")
 #set $br_locale = $metadata.Name
 #end if
+#if $br == 'desktop-file-utils'
+#set $br_desktop = 1
+#end if
 BuildRequires:  $br
 #end for
+#end if
+#if $extra.Desktop and $br_desktop
+BuildRequires: desktop-file-utils
 #end if
 #if $metadata.has_key("RunFdupes")
 BuildRequires:  fdupes
@@ -414,6 +427,12 @@ $metadata.ExtraInstall
 $str_newline.join($extra.content.install.post)
 #end if
 # << install post
+#if $extra.Desktop
+desktop-file-install --delete-original       \
+  --dir %{buildroot}%{_datadir}/applications             \
+  --remove-only-show-in=GNOME                            \
+   %{buildroot}%{_datadir}/applications/*
+#end if
 #if $metadata.has_key("LocaleName")
 #if $metadata.has_key("LocaleOptions")
 #set $localeopt_str = $metadata["LocaleOptions"]

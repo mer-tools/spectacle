@@ -36,6 +36,7 @@ System/Shells
 System/X11
 System/X11/Fonts
 System/X11/Icons
+System/X Hardware Support
 System/GUI/XFCE
 System/GUI/Other
 System/GUI/GNOME
