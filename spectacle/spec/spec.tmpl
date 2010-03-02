@@ -169,8 +169,6 @@ Obsoletes:   $obs
 #end for
 #end if
 
-BuildRoot:  %{_tmppath}/%{name}-%{version}-build
-
 %description
 #if $metadata.has_key("Description")
 ${metadata.Description}
@@ -471,10 +469,6 @@ make check
 #end if
 # << check_scriptlets
 #end if
-
-############################ clean scripts
-%clean
-rm -rf %{buildroot}
 
 ############################ Pre
 #if $extra.Schema
