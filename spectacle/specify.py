@@ -342,7 +342,8 @@ PkgBR:
             # setting the default value firstly
             self.metadata['SourcePrefix'] = '%{name}-%{version}'
             if not prefix or prefix == '.':
-                prefix, ignore = os.path.basename(tarball).split('.tar.')
+                if tarball:
+                    prefix, ignore = os.path.basename(tarball).split('.tar.')
 
             if prefix and prefix != '%s-%s' % (self.pkg, self.version):
                 prefix = prefix.replace(self.pkg, '%{name}')
