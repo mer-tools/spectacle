@@ -2,10 +2,12 @@ Name: PackageName
 Summary: string
 Version: string
 Release: string
+Epoch:   string # optional
 Group: string
 License: string
-URL: string
+URL: string       # optional
 BuildArch: string # optional
+ExclusiveArch: string # optional
 
 Description: |
     Text
@@ -19,9 +21,8 @@ ExtraSources: # optional
     - file2     # path2 default to '/'
 
 Patches:
-    - li0: -p0  # patch -p0
-    - li1       # default to -p1
-    - [li2, -p0, -z, -E]      # even can be a list
+    - li0.patch
+    - li1.patch
 
 Requires:
     - li0
@@ -68,16 +69,21 @@ ConfigOptions:
     - li0
     - li1
 
-Builder: make  # make, single-make, python, or other special builder, optional
+SetupOptions: "-xyz" # optional options for %setup macro
+
+Builder: make  # make, single-make, python, perl, or other special builder, optional
+
+ExtraInstall: string # extra install scripts
 
 LocaleName: string # optional
 LocaleOptions: # optional
     - opt1
     - opt2
 
-Documents:
-    - doc1
-    - doc2
+# file list for small pkgs
+Files:
+    - "%{_libdir}/*.so*"
+    - "%doc README GPL"
 
 # boolean options, use "yes"/"no" for TRUE/FALSE, all optional
 #   If the followings were not specified, it means FALSE
@@ -85,6 +91,8 @@ NeedCheckSection: yes       # %check in spec
 SupportOtherDistros: yes    # for distros other than moblin/meego
 NoAutoReq: yes              # 'AutoReq: 0' in spec
 NoAutoProv: yes             # 'AutoProv: 0' in spec
+NoSetup: yes                # need not %setup macros in %prep
+
 #   If the followings were not specified, it means TRUE
 UseAsNeeded: no            # 'export LD_AS_NEEDED=1' in spec
 

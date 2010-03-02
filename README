@@ -42,23 +42,24 @@ Several methods available for spectacle installation:
 
 ## Usage
 ### specify
-    Usage: specify [options] <yaml-path>
+    Usage: specify [options] [yaml-path]
 
     Options:
       --version   show program's version number and exit
       -h, --help  show this help message and exit
 
 ### ini2spectacle
-    Usage: ini2spectacle [options] <ini-path>
+    Usage: ini2spectacle [options] [ini-path]
 
     Options:
       --version             show program's version number and exit
       -h, --help            show this help message and exit
       -o OUTFILE_PATH, --output=OUTFILE_PATH
-                        Path of output yaml file
+                            Path of output yaml file
+      -f, --include-files   To store files list in YAML file
 
 ### spec2spectacle
-    Usage: spec2spectacle [options] <spec-path>
+    Usage: spec2spectacle [options] [spec-path]
 
     Options:
       --version             show program's version number and exit
@@ -67,6 +68,7 @@ Several methods available for spectacle installation:
                             Path of output yaml file
       -r, --replace-macros  To replace self-defined macros in spec file
       --no-builder-parsing  Do NOT try to parse build/install scripts
+      -f, --include-files   To store files list in YAML file
 
 ## Syntax of spectacle YAML
 The syntax of YAML can be refered here: <http://www.yaml.org/spec/>
@@ -88,13 +90,17 @@ All available directives for spectacle are listed as the following:
 
 * Release: **string**
 
+* Epoch: **string**, *optional*
+
 * Group: **string**
 
 * License: **string**
 
-* URL: **string**
+* URL: **string**, *optional*
 
 * BuildArch: **string**, *optional*
+
+* ExclusiveArch: **string**, *optional*
 
 * LocaleName: **string**, *optional*
 
@@ -107,6 +113,10 @@ All available directives for spectacle are listed as the following:
 * SourcePrefix: **string**, *optional*, specify the prefix path in source package
 
 * ExtraSources: **list** of **string**, *optional*
+
+* SetupOptions: **string**, *optional*
+
+* ExtraInstall: **string**, *optional*
 
 * Patches: **list** of **string**, all patches need to be in 'p1' level
 
@@ -135,9 +145,11 @@ All available directives for spectacle are listed as the following:
   **If not specified, the default value ``configure`` will be used**
 
 * Builder: **string**, *optional*, valid values: **make**, **single-make**,
-  **python**, **none**<br>
+  **python**, **perl**, **none**<br>
   **If not specified, the deault value ``make`` will be used. If do not want a
   automatic builder, please use ``none``.**
+
+* Files: **list** of **string**, *optional*, content of ``%files`` for small packages
 
 * FilesInput: **string**, *optional*, extra input source for %files
 
@@ -150,6 +162,8 @@ All available directives for spectacle are listed as the following:
 * NoAutoReq: **boolean**, whether add 'AutoReq: 0' to spec
 
 * NoAutoProv: **boolean**, whether add 'AutoProv: 0' to spec
+
+* NoSetup: **boolean**, whether to skip using ``%setup`` in ``%prep``
 
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
 
@@ -186,7 +200,7 @@ You can add any custom code between the markers, next time when you run
 relying on the meta data from the yaml file will be changed depending on the
 values in the YAML file.
 
-Totally 7 places with placeholders in spec can be customized:
+The following placeholders in spec can be customized:
 
 * Private Macros, used in this package's spec
 
@@ -194,6 +208,13 @@ Totally 7 places with placeholders in spec can be customized:
 
         # >> macros
         # << macros
+
+* Extra setup scripts in the last of ``%prep``
+
+    With placeholder:
+
+        # >> setup
+        # << setup
 
 * Pre-Build, scripts before package building
 
