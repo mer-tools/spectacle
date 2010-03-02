@@ -610,6 +610,20 @@ PkgBR:
         if check_scriptlets and 'NeedCheckSection' in self.metadata:
            content["check_scriptlets"] = check_scriptlets
 
+        # checking whether both 'Files' key and inline files exists
+        if files:
+            files_yaml = False
+            if 'Files' in self.metadata and self.metadata['Files']:
+                files_yaml = True
+            elif 'SubPackages' in self.metadata:
+                for spkg in self.metadata['SubPackages']:
+                    if 'Files' in spkg:
+                        files_yaml = True
+                        break
+
+            if files_yaml:
+                logger.warning('both "Files" YAML keyword and inline %file content in spec present')
+
         # try to remove duplicate '%defattr' in files list
         dup = '%defattr(-,root,root,-)'
         for key in content['files']:

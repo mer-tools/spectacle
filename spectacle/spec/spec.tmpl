@@ -633,6 +633,11 @@ fi
 %doc $doc
 #end for
 #end if
+#if "Files" in $metadata:
+#for $f in $metadata.Files
+$f
+#end for
+#end if
 # >> files
 #if $extra.content.has_key("files") and $extra.content.files.has_key("main")
 $str_newline.join($extra.content.files.main)
@@ -663,6 +668,11 @@ $str_newline.join($extra.content.files[$sp])
 #if $sp.has_key("Documents")
 #for $doc in $sp.Documents
 %doc $doc
+#end for
+#end if
+#if "Files" in $sp:
+#for $f in $sp.Files
+$f
 #end for
 #end if
 # >> files $sp.Name
