@@ -36,6 +36,9 @@ Epoch:      ${metadata.Epoch}
 #end if
 Group:      ${metadata.Group}
 License:    ${metadata.License}
+#if $metadata.has_key("ExclusiveArch")
+ExclusiveArch:  ${metadata.ExclusiveArch}
+#end if
 #if $metadata.has_key("BuildArch")
 BuildArch:  ${metadata.BuildArch}
 #end if
@@ -131,7 +134,9 @@ BuildRequires:  pkgconfig($br_comps[0])
 #set $br_locale = $metadata.Name
 #end if
 #if $br == 'desktop-file-utils'
-#set $br_desktop = 1
+#set $br_desktop = True
+#else
+#set $br_desktop = False
 #end if
 BuildRequires:  $br
 #end for
