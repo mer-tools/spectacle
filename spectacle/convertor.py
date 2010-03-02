@@ -50,6 +50,7 @@ ORDER_ENTRIES = ['Name',
                  'BuildArch',
                  'LocaleName',
                  'LocaleOptions',
+                 'Files',
                  'NeedCheckSection',
                  'SupportOtherDistros',
                  'UseAsNeeded',
@@ -134,23 +135,11 @@ class Convertor(object):
         except:
             pass
 
-        extra = {}
-        """
-        EXTRA_ENTRIES = ['Files',
-                         'PostMakeExtras',
-                         'PostMakeInstallExtras',
-                        ]
-
-        for entry in EXTRA_ENTRIES:
-            if entry in dict:
-                logger.warning('need to remove key "%s" to extra' % entry)
-                extra[entry] = dict[entry]
-                del dict[entry]
-        """
-
         if 'extra' in dict:
-            extra.update(dict['extra'])
+            extra = dict['extra']
             del dict['extra']
+        else:
+            extra = {}
 
         for k, v in dict.iteritems():
             logger.warning('un-ordered entry: %s' % k)

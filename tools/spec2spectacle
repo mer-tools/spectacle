@@ -113,11 +113,13 @@ class SpecConvertor(Convertor):
 class SpecParser(object):
     """ Parser of SPEC file of rpm package """
 
-    def __init__(self, replace_macros, builder_parsing):
+    def __init__(self, replace_macros, builder_parsing, include_files):
         # runtime variables
         self.items = {}
         self.table = {}
         self.cur_pkg = 'main'
+
+        self.include_files = include_files
 
         self.builder_parsing = builder_parsing
         self._Builder = None
@@ -338,7 +340,10 @@ class SpecParser(object):
         if files[0].startswith('-'):
             files.pop(0)
 
-        items['extra']['Files'] = files
+        if self.include_files:
+            items['Files'] = files
+        else:
+            items['extra']['Files'] = files
 
     def _do_description(self, items, pkg, v):
         items['Description'] = v.strip()
@@ -540,6 +545,9 @@ def parse_options(args):
     parser.add_option("",   "--no-builder-parsing", action="store_false",
                       dest="builder_parsing", default=True,
                       help="Do NOT try to parse build/install scripts")
+    parser.add_option("-f", "--include-files", action="store_true",
+                      dest="include_files", default=False,
+                      help="To store files list in YAML file")
 
     return parser.parse_args()
 
@@ -617,7 +625,8 @@ if __name__ == '__main__':
 
     """Read the input file"""
     spec_parser = SpecParser(replace_macros = options.replace_macros,
-                             builder_parsing = options.builder_parsing
+                             builder_parsing = options.builder_parsing,
+                             include_files = options.include_files
                             )
     try:
         spec_parser.read(spec_fname)
