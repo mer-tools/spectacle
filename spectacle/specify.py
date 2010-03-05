@@ -150,6 +150,12 @@ class RPMWriter():
                 return False
             return True
 
+        def _check_localename(metadata):
+            """ sub-routine for 'LocaleName' checking """
+            if 'LocaleOptions' in metadata and 'LocaleName' not in metadata:
+                return False
+            return True
+
         # checking for mandatory keys
         mandatory_keys = ('Name', 'Version', 'Release', 'Group',  'License')
         for key in mandatory_keys:
@@ -196,6 +202,11 @@ PkgBR:
             for sp in self.metadata["SubPackages"]:
                 if not _check_desc(sp):
                     logger.warning('sub-pkg: %s has no qualified "Description" tag' % sp['Name'])
+
+        # checking for validation of 'Description'
+        if not _check_localename(self.metadata):
+            self.metadata['LocaleName'] = "%{name}"
+            logger.warning('lost "LocaleName" keyword, use "%{name}" as default')
 
         # checking for LIST expected keys
         list_keys = ('Sources', 'ExtraSources', 'Patches',
