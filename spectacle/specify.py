@@ -60,6 +60,7 @@ BOOL_KEYS = ('NeedCheckSection',
 LIST_KEYS = ('Sources',
              'ExtraSources',
              'Patches',
+             'ConfigOptions',
              'Requires',
              'RequiresPre',
              'RequiresPreUn',
@@ -141,7 +142,7 @@ class RPMWriter():
                         'Infos': [],
                     }
 
-    def __init__(self, yaml_fpath, clean_old=False, spec_fpath=None):
+    def __init__(self, yaml_fpath, spec_fpath=None, clean_old=False, download_new=True):
         self.yaml_fpath = yaml_fpath
         now = datetime.datetime.now()
         self.metadata = {'MyVersion': __version__.VERSION, 'Date': now.strftime("%Y-%m-%d")}
@@ -152,6 +153,7 @@ class RPMWriter():
         self.packages = {}
 
         self.clean_old = clean_old
+        self.download_new = download_new
 
         # initialize extra info for spec
         self.extra = { 'subpkgs': {}, 'content': {} }
@@ -552,12 +554,13 @@ PkgBR:
             self.metadata['Sources'].extend(extra_srcs)
             self.metadata['ExtraInstall'] = extra_install
 
-        # update to SCM latest release
-        if "SCM" in self.metadata:
-            self.__get_scm_latest_release()
+        if self.download_new:
+            # update to SCM latest release
+            if "SCM" in self.metadata:
+                self.__get_scm_latest_release()
 
-        # if no srcpkg with yaml.version exists in cwd, trying to download
-        self.__download_sources()
+            # if no srcpkg with yaml.version exists in cwd, trying to download
+            self.__download_sources()
 
         # handle patches with extra options
         if "Patches" in self.metadata:
@@ -855,8 +858,8 @@ PkgBR:
         file.write(spec_content)
         file.close()
 
-def generate_rpm(yaml_fpath, clean_old = False, extra_content = None, spec_fpath=None):
-    rpm_writer = RPMWriter(yaml_fpath, clean_old, spec_fpath)
+def generate_rpm(yaml_fpath, clean_old = False, extra_content = None, spec_fpath=None, download_new=True):
+    rpm_writer = RPMWriter(yaml_fpath, spec_fpath, clean_old, download_new)
     rpm_writer.parse()
     rpm_writer.process(extra_content)
 

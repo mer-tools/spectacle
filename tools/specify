@@ -31,6 +31,9 @@ def parse_options(args):
     parser.add_option("-o", "--output", type="string",
                       dest="outfile_path", default=None,
                       help="Path of output spec file")
+    parser.add_option("-N", "--not-download", action="store_true",
+                      dest="not_download", default=False,
+                      help="Do not try to download newer source files")
 
     return parser.parse_args()
 
@@ -75,7 +78,7 @@ if __name__ == '__main__':
         # %{name}.spec as the default if not specified
         out_fpath = None
 
-    spec_fpath, newspec = specify.generate_rpm(yaml_fname, spec_fpath=out_fpath)
+    spec_fpath, newspec = specify.generate_rpm(yaml_fname, spec_fpath=out_fpath, download_new=not options.not_download)
     if newspec:
         logger.info("Creating new spec file: %s" % spec_fpath)
     else:
