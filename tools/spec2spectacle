@@ -497,6 +497,11 @@ class SpecParser(object):
                         for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', vi):
                             reqs.append(entry.split(',')[0])
                         nv += reqs
+                    elif ' ' in vi:
+                        reqs = []
+                        for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', vi):
+                            reqs.append(entry.split(' ')[0])
+                        nv += reqs
                     else:
                         nv.append(vi)
                 ck_items[k] = nv

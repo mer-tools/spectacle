@@ -134,9 +134,9 @@ BuildRequires:  pkgconfig($br_comps[0])
 #set $br_locale = $metadata.Name
 #end if
 #if $br == 'desktop-file-utils'
-#set $br_desktop = True
-#else
 #set $br_desktop = False
+#else
+#set $br_desktop = True
 #end if
 BuildRequires:  $br
 #end for
@@ -201,7 +201,9 @@ Group:      ${metadata.Group}
 #if 'NoAutoReq' in $metadata
 AutoReq:    0
 #end if
+#if not ( $metadata.has_key("AutoDepend") and not $metadata.AutoDepend )
 Requires:   %{name} = $auto_depend
+#end if
 #if $sp.has_key("Requires")
 #for $req in $sp.Requires
 Requires:   $req
@@ -364,10 +366,8 @@ fi
 #end if ## ConfigOptions
 
 #if $Builder == 'make'
-# Call make instruction with smp support
 make %{?jobs:-j%jobs}
 #else if $Builder == 'single-make'
-# Call make instruction
 make
 #else if $Builder != 'no-make' and $Builder != 'none' and $Builder != 'no-builder'
 $Builder
@@ -408,7 +408,7 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
 find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null ';'
 find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %{_fixperms} %{buildroot}/*
-#else if $Builder == 'make' or $Builder == 'single-make'
+#else if $Builder == 'make' or $Builder == 'single-make' or $Builder == 'qmake'
 #if 'SupportOtherDistros' in $metadata
 %if 0%{?moblin_version}
 %make_install
@@ -418,8 +418,6 @@ find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 #else
 %make_install
 #end if
-#else
-# Please write install script under ">> install post"
 #end if ## of Builder==python
 #if $metadata.has_key("ExtraInstall")
 $metadata.ExtraInstall
@@ -433,7 +431,6 @@ $str_newline.join($extra.content.install.post)
 #if $extra.Desktop
 desktop-file-install --delete-original       \
   --dir %{buildroot}%{_datadir}/applications             \
-  --remove-only-show-in=GNOME                            \
    %{buildroot}%{_datadir}/applications/*
 #end if
 #if $metadata.has_key("LocaleName")

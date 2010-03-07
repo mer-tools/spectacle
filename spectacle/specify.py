@@ -173,6 +173,8 @@ class RPMWriter():
                 if pl.has_key(px):
                     if len(pl[px]) == 1:
                         pcbr.append(pl[px][0])
+                    else:
+                        br.append(p)
                     logger.warning("""Please use one of the followings:
            - %s
          in PkgConfigBR instead of %s in PkgBR""" %('\n           - '.join(pl[px]), px))
@@ -526,7 +528,7 @@ PkgBR:
                     l1 = p1.sub(r'\1', l)
                     pkg_extra['Infos'].append(l1)
                     pkg_extra['Info'] = True
-                if re.match('.*\.desktop$', l):
+                if re.match('.*(usr/share|%{_datadir}).*\.desktop$', l):
                     pkg_extra['Desktop'] = True
                 if re.match('.*\.a$', l):
                     pkg_extra['Static'] = True
