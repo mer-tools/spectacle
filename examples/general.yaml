@@ -76,9 +76,7 @@ Builder: make  # make, single-make, python, perl, or other special builder, opti
 ExtraInstall: string # extra install scripts
 
 LocaleName: string # optional
-LocaleOptions: # optional
-    - opt1
-    - opt2
+LocaleOptions: string # optional
 
 # file list for small pkgs
 Files:

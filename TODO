@@ -11,11 +11,12 @@ Topic
       tag in the spec file
 - [X] When converting from ini, also delete the Makefile
 - [ ] and put a new makefile that supports spectacle
-- [ ] Check for invalid keywords and complain about them
-- [ ] Check if all mandatory keywords are present
+- [X] Check for invalid keywords and complain about them
+- [X] Check if all mandatory keywords are present
 - [X] Maintain a list of RPM Groups (to be provided ) and check if the
       rpm group in the yaml/spec is valid and if it is one of those
       supported in MeeGo
+- [X] Add %files content to YAML for small packages
 - [ ] Same for licenses (list of licenses TBD)
 - [ ] Calling specify in a directory with no yaml file should open an
       editor ($EDITOR) with a template of mandatory keywords that can
@@ -24,7 +25,6 @@ Topic
       will do quick guess on the package name and verion etc. (See
       speculate tool description)
 - [ ] Testing framework support
-- [ ] Add %files content to YAML for small packages
 - [ ] Speculate:
     - [ ] This is a tool that basically helps generate yaml files
     - [ ] Point it to a tar ball and maybe some other hints and it will
