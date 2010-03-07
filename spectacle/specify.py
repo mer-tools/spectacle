@@ -37,6 +37,64 @@ import logger
 
 SERIES_PATH = 'series.conf'
 
+MAND_KEYS = ('Name',
+             'Summary',
+             'Version',
+             'Group',
+             'License',
+            )
+
+SUB_MAND_KEYS = ('Name',
+                 'Summary',
+                 'Group',
+                )
+
+BOOL_KEYS = ('NeedCheckSection',
+             'SupportOtherDistros',
+             'NoAutoReq',
+             'NoAutoProv',
+             'NoSetup',
+             'UseAsNeeded',
+            )
+
+LIST_KEYS = ('Sources',
+             'ExtraSources',
+             'Patches',
+             'ConfigOptions',
+             'Requires',
+             'RequiresPre',
+             'RequiresPreUn',
+             'RequiresPost',
+             'RequiresPostUn',
+             'PkgBR',
+             'PkgConfigBR',
+             'Provides',
+             'Conflicts',
+             'Obsoletes',
+             'AutoSubPackages',
+             'Files',
+             'Documents',
+             )
+
+STR_KEYS =  ('Name',
+             'Summary',
+             'Description',
+             'Version',
+             'Release',
+             'Epoch',
+             'Group',
+             'License',
+             'URL',
+             'BuildArch',
+             'ExclusiveArch',
+             'SourcePrefix',
+             'Configure',
+             'Builder',
+             'SetupOptions',
+             'LocaleName',
+             'LocaleOptions',
+            )
+
 class GitAccess():
     def __init__(self, path):
         self.path = path
@@ -84,17 +142,18 @@ class RPMWriter():
                         'Infos': [],
                     }
 
-    def __init__(self, yaml_fpath, clean_old = False):
+    def __init__(self, yaml_fpath, spec_fpath=None, clean_old=False, download_new=True):
         self.yaml_fpath = yaml_fpath
         now = datetime.datetime.now()
         self.metadata = {'MyVersion': __version__.VERSION, 'Date': now.strftime("%Y-%m-%d")}
         self.pkg = None
         self.version = None
         self.release = None
-        self.specfile = None
+        self.specfile = spec_fpath
         self.packages = {}
 
         self.clean_old = clean_old
+        self.download_new = download_new
 
         # initialize extra info for spec
         self.extra = { 'subpkgs': {}, 'content': {} }
@@ -114,6 +173,33 @@ class RPMWriter():
         print yaml.dump(yaml.load(self.stream))
             
     def sanity_check(self):
+
+        def _check_mandatory_keys(metadata, subpkg = None):
+            """ return [] if all mandatory keys found, otherwise return the lost keys """
+            if subpkg:
+                mkeys = list(SUB_MAND_KEYS)
+            else:
+                mkeys = list(MAND_KEYS)
+
+            for key in metadata:
+                if key in mkeys:
+                    mkeys.remove(key)
+                    if not mkeys: break
+
+            return mkeys
+
+        def _check_invalid_keys(metadata, subpkg = None):
+            """ return list of invalid keys """
+            all_keys = list(LIST_KEYS + STR_KEYS + BOOL_KEYS + ('Date', 'MyVersion'))
+            if not subpkg:
+                all_keys.append('SubPackages')
+
+            keys = []
+            for key in metadata:
+                if key not in all_keys:
+                    keys.append(key)
+
+            return keys
 
         def _check_group(metadata):
             if metadata.has_key("Group"):
@@ -150,6 +236,18 @@ class RPMWriter():
                 return False
             return True
 
+        def _check_strkey(metadata, key):
+            """ sub-routine for STR typed keys checking """
+            if key in metadata and not isinstance(metadata[key], str):
+                return False
+            return True
+
+        def _check_boolkey(metadata, key):
+            """ sub-routine for boolean typed keys checking """
+            if key in metadata and not isinstance(metadata[key], bool):
+                return False
+            return True
+
         def _check_localename(metadata):
             """ sub-routine for 'LocaleName' checking """
             if 'LocaleOptions' in metadata and 'LocaleName' not in metadata:
@@ -157,10 +255,25 @@ class RPMWriter():
             return True
 
         # checking for mandatory keys
-        mandatory_keys = ('Name', 'Version', 'Release', 'Group',  'License')
-        for key in mandatory_keys:
-            if key not in self.metadata:
-                logger.error('Missing %s Tag. Add it and rettry...' % key)
+        keys = _check_mandatory_keys(self.metadata)
+        if keys:
+            logger.error('Missing mandatory keys for main package: %s' % ', '.join(keys))
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                keys = _check_mandatory_keys(sp, sp['Name'])
+                if keys:
+                    logger.error('Missing mandatory keys for sub-pkg %s: %s' % (sp['Name'], ', '.join(keys)))
+
+        # checking for unexpected keys
+        keys = _check_invalid_keys(self.metadata)
+        if keys:
+            logger.warning('Unexpected keys found: %s' % ', '.join(keys))
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                keys = _check_invalid_keys(sp, sp['Name'])
+                if keys:
+                    logger.warning('Unexpected keys for sub-pkg %s found: %s' % (sp['Name'], ', '.join(keys)))
+
 
         if self.metadata.has_key("PkgBR"):
             _check_pkgconfig()
@@ -192,10 +305,11 @@ PkgBR:
     - %s
                     """ %('\n    - '.join(pcbr), '\n    - '.join(br))
 
-        # checking for unexpected keys
-        # TODO
-
+        # checking for meego valid groups
         _check_group(self.metadata)
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                _check_group(sp)
 
         # checking for validation of 'Description'
         if not _check_desc(self.metadata):
@@ -205,18 +319,13 @@ PkgBR:
                 if not _check_desc(sp):
                     logger.warning('sub-pkg: %s has no qualified "Description" tag' % sp['Name'])
 
-        # checking for validation of 'Description'
+        # checking for validation of 'LocaleName' and 'LocaleOptions'
         if not _check_localename(self.metadata):
             self.metadata['LocaleName'] = "%{name}"
             logger.warning('lost "LocaleName" keyword, use "%{name}" as default')
 
         # checking for LIST expected keys
-        list_keys = ('Sources', 'ExtraSources', 'Patches',
-                     'Requires', 'RequiresPre', 'RequiresPreUn',
-                     'RequiresPost', 'RequiresPostUn', 'PkgBR',
-                     'PkgConfigBR', 'Provides', 'Conflicts',
-                     'Obsoletes', 'AutoSubPackages')
-        for key in list_keys:
+        for key in LIST_KEYS:
             if not _check_listkey(self.metadata, key):
                 logger.warning('the value of "%s" in main package is expected as list typed' % key)
                 self.metadata[key] = [self.metadata[key]]
@@ -225,9 +334,29 @@ PkgBR:
                     if not _check_listkey(sp, key):
                         logger.warning('the value of "%s" in %s sub-package is expected as list typed' % (key, sp['Name']))
                         sp[key] = [sp[key]]
-        if "SubPackages" in self.metadata:
-            for sp in self.metadata["SubPackages"]:
-                _check_group(sp)
+
+        # checking for STR expected keys
+        for key in STR_KEYS:
+            if not _check_strkey(self.metadata, key):
+                logger.warning('the value of "%s" in main package is expected as string typed' % key)
+                self.metadata[key] = ' '.join(self.metadata[key])
+            if "SubPackages" in self.metadata:
+                for sp in self.metadata["SubPackages"]:
+                    if not _check_strkey(sp, key):
+                        logger.warning('the value of "%s" in %s sub-package is expected as string typed' % (key, sp['Name']))
+                        sp[key] = ' '.join(sp[key])
+
+        # checking for BOOL expected keys
+        for key in BOOL_KEYS:
+            if not _check_boolkey(self.metadata, key):
+                logger.warning('the value of "%s" in main package is expected as bool typed, dropped!' % key)
+                # just drop it
+                del self.metadata[key]
+            if "SubPackages" in self.metadata:
+                for sp in self.metadata["SubPackages"]:
+                    if not _check_boolkey(sp, key):
+                        logger.warning('the value of "%s" in %s sub-package is expected as bool typed, dropped!' % (key, sp['Name']))
+                        del sp[key]
 
     def __get_scm_latest_release(self):
 
@@ -400,7 +529,8 @@ PkgBR:
         self.version = self.metadata['Version']
         self.release = self.metadata['Release']
 
-        self.specfile = "%s.spec" % self.pkg
+        if not self.specfile:
+            self.specfile = "%s.spec" % self.pkg
         self.newspec = True
 
         # handling 'ExtraSources', extra separated files which need to be install
@@ -426,12 +556,13 @@ PkgBR:
             self.metadata['Sources'].extend(extra_srcs)
             self.metadata['ExtraInstall'] = extra_install
 
-        # update to SCM latest release
-        if "SCM" in self.metadata:
-            self.__get_scm_latest_release()
+        if self.download_new:
+            # update to SCM latest release
+            if "SCM" in self.metadata:
+                self.__get_scm_latest_release()
 
-        # if no srcpkg with yaml.version exists in cwd, trying to download
-        self.__download_sources()
+            # if no srcpkg with yaml.version exists in cwd, trying to download
+            self.__download_sources()
 
         # handle patches with extra options
         if "Patches" in self.metadata:
@@ -729,8 +860,8 @@ PkgBR:
         file.write(spec_content)
         file.close()
 
-def generate_rpm(yaml_fpath, clean_old = False, extra_content = None):
-    rpm_writer = RPMWriter(yaml_fpath, clean_old)
+def generate_rpm(yaml_fpath, clean_old = False, extra_content = None, spec_fpath=None, download_new=True):
+    rpm_writer = RPMWriter(yaml_fpath, spec_fpath, clean_old, download_new)
     rpm_writer.parse()
     rpm_writer.process(extra_content)
 
