@@ -141,14 +141,14 @@ class RPMWriter():
                         'Infos': [],
                     }
 
-    def __init__(self, yaml_fpath, clean_old = False):
+    def __init__(self, yaml_fpath, clean_old=False, spec_fpath=None):
         self.yaml_fpath = yaml_fpath
         now = datetime.datetime.now()
         self.metadata = {'MyVersion': __version__.VERSION, 'Date': now.strftime("%Y-%m-%d")}
         self.pkg = None
         self.version = None
         self.release = None
-        self.specfile = None
+        self.specfile = spec_fpath
         self.packages = {}
 
         self.clean_old = clean_old
@@ -525,7 +525,8 @@ PkgBR:
         self.version = self.metadata['Version']
         self.release = self.metadata['Release']
 
-        self.specfile = "%s.spec" % self.pkg
+        if not self.specfile:
+            self.specfile = "%s.spec" % self.pkg
         self.newspec = True
 
         # handling 'ExtraSources', extra separated files which need to be install
@@ -854,8 +855,8 @@ PkgBR:
         file.write(spec_content)
         file.close()
 
-def generate_rpm(yaml_fpath, clean_old = False, extra_content = None):
-    rpm_writer = RPMWriter(yaml_fpath, clean_old)
+def generate_rpm(yaml_fpath, clean_old = False, extra_content = None, spec_fpath=None):
+    rpm_writer = RPMWriter(yaml_fpath, clean_old, spec_fpath)
     rpm_writer.parse()
     rpm_writer.process(extra_content)
 
