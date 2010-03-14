@@ -1,0 +1,5 @@
+1a2,5
+> [33mWarning:[0m Please use one of the followings:
+>            - x11-xcb
+>            - x11
+>          in PkgConfigBR instead of libX11-devel in PkgBR

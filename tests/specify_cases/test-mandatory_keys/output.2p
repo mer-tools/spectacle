@@ -1,0 +1,4 @@
+2c2
+< [32mInfo:[0m Creating new spec file: output.spec
+---
+> [31mError:[0m Missing mandatory keys for main package: Version

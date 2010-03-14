@@ -1,0 +1,2 @@
+1a2
+> [33mWarning:[0m found duplicate Requires for %{name} = %{version}-%{release} in sub-pkg:devel, please remove it

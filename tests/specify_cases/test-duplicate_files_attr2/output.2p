@@ -1,0 +1,5 @@
+2c2,3
+< [32mInfo:[0m Creating new spec file: output.spec
+---
+> [33mWarning:[0m found duplicate "%defattr(-,root,root,-)" in file list, removed!
+> [32mInfo:[0m Old spec file exists, patching output.spec ...
