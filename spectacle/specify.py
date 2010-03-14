@@ -94,6 +94,7 @@ STR_KEYS =  ('Name',
              'SetupOptions',
              'LocaleName',
              'LocaleOptions',
+             'FilesInput',
              'PostScripts',
             )
 
