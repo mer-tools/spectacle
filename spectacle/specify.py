@@ -832,7 +832,11 @@ PkgBR:
             if docs:
                 logger.warning('please move "Docments" values to %files section in .spec!')
 
-            files = copy.deepcopy(self.extra['content']['files'])
+            if 'files' in self.extra['content']:
+                files = copy.deepcopy(self.extra['content']['files'])
+            else:
+                files = {}
+
             if 'Files' in self.metadata:
                 if 'main' in files:
                     files['main'] += self.metadata['Files']
