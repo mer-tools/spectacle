@@ -96,6 +96,7 @@ STR_KEYS =  ('Name',
              'LocaleOptions',
              'FilesInput',
              'PostScripts',
+             'ExtraInstall',
             )
 
 class GitAccess():
