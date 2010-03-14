@@ -4,7 +4,7 @@
  
  Configure: none
  Builder: none
-+RunFdupes: yes
++RunFdupes: "%{_datadir}"
  
  SubPackages:
      - Name: devel

@@ -80,5 +80,10 @@ def compare_outfile(work_dir):
             print output_diff
             """
             all_equ = all_equ and (exp_output_diff == output_diff)
+            if not all_equ:
+                print "Expected:"
+                print exp_output_diff
+                print "Actual:"
+                print output_diff
 
     return all_equ
