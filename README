@@ -165,6 +165,8 @@ All available directives for spectacle are listed as the following:
 
 * NoSetup: **boolean**, whether to skip using ``%setup`` in ``%prep``
 
+* RunFdupes: **boolean**, whether to run fdupes in %install
+
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
 
 * SubPackages: **list** of **dict**, the **dict** item is the lower level

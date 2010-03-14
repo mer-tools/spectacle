@@ -55,6 +55,7 @@ BOOL_KEYS = ('NeedCheckSection',
              'NoAutoProv',
              'NoSetup',
              'UseAsNeeded',
+             'RunFdupes',
             )
 
 LIST_KEYS = ('Sources',
@@ -93,6 +94,7 @@ STR_KEYS =  ('Name',
              'SetupOptions',
              'LocaleName',
              'LocaleOptions',
+             'PostScripts',
             )
 
 class GitAccess():
