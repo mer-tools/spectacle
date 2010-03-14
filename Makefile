@@ -28,6 +28,9 @@ dist-gz:
 doc:
 	markdown README > README.html
 
+test:
+	cd tests/; python alltest.py
+
 install: all install-data
 	python setup.py install
 
