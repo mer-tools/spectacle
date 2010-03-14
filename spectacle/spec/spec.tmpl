@@ -354,7 +354,13 @@ fi
 #set $length = len($metadata.ConfigOptions)
 #set $idx = 1
 #for $opt in $metadata.ConfigOptions
+#if 'arm:' in $opt
+%ifarch %{arm}
+    $opt[4:len($opt)]
+%endif#slurp
+#else
     $opt#slurp
+#end if
 #if $idx == $length
 
 #else
@@ -495,7 +501,7 @@ fi
 
 ############################ Post
 #if $extra.Info or $extra.Lib or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts')
-#set $only_Lib = $extra.Lib and not ($extra.Info or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts'))
+#set $only_Lib = $extra.Lib and not ($extra.Info or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts')) and not $extra.content.has_key("post") and not $extra.content.install.has_key("main")
 #if $only_Lib
 %post -p /sbin/ldconfig
 #else
@@ -514,8 +520,10 @@ gconftool-2 --makefile-install-rule \
 #end for
 #end if
 ## -Extra Post Script
-#if $metadata.has_key('PostScripts')
-$metadata.PostScripts
+#if  $extra.content.has_key("post") and $extra.content.post.has_key("main")
+# >> post
+$str_newline.join($extra.content.post.main)
+# << post
 #end if
 ## -Info
 #if $extra.Info

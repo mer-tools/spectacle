@@ -491,7 +491,8 @@ class SpecParser(object):
             elif k in REQUIRES:
                 nv = []
                 for vi in v:
-                    if 'pkgconfig' in v:
+                    print vi
+                    if 'pkgconfig' in vi:
                         nv.append(vi)
                     elif ',' in vi:
                         reqs = []

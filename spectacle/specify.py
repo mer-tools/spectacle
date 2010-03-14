@@ -55,7 +55,7 @@ BOOL_KEYS = ('NeedCheckSection',
              'NoAutoProv',
              'NoSetup',
              'UseAsNeeded',
-             'RunFdupes',
+             'NoLocale'
             )
 
 LIST_KEYS = ('Sources',
@@ -97,6 +97,7 @@ STR_KEYS =  ('Name',
              'FilesInput',
              'PostScripts',
              'ExtraInstall',
+             'RunFdupes',
             )
 
 class GitAccess():
@@ -680,7 +681,7 @@ PkgBR:
                     pkg_extra['Static'] = True
                 if re.match('.*etc/rc.d/init.d.*', l) or re.match('.*etc/init.d.*', l):
                     pkg_extra['Service'] = True
-                if re.match('.*(%{_libdir}|%{_lib}).*', l) and re.match('.*so.*', l) or \
+                if re.match('.*(%{_libdir}|%{_lib}).*|.*/usr/lib/.*', l) and re.match('.*so.*', l) or \
                    re.match('.*(/ld.so.conf.d/).*', l):
                     if pkg_name != 'devel' and not pkg_name.endswith('-devel'):
                         # 'devel' sub pkgs should not set Lib flags
@@ -724,6 +725,7 @@ PkgBR:
         build = {}
         macros = {}         # global macros
         setup = {}
+        post = {}
         check_scriptlets = [] # extra headers
 
         for i in file(spec_fpath).read().split("\n"):
@@ -751,6 +753,8 @@ PkgBR:
                     macros['main'] = recording
                 elif matchout.group(1) == "setup":
                     setup['main'] = recording
+                elif matchout.group(1) == "post":
+                    post['main'] = recording
                 elif matchout.group(1) == "check_scriptlets":
                     check_scriptlets = recording
 
@@ -766,6 +770,8 @@ PkgBR:
            content["macros"] = macros
         if setup:
            content["setup"] = setup
+        if post:
+           content["post"] = post
 
         if check_scriptlets and 'NeedCheckSection' in self.metadata:
            content["check_scriptlets"] = check_scriptlets
