@@ -67,6 +67,7 @@ SINGLES = ( 'Summary',
             'Url',
             'Group',
             'BuildArch',
+            'ExclusiveArch',
             'License' )
 REQUIRES = ('BuildRequires',
             'PreRequires',
