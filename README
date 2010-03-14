@@ -153,6 +153,8 @@ All available directives for spectacle are listed as the following:
 
 * FilesInput: **string**, *optional*, extra input source for %files
 
+* PostScripts: **string**, *optional*, extra scripts for %post section in spec
+
 * NeedCheckSection: **boolean**, whether need ``%check`` section in spec
 
 * SupportOtherDistros: **boolean**, whether need to check for other distros (besides Moblin)
