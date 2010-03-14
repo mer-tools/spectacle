@@ -254,6 +254,13 @@ class RPMWriter():
                 return False
             return True
 
+        def _check_dup_files(metadata):
+            # try to remove duplicate '%defattr' in files list
+            dup = '%defattr(-,root,root,-)'
+            if 'Files' in metadata and dup in metadata['Files']:
+                logger.warning('found duplicate "%s" in file list of YAML, removed!' % dup)
+                metadata['Files'].remove(dup)
+
         # checking for mandatory keys
         keys = _check_mandatory_keys(self.metadata)
         if keys:
@@ -275,6 +282,7 @@ class RPMWriter():
                     logger.warning('Unexpected keys for sub-pkg %s found: %s' % (sp['Name'], ', '.join(keys)))
 
 
+        # checking for proposal pkgconfig requires
         if self.metadata.has_key("PkgBR"):
             _check_pkgconfig()
             pcbr = []
@@ -357,6 +365,9 @@ PkgBR:
                     if not _check_boolkey(sp, key):
                         logger.warning('the value of "%s" in %s sub-package is expected as bool typed, dropped!' % (key, sp['Name']))
                         del sp[key]
+
+        # checking duplicate 'Files' items
+        _check_dup_files(self.metadata)
 
     def __get_scm_latest_release(self):
 
