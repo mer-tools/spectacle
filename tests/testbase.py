@@ -40,6 +40,10 @@ import os,sys
 import glob
 import shutil
 
+BLUE='\033[%dm' % 34
+RED='\033[%dm' % 31
+RESET = '\033[0m'
+
 def prep_working_env(cases_dir, case, dst_dir):
     shutil.copy(os.path.join(cases_dir, 'base', 'testpkg.yaml'), dst_dir)
     for out in glob.glob(os.path.join(cases_dir, 'test-'+case, '*')):
@@ -68,22 +72,29 @@ def run_and_check(work_dir):
 def compare_outfile(work_dir):
     all_equ = True
     #print glob.glob(os.path.join(work_dir, '*'))
+    desc = {'output.p': '*.spec',
+            'output.1p': 'STDOUT',
+            'output.2p': 'STDERR'}
     for out in ('output.p', 'output.1p', 'output.2p'):
         fp = os.path.join(work_dir, out)
         if os.path.exists(fp):
             exp_output_diff = file(fp).read().strip()
             output_diff = file(os.path.join(work_dir, 'new'+out)).read().strip()
-            """
-            print fp, 'orig>>>'
-            print exp_output_diff
-            print fp, 'new<<<'
-            print output_diff
-            """
-            all_equ = all_equ and (exp_output_diff == output_diff)
-            if not all_equ:
-                print "Expected:"
+            if exp_output_diff != output_diff:
+                all_equ = False
+
+                if not output_diff:
+                    output_diff = '<EMPTY>'
+                if not exp_output_diff:
+                    exp_output_diff = '<EMPTY>'
+
+                print "%sExpected changes of %s:" % (BLUE,desc[out])
+                print '----------------------------------------------------------------------%s' % RESET
                 print exp_output_diff
-                print "Actual:"
+                print '%s----------------------------------------------------------------------%s' % (BLUE,RESET)
+                print "%sActual:" % RED
+                print '----------------------------------------------------------------------%s' % RESET
                 print output_diff
+                print '%s----------------------------------------------------------------------%s' % (RED,RESET)
 
     return all_equ
