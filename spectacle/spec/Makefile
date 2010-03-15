@@ -17,3 +17,4 @@ clean:
 	rm -f *.xsd *.wsdl
 	rm -f *.pyc *.pyo
 	rm -f *.py
+	rm -f *.bak
