@@ -169,6 +169,10 @@ All available directives for spectacle are listed as the following:
 
 * NoLocale: **boolean**, whether to use ``%find_lang`` to search locale data
 
+* AutoDepend: **boolean**, for subpackages only, whether to add Require to main package automatically
+
+* WholeName: **boolean**, for subpackages only, whether to use **Name** as the whole package name
+
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
 
 * SubPackages: **list** of **dict**, the **dict** item is the lower level

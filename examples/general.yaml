@@ -75,6 +75,7 @@ Builder: make  # make, single-make, python, perl, or other special builder, opti
 
 ExtraInstall: string # extra install scripts
 
+#NoLocale
 LocaleName: string # optional
 LocaleOptions: string # optional
 
@@ -103,6 +104,10 @@ SubPackages:
         Text
         Text line2
     - Name: string
+      # If the followings were not specified, means FALSE
+      WholeName: yes
+      # If the followings were not specified, means TRUE
+      AutoDepend: no
       Summary: string
       Description: |
             Text

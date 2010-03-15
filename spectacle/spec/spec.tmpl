@@ -190,7 +190,11 @@ Development files for %{name}
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
 #set $sub_extra = $extra.subpkgs[$sp.Name]
+#if $sp.has_key("WholeName") and $sp.WholeName
+%package -n $sp.Name
+#else
 %package $sp.Name
+#end if
 Summary:    $sp.Summary
 #if $sp.has_key("Group")
 Group:      $sp.Group
@@ -200,7 +204,7 @@ Group:      ${metadata.Group}
 #if 'NoAutoReq' in $metadata
 AutoReq:    0
 #end if
-#if not ( $metadata.has_key("AutoDepend") and not $metadata.AutoDepend )
+#if not ( $sp.has_key("AutoDepend") and not $sp.AutoDepend )
 Requires:   %{name} = $auto_depend
 #end if
 #if $sp.has_key("Requires")
@@ -264,7 +268,11 @@ Obsoletes:   $obs
 #end for
 #end if
 
+#if $sp.has_key("WholeName") and $sp.WholeName
+%description -n $sp.Name
+#else
 %description $sp.Name
+#end if
 #if $sp.has_key('Description')
 $sp.Description
 #else
@@ -655,10 +663,15 @@ $str_newline.join($extra.content.files[$sp])
 
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
-#if $sp.has_key('FilesInput')
-%files $sp.Name -f $sp.FilesInput
+#if $sp.has_key("WholeName") and $sp.WholeName
+#set $pkg_name = "-n " + $sp.Name
 #else
-%files $sp.Name
+#set $pkg_name = $sp.Name
+#end if
+#if $sp.has_key('FilesInput')
+%files $pkg_name -f $sp.FilesInput
+#else
+%files $pkg_name
 #end if
 %defattr(-,root,root,-)
 #if $sp.has_key("Documents")

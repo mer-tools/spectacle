@@ -37,5 +37,5 @@ else
   rm -f output.2p
 fi
 
-mkdir tmp-files
+mkdir -p tmp-files
 mv *.yaml *.spec *.[12o] tmp-files

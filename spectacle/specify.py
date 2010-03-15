@@ -55,7 +55,9 @@ BOOL_KEYS = ('NeedCheckSection',
              'NoAutoProv',
              'NoSetup',
              'UseAsNeeded',
-             'NoLocale'
+             'NoLocale',
+             'WholeName',
+             'AutoDepend',
             )
 
 LIST_KEYS = ('Sources',
@@ -99,6 +101,13 @@ STR_KEYS =  ('Name',
              'ExtraInstall',
              'RunFdupes',
             )
+
+SUBONLY_KEYS = ('WholeName',
+                'AutoDepend',
+                )
+
+# TODO
+MAINONLY_KEYS = ()
 
 DROP_KEYS = ('PostScripts',
              'Documents',
@@ -202,6 +211,11 @@ class RPMWriter():
             all_keys = list(LIST_KEYS + STR_KEYS + BOOL_KEYS + ('Date', 'MyVersion'))
             if not subpkg:
                 all_keys.append('SubPackages')
+                for key in SUBONLY_KEYS:
+                    all_keys.remove(key)
+            else:
+                for key in MAINONLY_KEYS:
+                    all_keys.remove(key)
 
             keys = []
             for key in metadata:
