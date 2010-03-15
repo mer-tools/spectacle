@@ -49,14 +49,14 @@ SUB_MAND_KEYS = ('Name',
                  'Group',
                 )
 
-BOOL_KEYS = ('NeedCheckSection',
+BOOL_KEYS = ('NeedRunTests',
              'SupportOtherDistros',
              'NoAutoReq',
              'NoAutoProv',
              'NoSetup',
              'UseAsNeeded',
              'NoLocale',
-             'WholeName',
+             'AsWholeName',
              'AutoDepend',
             )
 
@@ -102,7 +102,7 @@ STR_KEYS =  ('Name',
              'RunFdupes',
             )
 
-SUBONLY_KEYS = ('WholeName',
+SUBONLY_KEYS = ('AsWholeName',
                 'AutoDepend',
                 )
 
@@ -112,6 +112,9 @@ MAINONLY_KEYS = ()
 DROP_KEYS = ('PostScripts',
              'Documents',
             )
+
+RENAMED_KEYS = {'NeedCheckSection': 'NeedRunTests',
+               }
 
 class GitAccess():
     def __init__(self, path):
@@ -209,6 +212,7 @@ class RPMWriter():
         def _check_invalid_keys(metadata, subpkg = None):
             """ return list of invalid keys """
             all_keys = list(LIST_KEYS + STR_KEYS + BOOL_KEYS + ('Date', 'MyVersion'))
+            all_keys += RENAMED_KEYS.keys()
             if not subpkg:
                 all_keys.append('SubPackages')
                 for key in SUBONLY_KEYS:
@@ -289,6 +293,13 @@ class RPMWriter():
                 if key in metadata:
                     logger.warning('Deprecated key: %s found, please use other valid keys' % key)
 
+        def _check_renamed_keys(metadata):
+            for key in RENAMED_KEYS:
+                if key in metadata:
+                    metadata[RENAMED_KEYS[key]] = metadata[key]
+                    del metadata[key]
+                    logger.warning('Renamed key: %s found, please use %s instead' % (key, RENAMED_KEYS[key]))
+
         # checking for mandatory keys
         keys = _check_mandatory_keys(self.metadata)
         if keys:
@@ -311,6 +322,9 @@ class RPMWriter():
 
         # checking for deprecated keys
         _check_dropped_keys(self.metadata)
+
+        # checking for renamed keys
+        _check_renamed_keys(self.metadata)
 
         # checking for proposal pkgconfig requires
         if self.metadata.has_key("PkgBR"):
@@ -639,7 +653,7 @@ PkgBR:
 
         # clean up all boolean type options, remove redundant ones
         #   for keys with default value FALSE
-        for bopt in ('NeedCheckSection',
+        for bopt in ('NeedRunTests',
                      'SupportOtherDistros',
                      'NoAutoReq',
                      'NoAutoProv',
@@ -798,7 +812,7 @@ PkgBR:
         if post:
            content["post"] = post
 
-        if check_scriptlets and 'NeedCheckSection' in self.metadata:
+        if check_scriptlets and 'NeedRunTests' in self.metadata:
            content["check_scriptlets"] = check_scriptlets
 
         # checking whether both 'Files' key and inline files exists

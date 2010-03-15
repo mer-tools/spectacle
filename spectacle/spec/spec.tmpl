@@ -190,7 +190,7 @@ Development files for %{name}
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
 #set $sub_extra = $extra.subpkgs[$sp.Name]
-#if $sp.has_key("WholeName") and $sp.WholeName
+#if $sp.has_key("AsWholeName") and $sp.AsWholeName
 %package -n $sp.Name
 #else
 %package $sp.Name
@@ -268,7 +268,7 @@ Obsoletes:   $obs
 #end for
 #end if
 
-#if $sp.has_key("WholeName") and $sp.WholeName
+#if $sp.has_key("AsWholeName") and $sp.AsWholeName
 %description -n $sp.Name
 #else
 %description $sp.Name
@@ -284,10 +284,10 @@ Description: %{summary}
 
 ############################ prep scripts
 %prep
-#if $metadata.has_key("Sources") 
+#if $metadata.has_key("Sources")
 #if $metadata.has_key("NoSetup") and $metadata.NoSetup
 # No setup
-#else if $metadata.has_key("SetupOptions") 
+#else if $metadata.has_key("SetupOptions")
 %setup $metadata.SetupOptions
 #else
 %setup -q -n $metadata.SourcePrefix
@@ -333,7 +333,7 @@ qmake-qt4 install_prefix=/usr
 make %{?jobs:-j%jobs}
 #else if $Builder == 'perl'
 if test -f Makefile.PL; then
-%{__perl} Makefile.PL INSTALLDIRS=vendor  
+%{__perl} Makefile.PL INSTALLDIRS=vendor
 make %{?jobs:-j%jobs}
 else
 %{__perl} Build.PL  --installdirs vendor
@@ -461,7 +461,7 @@ desktop-file-install --delete-original       \
 %fdupes  %{buildroot}/${metadata.RunFdupes}
 #end if
 ############################ optional check scripts
-#if $metadata.has_key("NeedCheckSection") or $metadata.has_key("Check") 
+#if $metadata.has_key("NeedRunTests") or $metadata.has_key("Check")
 %check
 # >> check_scriptlets
 #if $extra.content.has_key("check_scriptlets")
@@ -473,7 +473,7 @@ make test
 else
 ./Build test
 fi
-#else 
+#else
 make check
 #end if
 #end if
@@ -663,7 +663,7 @@ $str_newline.join($extra.content.files[$sp])
 
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
-#if $sp.has_key("WholeName") and $sp.WholeName
+#if $sp.has_key("AsWholeName") and $sp.AsWholeName
 #set $pkg_name = "-n " + $sp.Name
 #else
 #set $pkg_name = $sp.Name

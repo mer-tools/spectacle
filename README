@@ -155,7 +155,7 @@ All available directives for spectacle are listed as the following:
 
 * RunFdupes: **string**, parameters of ``fdupes`` in %install
 
-* NeedCheckSection: **boolean**, whether need ``%check`` section in spec
+* NeedRunTests: **boolean**, whether need ``%check`` section in spec
 
 * SupportOtherDistros: **boolean**, whether need to check for other distros (besides Moblin)
 
@@ -171,7 +171,7 @@ All available directives for spectacle are listed as the following:
 
 * AutoDepend: **boolean**, for subpackages only, whether to add Require to main package automatically
 
-* WholeName: **boolean**, for subpackages only, whether to use **Name** as the whole package name
+* AsWholeName: **boolean**, for subpackages only, whether to use **Name** as the whole package name
 
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
 
@@ -268,7 +268,7 @@ If no sub-package name specified, it means the files of **main** package.
         # >> check_scriptlets
         # << check_scriptlets
 
-**NOTE**: Only when *NeedCheckSection* specified as TRUE, these placeholder can
+**NOTE**: Only when *NeedRunTests* specified as TRUE, these placeholder can
 be written to generated spec and the content between them can be recorded.
 
 ## Internal Implementation
