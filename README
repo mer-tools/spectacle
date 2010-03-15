@@ -155,6 +155,8 @@ All available directives for spectacle are listed as the following:
 
 * PostScripts: **string**, *optional*, extra scripts for %post section in spec
 
+* RunFdupes: **string**, parameters of ``fdupes`` in %install
+
 * NeedCheckSection: **boolean**, whether need ``%check`` section in spec
 
 * SupportOtherDistros: **boolean**, whether need to check for other distros (besides Moblin)
@@ -167,7 +169,7 @@ All available directives for spectacle are listed as the following:
 
 * NoSetup: **boolean**, whether to skip using ``%setup`` in ``%prep``
 
-* RunFdupes: **boolean**, whether to run fdupes in %install
+* NoLocale: **boolean**, whether to use ``%find_lang`` to search locale data
 
 * AutoSubPackages: **list** of **string**, mainly for '-devel'
 

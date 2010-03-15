@@ -500,8 +500,8 @@ fi
 #end if
 
 ############################ Post
-#if $extra.Info or $extra.Lib or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts')
-#set $only_Lib = $extra.Lib and not ($extra.Info or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts')) and not $extra.content.has_key("post") and not $extra.content.install.has_key("main")
+#if $extra.Lib or $extra.Info or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts') or ($extra.content.has_key("post") and $extra.content.post.has_key("main"))
+#set $only_Lib = not ($extra.Info or $extra.Schema or $extra.Icon or $metadata.has_key('PostScripts') or ($extra.content.has_key("post") and $extra.content.post.has_key("main")))
 #if $only_Lib
 %post -p /sbin/ldconfig
 #else
