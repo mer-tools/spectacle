@@ -153,8 +153,6 @@ All available directives for spectacle are listed as the following:
 
 * FilesInput: **string**, *optional*, extra input source for %files
 
-* PostScripts: **string**, *optional*, extra scripts for %post section in spec
-
 * RunFdupes: **string**, parameters of ``fdupes`` in %install
 
 * NeedCheckSection: **boolean**, whether need ``%check`` section in spec

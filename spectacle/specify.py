@@ -100,6 +100,10 @@ STR_KEYS =  ('Name',
              'RunFdupes',
             )
 
+DROP_KEYS = ('PostScripts',
+             'Documents',
+            )
+
 class GitAccess():
     def __init__(self, path):
         self.path = path
@@ -266,6 +270,11 @@ class RPMWriter():
                 logger.warning('found duplicate "%s" in file list of YAML, removed!' % dup)
                 metadata['Files'].remove(dup)
 
+        def _check_dropped_keys(metadata):
+            for key in DROP_KEYS:
+                if key in metadata:
+                    logger.warning('Deprecated key: %s found, please use other valid keys' % key)
+
         # checking for mandatory keys
         keys = _check_mandatory_keys(self.metadata)
         if keys:
@@ -286,6 +295,8 @@ class RPMWriter():
                 if keys:
                     logger.warning('Unexpected keys for sub-pkg %s found: %s' % (sp['Name'], ', '.join(keys)))
 
+        # checking for deprecated keys
+        _check_dropped_keys(self.metadata)
 
         # checking for proposal pkgconfig requires
         if self.metadata.has_key("PkgBR"):
@@ -841,6 +852,7 @@ PkgBR:
         """
 
         try:
+            # TODO, cleanup docs handling when all pkgs need not, include spec.tmpl
             docs = {}
             if 'Documents' in self.metadata:
                 docs['main'] = self.metadata['Documents']
@@ -848,10 +860,6 @@ PkgBR:
                 for sp in self.metadata["SubPackages"]:
                     if 'Documents' in sp:
                         docs[sp['Name']] = sp['Documents']
-
-            # TODO, cleanup docs handling when all pkgs need not, include spec.tmpl
-            if docs:
-                logger.warning('please move "Docments" values to %files section in .spec!')
 
             if 'files' in self.extra['content']:
                 files = copy.deepcopy(self.extra['content']['files'])
