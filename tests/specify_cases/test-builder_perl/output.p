@@ -4,7 +4,7 @@
 < 
 ---
 > if test -f Makefile.PL; then
-> %{__perl} Makefile.PL INSTALLDIRS=vendor  
+> %{__perl} Makefile.PL INSTALLDIRS=vendor
 > make %{?jobs:-j%jobs}
 > else
 > %{__perl} Build.PL  --installdirs vendor

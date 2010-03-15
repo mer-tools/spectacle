@@ -7,7 +7,7 @@ fi
 
 CaseName=$1
 
-cd test-${CaseName}
+cd test-${CaseName} || exit 0
 
 cp ../base/testpkg.yaml .
 specify -N -o output.spec testpkg.yaml 1>output.1.o 2>output.2.o
