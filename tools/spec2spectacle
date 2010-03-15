@@ -100,7 +100,6 @@ class SpecConvertor(Convertor):
     def __init__(self):
         sb_cv_table = {
                 'BuildRequires': 'PkgBR',
-                'PkgConfig': 'PkgConfigBR',
                 'pre': 'install-pre',
                 'description': 'Description',
                 'Requires(post)': 'RequiresPost',
@@ -489,11 +488,16 @@ class SpecParser(object):
                     ck_items[k] = v[0]
 
             elif k in REQUIRES:
+                nbr = [] # new 'PkgConfigBR' list
                 nv = []
                 for vi in v:
-                    print vi
                     if 'pkgconfig' in vi:
-                        nv.append(vi)
+                        if k == 'BuildRequires':
+                            for m in re.finditer('pkgconfig\s*\(\s*([^\)]*)\s*\)', vi):
+                                if m and m.group(1):
+                                    nbr.append(m.group(1))
+                        else:
+                            nv.append(vi)
                     elif ',' in vi:
                         reqs = []
                         for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', vi):
@@ -507,6 +511,8 @@ class SpecParser(object):
                     else:
                         nv.append(vi)
                 ck_items[k] = nv
+                if nbr:
+                    ck_items['PkgConfigBR'] = nbr
             else:
                 ck_items[k] = v
 
