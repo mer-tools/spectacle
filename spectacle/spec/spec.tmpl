@@ -463,9 +463,9 @@ desktop-file-install --delete-original       \
 ############################ optional check scripts
 #if $metadata.has_key("NeedRunTests") or $metadata.has_key("Check")
 %check
-# >> check_scriptlets
-#if $extra.content.has_key("check_scriptlets")
-$str_newline.join($extra.content.check_scriptlets)
+# >> check
+#if $extra.content.has_key("check")
+$str_newline.join($extra.content.check)
 #else
 #if  $Builder == 'perl'
 if test -f Makefile.PL; then
@@ -477,7 +477,7 @@ fi
 make check
 #end if
 #end if
-# << check_scriptlets
+# << check
 #end if
 
 ############################ Pre

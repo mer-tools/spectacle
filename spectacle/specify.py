@@ -49,16 +49,20 @@ SUB_MAND_KEYS = ('Name',
                  'Group',
                 )
 
-BOOL_KEYS = ('NeedRunTests',
-             'SupportOtherDistros',
-             'NoAutoReq',
-             'NoAutoProv',
-             'NoSetup',
-             'UseAsNeeded',
-             'NoLocale',
-             'AsWholeName',
-             'AutoDepend',
-            )
+# boolean keys with the default 'False' value
+BOOLNO_KEYS = ('Check',
+               'SupportOtherDistros',
+               'NoAutoReq',
+               'NoAutoProv',
+               'NoSetup',
+               'AsWholeName',
+              )
+# boolean keys with the default 'True' value
+BOOLYES_KEYS = ('UseAsNeeded',
+                'NoLocale',
+                'AutoDepend',
+               )
+BOOL_KEYS = BOOLNO_KEYS + BOOLYES_KEYS
 
 LIST_KEYS = ('Sources',
              'ExtraSources',
@@ -113,7 +117,7 @@ DROP_KEYS = ('PostScripts',
              'Documents',
             )
 
-RENAMED_KEYS = {'NeedCheckSection': 'NeedRunTests',
+RENAMED_KEYS = {'NeedCheckSection': 'Check',
                }
 
 class GitAccess():
@@ -651,18 +655,13 @@ PkgBR:
 
         self.analyze_source()
 
-        # clean up all boolean type options, remove redundant ones
+        # clean up all boolean type keys, remove the ones with default values
         #   for keys with default value FALSE
-        for bopt in ('NeedRunTests',
-                     'SupportOtherDistros',
-                     'NoAutoReq',
-                     'NoAutoProv',
-                    ):
+        for bopt in BOOLNO_KEYS:
             if bopt in self.metadata and not self.metadata[bopt]:
                 del self.metadata[bopt]
         #   for keys with default value TRUE
-        for bopt in ('UseAsNeeded',
-                    ):
+        for bopt in BOOLYES_KEYS:
             if bopt in self.metadata and self.metadata[bopt]:
                 del self.metadata[bopt]
 
@@ -794,7 +793,8 @@ PkgBR:
                     setup['main'] = recording
                 elif matchout.group(1) == "post":
                     post['main'] = recording
-                elif matchout.group(1) == "check_scriptlets":
+                elif matchout.group(1) == "check" or \
+                     matchout.group(1) == "check_scriptlets": #TODO, remove it whenever cleanup
                     check_scriptlets = recording
 
             if record:
@@ -812,8 +812,8 @@ PkgBR:
         if post:
            content["post"] = post
 
-        if check_scriptlets and 'NeedRunTests' in self.metadata:
-           content["check_scriptlets"] = check_scriptlets
+        if check_scriptlets and 'Check' in self.metadata:
+           content["check"] = check_scriptlets
 
         # checking whether both 'Files' key and inline files exists
         if files:

@@ -86,7 +86,7 @@ Files:
 
 # boolean options, use "yes"/"no" for TRUE/FALSE, all optional
 #   If the followings were not specified, it means FALSE
-NeedRunTests: yes       # %check in spec
+Check: yes       # %check in spec
 SupportOtherDistros: yes    # for distros other than moblin/meego
 NoAutoReq: yes              # 'AutoReq: 0' in spec
 NoAutoProv: yes             # 'AutoProv: 0' in spec
