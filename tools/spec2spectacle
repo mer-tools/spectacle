@@ -54,8 +54,9 @@ HEADERS = ( 'package',
             'build',
             'install',
             'clean',
-            'post',
+            'check',
             'postun',
+            'post',
             'files',
             'changelog' )
 SINGLES = ( 'Summary',
@@ -321,6 +322,10 @@ class SpecParser(object):
         # skip
         pass
 
+    def _do_check(self, items, pkg, v):
+        items['extra']['check'] = v.strip()
+        items['Check'] = 'yes'
+
     def _do_post(self, items, pkg, v):
         # skip
         pass
@@ -354,7 +359,7 @@ class SpecParser(object):
         comment = re.compile('^#.*')
         directive = re.compile('^([\w()]+):[ \t]*(.*)')
         define_re = re.compile('^%define\s+(\w+)\s+(.*)')
-        header_re = re.compile('^%(prep|build|install|clean|postun|post|files|changelog|package|description)\s*(.*)')
+        header_re = re.compile('^%(' + '|'.join(HEADERS) + ')\s*(.*)')
 
         state = ST_DEFINE
         items = self.items

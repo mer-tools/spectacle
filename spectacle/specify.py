@@ -764,7 +764,7 @@ PkgBR:
         macros = {}         # global macros
         setup = {}
         post = {}
-        check_scriptlets = [] # extra headers
+        check = {} # extra headers
 
         for i in file(spec_fpath).read().split("\n"):
             matchin = sin.match(i)
@@ -795,7 +795,7 @@ PkgBR:
                     post['main'] = recording
                 elif matchout.group(1) == "check" or \
                      matchout.group(1) == "check_scriptlets": #TODO, remove it whenever cleanup
-                    check_scriptlets = recording
+                    check['main'] = recording
 
             if record:
                 recording.append(i)
@@ -812,8 +812,8 @@ PkgBR:
         if post:
            content["post"] = post
 
-        if check_scriptlets and 'Check' in self.metadata:
-           content["check"] = check_scriptlets
+        if check and 'Check' in self.metadata:
+           content["check"] = check
 
         # checking whether both 'Files' key and inline files exists
         if files:

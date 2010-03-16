@@ -461,11 +461,11 @@ desktop-file-install --delete-original       \
 %fdupes  %{buildroot}/${metadata.RunFdupes}
 #end if
 ############################ optional check scripts
-#if $metadata.has_key("NeedRunTests") or $metadata.has_key("Check")
+#if $metadata.has_key("Check")
 %check
 # >> check
 #if $extra.content.has_key("check")
-$str_newline.join($extra.content.check)
+$str_newline.join($extra.content.check.main)
 #else
 #if  $Builder == 'perl'
 if test -f Makefile.PL; then
