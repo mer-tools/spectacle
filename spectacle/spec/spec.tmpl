@@ -507,6 +507,14 @@ if [ "$1" -eq 0 ]; then
 fi
 #end if
 
+############################ Pre
+#if $extra.content.has_key("pre") and $extra.content.pre.has_key("main")
+%pre
+# >> pre
+$str_newline.join($extra.content.pre.main)
+# << pre
+#end if
+
 ############################ Post
 #set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key("main")
 #if $extra.Lib or $extra.Info or $extra.Schema or $extra.Icon or $has_extra_post
