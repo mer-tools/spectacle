@@ -55,6 +55,7 @@ HEADERS = ( 'package',
             'install',
             'clean',
             'check',
+            'pre',
             'postun',
             'post',
             'files',
@@ -326,13 +327,14 @@ class SpecParser(object):
         items['extra']['check'] = v.strip()
         items['Check'] = 'yes'
 
+    def _do_pre(self, items, pkg, v):
+        items['extra']['pre'] = v.strip()
+
     def _do_post(self, items, pkg, v):
-        # skip
-        pass
+        items['extra']['post'] = v.strip()
 
     def _do_postun(self, items, pkg, v):
-        # skip
-        pass
+        items['extra']['postun'] = v.strip()
 
     def _do_changelog(self, items, pkg, v):
         # TODO, do it automatically

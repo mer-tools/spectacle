@@ -54,7 +54,6 @@ class SpectacleDumper(object):
             'Files': ('files', None),
             'macros': ('macros', None),
             'setup': ('setup', None),
-            'check': ('check', None),
             'PostMakeInstallExtras': ('install', 'post'),
             'PreMakeInstallExtras': ('install', 'pre'),
             'PostMakeExtras': ('build', 'post'),
