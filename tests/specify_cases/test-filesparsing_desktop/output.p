@@ -4,5 +4,5 @@
 > desktop-file-install --delete-original       \
 >   --dir %{buildroot}%{_datadir}/applications             \
 >    %{buildroot}%{_datadir}/applications/*
-63a68
+64a69
 > %{_datadir}/*.desktop

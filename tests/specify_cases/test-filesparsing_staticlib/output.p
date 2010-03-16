@@ -7,5 +7,5 @@
 > make %{?jobs:-j%jobs}
 51a54
 > %make_install
-63a67
+64a68
 > %{_libdir}/*.a

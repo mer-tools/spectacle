@@ -1,9 +1,9 @@
 16a17,18
 > Requires(post):  /sbin/ldconfig
 > Requires(postun):  /sbin/ldconfig
-57a60
+58a61
 > %post -p /sbin/ldconfig
-58a62
+59a63
 > %postun -p /sbin/ldconfig
-63a68
+64a69
 > %{_libdir}/*.so

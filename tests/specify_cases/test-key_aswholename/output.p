@@ -6,11 +6,11 @@
 < %description devel
 ---
 > %description -n haha-devel
-68c68
+69c69
 < %files devel
 ---
 > %files -n haha-devel
-70,71c70,71
+71,72c71,72
 < # >> files devel
 < # << files devel
 ---

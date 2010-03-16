@@ -15,13 +15,19 @@ mv output.spec output.spec.o
 patch < input.p
 specify -N -o output.spec testpkg.yaml 1>output.1 2>output.2
 
-diff output.spec.o output.spec > output.p
-if [ $? != 0 ]; then
-  echo 'Output diff:'
-  cat output.p
+if [ -f output.spec ]; then
+  diff output.spec.o output.spec > output.p
+  if [ $? != 0 ]; then
+    echo 'Output diff:'
+    cat output.p
+  else
+    rm -f output.p
+  fi
 else
   rm -f output.p
+  touch output.no
 fi
+
 diff output.1.o output.1 > output.1p
 if [ $? != 0 ]; then
   echo 'Stdout diff:'
@@ -38,4 +44,4 @@ else
 fi
 
 mkdir -p tmp-files
-mv *.yaml *.spec *.[12o] tmp-files
+mv -f *.yaml *.spec *.[12o] tmp-files
