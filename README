@@ -260,6 +260,8 @@ The following placeholders in spec can be customized:
         # << files [sub-package]
 **NOTE**: "sub-packge" stands for the name of sub-package, and it is optional.
 If no sub-package name specified, it means the files of **main** package.
+**NOTE**: If the file list is simple enough, you can use YAML *Files* keyword
+instead to record it.
 
 * Scriptlets for %check section
 
@@ -267,17 +269,41 @@ If no sub-package name specified, it means the files of **main** package.
 
         # >> check
         # << check
+**NOTE**: Only if YAML boolean *Check* is specifed as ``yes``, %check with
+placeholder lines will be generated in .spec.
 
-**NOTE**: Only when *Check* specified as TRUE, these placeholder can
-be written to generated spec and the content between them can be recorded.
+* Scriptlets for %pre section
+
+    With placeholder:
+
+        # >> pre
+        # << pre
+**NOTE**: The placeholder lines will NOT generated in spec by default. If
+you need customized %pre scripts, it need be added manually, and only once.
+
+* Scriptlets for %post section
+
+    With placeholder:
+
+        # >> post
+        # << post
+**NOTE**: The placeholder lines will NOT generated in spec by default. If
+you need customized %post scripts, it need be added manually, and only once.
+
+* Scriptlets for %postun section
+
+    With placeholder:
+
+        # >> postun
+        # << postun
+**NOTE**: The placeholder lines will NOT generated in spec by default. If
+you need customized %postun scripts, it need be added manually, and only once.
 
 ## Internal Implementation
 Spectacle uses cheetah templates to generate the spec file, based the metadata
 from yaml file. But the end users need not tackle it.
 
-## Tips
-
-* If to upgrade the pkg to a newer version, you can just edit the version str
+## Tips * If to upgrade the pkg to a newer version, you can just edit the version str
   in yaml, and when you run ``specify``, it will download the needed files for
   you automatically.
 
