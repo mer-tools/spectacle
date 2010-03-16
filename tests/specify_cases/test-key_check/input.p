@@ -4,7 +4,7 @@
  
  Configure: none
  Builder: none
-+NeedRunTests: yes
++Check: yes
  
  SubPackages:
      - Name: devel
