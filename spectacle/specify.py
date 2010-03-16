@@ -763,7 +763,9 @@ PkgBR:
         build = {}
         macros = {}         # global macros
         setup = {}
+        pre = {}
         post = {}
+        postun = {}
         check = {} # extra headers
 
         for i in file(spec_fpath).read().split("\n"):
@@ -793,6 +795,10 @@ PkgBR:
                     setup['main'] = recording
                 elif matchout.group(1) == "post":
                     post['main'] = recording
+                elif matchout.group(1) == "postun":
+                    postun['main'] = recording
+                elif matchout.group(1) == "pre":
+                    pre['main'] = recording
                 elif matchout.group(1) == "check" or \
                      matchout.group(1) == "check_scriptlets": #TODO, remove it whenever cleanup
                     check['main'] = recording
@@ -811,6 +817,10 @@ PkgBR:
            content["setup"] = setup
         if post:
            content["post"] = post
+        if postun:
+           content["postun"] = postun
+        if pre:
+           content["pre"] = pre
 
         if check and 'Check' in self.metadata:
            content["check"] = check

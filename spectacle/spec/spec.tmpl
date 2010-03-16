@@ -508,8 +508,9 @@ fi
 #end if
 
 ############################ Post
-#if $extra.Lib or $extra.Info or $extra.Schema or $extra.Icon or ($extra.content.has_key("post") and $extra.content.post.has_key("main"))
-#set $only_Lib = not ($extra.Info or $extra.Schema or $extra.Icon or ($extra.content.has_key("post") and $extra.content.post.has_key("main")))
+#set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key("main")
+#if $extra.Lib or $extra.Info or $extra.Schema or $extra.Icon or $has_extra_post
+#set $only_Lib = not ($extra.Info or $extra.Schema or $extra.Icon or $has_extra_post)
 #if $only_Lib
 %post -p /sbin/ldconfig
 #else
@@ -527,12 +528,6 @@ gconftool-2 --makefile-install-rule \
     $schema  > /dev/null || :
 #end for
 #end if
-## -Extra Post Script
-#if  $extra.content.has_key("post") and $extra.content.post.has_key("main")
-# >> post
-$str_newline.join($extra.content.post.main)
-# << post
-#end if
 ## -Info
 #if $extra.Info
 #for $inf in $extra.Infos
@@ -545,11 +540,18 @@ $str_newline.join($extra.content.post.main)
 %{_bindir}/gtk-update-icon-cache \
   --quiet %{_datadir}/icons/hicolor 2> /dev/null|| :
 #end if
+## -Extra Post Script
+#if $has_extra_post
+# >> post
+$str_newline.join($extra.content.post.main)
+# << post
+#end if
 #end if ## need post
 
 ############################ PostUn
-#if $extra.Info or $extra.Lib
-#set $only_Lib = $extra.Lib and not $extra.Info
+#set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key("main")
+#if $extra.Info or $extra.Lib or $has_extra_postun
+#set $only_Lib = not ($extra.Info or $has_extra_postun)
 #if $only_Lib
 %postun -p /sbin/ldconfig
 #else
@@ -558,12 +560,19 @@ $str_newline.join($extra.content.post.main)
 #if $extra.Lib and not $only_Lib
 /sbin/ldconfig
 #end if
+## -Info
 #if $extra.Info
 if [ $1 = 0 ] ;then
 #for $inf in $extra.Infos
 %install_info_delete --info-dir=%{_infodir} $inf
 #end for
 fi
+#end if
+## -Extra Postun Script
+#if $has_extra_postun
+# >> postun
+$str_newline.join($extra.content.postun.main)
+# << postun
 #end if
 #end if ## need postun
 
@@ -572,7 +581,7 @@ fi
 #for $sp in $metadata.SubPackages
 #set $sub_extra = $extra.subpkgs[$sp.Name]
 #if $sub_extra.Info or $sub_extra.Lib or $sub_extra.Schema
-#set $only_Lib = $sub_extra.Lib and not ($sub_extra.Info or $sub_extra.Schema)
+#set $only_Lib = not ($sub_extra.Info or $sub_extra.Schema)
 #if $only_Lib
 %post $sp.Name -p /sbin/ldconfig
 #else
@@ -602,7 +611,7 @@ gconftool-2 --makefile-install-rule \
 
 ## PostUn for SubPackages
 #if $sub_extra.Info or $sub_extra.Lib
-#set $only_Lib = $sub_extra.Lib and not $sub_extra.Info
+#set $only_Lib = not $sub_extra.Info
 #if $only_Lib
 %postun $sp.Name -p /sbin/ldconfig
 #else
