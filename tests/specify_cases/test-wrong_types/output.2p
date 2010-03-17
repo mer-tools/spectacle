@@ -1,3 +1,7 @@
-1a2,3
-> [33mWarning:[0m the value of "Sources" in main package is expected as list typed
-> [33mWarning:[0m the value of "License" in main package is expected as string typed
+--- output.2.o	2010-03-17 21:15:19.000000000 +0800
++++ output.2	2010-03-17 21:15:19.000000000 +0800
+@@ -1,2 +1,4 @@
+ [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
++[33mWarning:[0m the value of "Sources" in main package is expected as list typed
++[33mWarning:[0m the value of "License" in main package is expected as string typed
+ [32mInfo:[0m Creating new spec file: output.spec

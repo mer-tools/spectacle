@@ -1,3 +1,7 @@
-1a2,3
-> [33mWarning:[0m Deprecated key: PostScripts found, please use other valid keys
-> [33mWarning:[0m Deprecated key: Documents found, please use other valid keys
+--- output.2.o	2010-03-17 21:15:04.000000000 +0800
++++ output.2	2010-03-17 21:15:05.000000000 +0800
+@@ -1,2 +1,4 @@
+ [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
++[33mWarning:[0m Deprecated key: PostScripts found, please use other valid keys
++[33mWarning:[0m Deprecated key: Documents found, please use other valid keys
+ [32mInfo:[0m Creating new spec file: output.spec

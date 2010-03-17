@@ -1,5 +1,9 @@
-1a2,5
-> [33mWarning:[0m Please use one of the followings:
->            - x11-xcb
->            - x11
->          in PkgConfigBR instead of libX11-devel in PkgBR
+--- output.2.o	2010-03-17 21:15:18.000000000 +0800
++++ output.2	2010-03-17 21:15:18.000000000 +0800
+@@ -1,2 +1,6 @@
+ [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
++[33mWarning:[0m Please use one of the followings:
++           - x11-xcb
++           - x11
++         in PkgConfigBR instead of libX11-devel in PkgBR
+ [32mInfo:[0m Creating new spec file: output.spec

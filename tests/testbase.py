@@ -17,28 +17,35 @@
 #    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 SCRIPTS = """
-specify -N -o output.spec testpkg.yaml 1>output.1 2>output.2
+specify -N -o output.spec testpkg.yaml 1>output.1.o 2>output.2.o
 mv output.spec output.orig.spec
 patch -s < input.p
-specify -N -o output.spec testpkg.yaml 1>newouput.1 2>newoutput.2
+specify -N -o output.spec testpkg.yaml 1>ouput.1 2>output.2
 if [ ! -f output.no -a ! -f output.spec ]; then
-  mv newoutput.2 output.error
+  mv output.2 output.error
   exit 1
 fi
 if [ -f output.p ]; then
-  diff output.orig.spec output.spec > newoutput.p
+  diff -upN output.orig.spec output.spec > newoutput.p
+  mv output.spec output.new.spec
+  patch < output.p >/dev/null
 fi
 if [ -f output.1p ]; then
-  diff output.1 newoutput.1 > newoutput.1p
+  diff -upN output.1.o output.1 > newoutput.1p
+  mv output.1 output.1.n
+  patch < output.1p >/dev/null
 fi
 if [ -f output.2p ]; then
-  diff output.2 newoutput.2 > newoutput.2p
+  diff -upN output.2.o output.2 > newoutput.2p
+  mv output.2 output.2.n
+  patch < output.2p >/dev/null
 fi
 """
 
 import os,sys
 import glob
 import shutil
+import filecmp
 
 BLUE='\033[%dm' % 34
 RED='\033[%dm' % 31
@@ -75,13 +82,21 @@ def compare_outfile(work_dir):
     desc = {'output.p': '*.spec',
             'output.1p': 'STDOUT',
             'output.2p': 'STDERR'}
+    orig = {'output.p': 'output.orig.spec',
+            'output.1p': 'output.1.o',
+            'output.2p': 'output.2.o'}
+    new  = {'output.p': 'output.new.spec',
+            'output.1p': 'output.1.n',
+            'output.2p': 'output.2.n'}
     for out in ('output.p', 'output.1p', 'output.2p'):
         fp = os.path.join(work_dir, out)
         if os.path.exists(fp):
-            exp_output_diff = file(fp).read().strip()
-            output_diff = file(os.path.join(work_dir, 'new'+out)).read().strip()
-            if exp_output_diff != output_diff:
+            if not filecmp.cmp(os.path.join(work_dir, orig[out]),\
+                               os.path.join(work_dir, new[out])):
                 all_equ = False
+
+                exp_output_diff = file(fp).read().strip()
+                output_diff = file(os.path.join(work_dir, 'new'+out)).read().strip()
 
                 if not output_diff:
                     output_diff = '<EMPTY>'

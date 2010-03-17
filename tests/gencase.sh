@@ -14,13 +14,13 @@ cp ../base/testpkg.yaml .
 specify -N -o output.spec testpkg.yaml 1>output.1.o 2>output.2.o
 vi testpkg.yaml
 diff -upN ../base/testpkg.yaml testpkg.yaml > input.p
-mv output.spec output.spec.o
+mv output.spec output.orig.spec
 specify -N -o output.spec testpkg.yaml 1>output.1 2>output.2
 echo 'Input diff:'
 cat input.p
 
 if [ -f output.spec ]; then
-  diff output.spec.o output.spec > output.p
+  diff -upN output.orig.spec output.spec > output.p
   if [ $? != 0 ]; then
     echo 'Output diff:'
     cat output.p
@@ -32,7 +32,7 @@ else
   touch output.no
 fi
 
-diff output.1.o output.1 > output.1p
+diff -upN output.1.o output.1 > output.1p
 if [ $? != 0 ]; then
   echo 'Stdout diff:'
   cat output.1p
@@ -40,7 +40,7 @@ else
   rm -f output.1p
 fi
 
-diff output.2.o output.2 > output.2p
+diff -upN output.2.o output.2 > output.2p
 if [ $? != 0 ]; then
   echo 'Stderr diff:'
   cat output.2p
