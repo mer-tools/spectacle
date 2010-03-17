@@ -203,7 +203,7 @@ class RPMWriter():
             """ return the empty keys """
             keys = []
             for key in metadata.keys():
-                if not metadata[key]:
+                if metadata[key] is None:
                     keys.append(key)
                     del metadata[key]
 
@@ -536,7 +536,7 @@ PkgBR:
                 if len(xx) > 1 and xx[1] == "in":
                     extractfile
                     buf = tarinfo.tobuf()
-                    print buf
+                    #print buf
 
         prefix = None
         if tarball:
@@ -582,6 +582,21 @@ PkgBR:
                 patches.append(line)
                 comments.append(comment + '# ' + line)
                 comment = ''
+
+    def __cleanup_boolkeys(self, items):
+        """ clean up all boolean type keys,
+            use the exists status to present bool value
+        """
+        #   for keys with default value FALSE
+        for bopt in BOOLNO_KEYS:
+            if bopt in items and not items[bopt]:
+                del items[bopt]
+        #   for keys with default value TRUE
+        for bopt in BOOLYES_KEYS:
+            if bopt in items and not items[bopt]:
+                del items[bopt]
+            else:
+                items[bopt] = True
 
     def parse(self):
 
@@ -674,15 +689,11 @@ PkgBR:
 
         self.analyze_source()
 
-        # clean up all boolean type keys, remove the ones with default values
-        #   for keys with default value FALSE
-        for bopt in BOOLNO_KEYS:
-            if bopt in self.metadata and not self.metadata[bopt]:
-                del self.metadata[bopt]
-        #   for keys with default value TRUE
-        for bopt in BOOLYES_KEYS:
-            if bopt in self.metadata and self.metadata[bopt]:
-                del self.metadata[bopt]
+        # clean up all boolean type keys, use the exists status to present bool value
+        self.__cleanup_boolkeys(self.metadata)
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                self.__cleanup_boolkeys(sp)
 
         # check duplicate default configopts
         dup = '--disable-static'
@@ -693,6 +704,7 @@ PkgBR:
                 del self.metadata['ConfigOptions']
 
         # check duplicate requires for base package
+        # TODO remove autodep code from tmpl
         if "SubPackages" in self.metadata:
             if 'Epoch' in self.metadata:
                 autodep = "%{name} = %{epoch}:%{version}-%{release}"

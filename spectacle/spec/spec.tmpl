@@ -190,7 +190,7 @@ Development files for %{name}
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
 #set $sub_extra = $extra.subpkgs[$sp.Name]
-#if $sp.has_key("AsWholeName") and $sp.AsWholeName
+#if $sp.has_key("AsWholeName")
 %package -n $sp.Name
 #else
 %package $sp.Name
@@ -204,7 +204,7 @@ Group:      ${metadata.Group}
 #if 'NoAutoReq' in $metadata
 AutoReq:    0
 #end if
-#if not ( $sp.has_key("AutoDepend") and not $sp.AutoDepend )
+#if $sp.has_key("AutoDepend")
 Requires:   %{name} = $auto_depend
 #end if
 #if $sp.has_key("Requires")
@@ -268,7 +268,7 @@ Obsoletes:   $obs
 #end for
 #end if
 
-#if $sp.has_key("AsWholeName") and $sp.AsWholeName
+#if $sp.has_key("AsWholeName")
 %description -n $sp.Name
 #else
 %description $sp.Name
@@ -285,7 +285,7 @@ Description: %{summary}
 ############################ prep scripts
 %prep
 #if $metadata.has_key("Sources")
-#if $metadata.has_key("NoSetup") and $metadata.NoSetup
+#if $metadata.has_key("NoSetup")
 # No setup
 #else if $metadata.has_key("SetupOptions")
 %setup $metadata.SetupOptions
@@ -315,7 +315,7 @@ $str_newline.join($extra.content.setup.main)
 
 ############################ build scripts
 %build
-#if 'UseAsNeeded' in $metadata and not $metadata.UseAsNeeded
+#if not $metadata.has_key('UseAsNeeded')
 unset LD_AS_NEEDED
 #end if
 # >> build pre
@@ -691,7 +691,7 @@ $str_newline.join($extra.content.files[$sp])
 
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
-#if $sp.has_key("AsWholeName") and $sp.AsWholeName
+#if $sp.has_key("AsWholeName")
 #set $pkg_name = "-n " + $sp.Name
 #else
 #set $pkg_name = $sp.Name
