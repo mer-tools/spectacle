@@ -55,6 +55,7 @@ HEADERS = ( 'package',
             'install',
             'clean',
             'check',
+            'preun',
             'pre',
             'postun',
             'post',
@@ -344,38 +345,34 @@ class SpecParser(object):
         items['extra']['check'] = v.strip()
         items['Check'] = True
 
-    def _do_pre(self, items, pkg, h, v):
-        inline_prog = ''
-        ls = h.split()
+    def __parse_prog_in_opt(self, header):
+        ls = header.split()
         if '-p' in ls:
             try:
-                inline_prog = ls[ls.index('-p')+1]
+                return ls[ls.index('-p')+1]
             except IndexError:
                 raise SpecFormatError(h)
+        else:
+            return ''
 
-        items['extra']['pre'] = inline_prog + v.strip()
+    def __do_extra_scripts(self, items, h, v):
+        section = h.split()[0][1:]
+        items['extra'][section] = v.strip().splitlines()
+        inline_prog = self.__parse_prog_in_opt(h)
+        if inline_prog:
+            items['extra'][section].insert(0, inline_prog)
+
+    def _do_pre(self, items, pkg, h, v):
+        self.__do_extra_scripts(items, h, v)
+
+    def _do_preun(self, items, pkg, h, v):
+        self.__do_extra_scripts(items, h, v)
 
     def _do_post(self, items, pkg, h, v):
-        inline_prog = ''
-        ls = h.split()
-        if '-p' in ls:
-            try:
-                inline_prog = ls[ls.index('-p')+1]
-            except IndexError:
-                raise SpecFormatError(h)
-
-        items['extra']['post'] = inline_prog + v.strip()
+        self.__do_extra_scripts(items, h, v)
 
     def _do_postun(self, items, pkg, h, v):
-        inline_prog = ''
-        ls = h.split()
-        if '-p' in ls:
-            try:
-                inline_prog = ls[ls.index('-p')+1]
-            except IndexError:
-                raise SpecFormatError(h)
-
-        items['extra']['postun'] = inline_prog + v.strip()
+        self.__do_extra_scripts(items, h, v)
 
     def _do_changelog(self, items, pkg, h, v):
         # TODO, do it automatically
