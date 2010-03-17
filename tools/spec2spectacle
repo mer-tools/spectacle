@@ -521,13 +521,13 @@ class SpecParser(object):
                             nv.append(vi)
                     elif ',' in vi:
                         reqs = []
-                        for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', vi):
-                            reqs.append(entry.split(',')[0])
+                        for entry in re.findall('\S+\s+[<>=]+\s+[^,\s]+|[^,\s]+', vi):
+                            reqs.append(entry)
                         nv += reqs
                     elif ' ' in vi:
                         reqs = []
                         for entry in re.findall('\S+\s+[<>=]+\s+\S+|\S+', vi):
-                            reqs.append(entry.split(' ')[0])
+                            reqs.append(entry)
                         nv += reqs
                     else:
                         nv.append(vi)
