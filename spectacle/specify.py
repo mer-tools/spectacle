@@ -795,6 +795,7 @@ PkgBR:
         macros = {}         # global macros
         setup = {}
         pre = {}
+        preun = {}
         post = {}
         postun = {}
         check = {} # extra headers
@@ -831,6 +832,8 @@ PkgBR:
                     postun['main'] = recording
                 elif matchout.group(1) == "pre":
                     pre['main'] = recording
+                elif matchout.group(1) == "preun":
+                    preun['main'] = recording
                 elif matchout.group(1) == "check" or \
                      matchout.group(1) == "check_scriptlets": #TODO, remove it whenever cleanup
                     check['main'] = recording
@@ -853,6 +856,8 @@ PkgBR:
            content["postun"] = postun
         if pre:
            content["pre"] = pre
+        if preun:
+           content["preun"] = preun
 
         if check and 'Check' in self.metadata:
            content["check"] = check
