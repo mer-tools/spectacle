@@ -131,10 +131,27 @@ class SpecParser(object):
         self.macros = []
 
     def __switch_subpkg(self, subpkg):
+
+        # whether '-n subpkg'?
+        wholename = False
+        ls = subpkg.split()
+        if '-n' in ls:
+            try:
+                subpkg = ls[ls.index('-n')+1]
+                wholename = True
+            except IndexError:
+                raise SpecFormatError(subpkg)
+
+
         if 'SubPackages' not in self.items:
             self.items['SubPackages'] = {}
         if subpkg not in self.items['SubPackages']:
             self.items['SubPackages'][subpkg] = {}
+        if wholename:
+            self.items['SubPackages'][subpkg]['AsWholeName'] = True
+
+        # switch
+        self.cur_pkg = subpkg
 
         return self.items['SubPackages'][subpkg]
 
@@ -325,7 +342,7 @@ class SpecParser(object):
 
     def _do_check(self, items, pkg, v):
         items['extra']['check'] = v.strip()
-        items['Check'] = 'yes'
+        items['Check'] = True
 
     def _do_pre(self, items, pkg, v):
         items['extra']['pre'] = v.strip()
@@ -421,16 +438,13 @@ class SpecParser(object):
                     if header == 'package':
                         if not opt:
                             raise SpecFormatError(line)
-                        self.cur_pkg = opt
-                        items = self.__switch_subpkg(self.cur_pkg)
-
+                        items = self.__switch_subpkg(opt)
                     else:
                         # inline sections of other headers
                         state = ST_INLINE
-                        if opt and not opt.startswith('-'):
+                        if opt and (not opt.startswith('-') or '-n' in opt):
                             # section with sub-pkg specified
-                            self.cur_pkg = opt.split()[0]
-                            items = self.__switch_subpkg(self.cur_pkg)
+                            items = self.__switch_subpkg(opt)
                         else:
                             # for 'main' package
                             items = self.items
