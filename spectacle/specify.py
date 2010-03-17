@@ -199,6 +199,16 @@ class RPMWriter():
             
     def sanity_check(self):
 
+        def _check_empty_keys(metadata):
+            """ return the empty keys """
+            keys = []
+            for key in metadata.keys():
+                if not metadata[key]:
+                    keys.append(key)
+                    del metadata[key]
+
+            return keys
+
         def _check_mandatory_keys(metadata, subpkg = None):
             """ return [] if all mandatory keys found, otherwise return the lost keys """
             if subpkg:
@@ -303,6 +313,16 @@ class RPMWriter():
                     metadata[RENAMED_KEYS[key]] = metadata[key]
                     del metadata[key]
                     logger.warning('Renamed key: %s found, please use %s instead' % (key, RENAMED_KEYS[key]))
+
+        # checking for empty keys
+        keys = _check_empty_keys(self.metadata)
+        if keys:
+            logger.warning('Please remove empty keys in main package: %s' % ', '.join(keys))
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                keys = _check_empty_keys(sp)
+                if keys:
+                    logger.warning('Please remove empty keys in %s subpackage: %s' % (sp['Name'], ', '.join(keys)))
 
         # checking for mandatory keys
         keys = _check_mandatory_keys(self.metadata)
