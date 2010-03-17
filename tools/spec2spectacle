@@ -537,14 +537,7 @@ class SpecParser(object):
                 nbr = [] # new 'PkgConfigBR' list
                 nv = []
                 for vi in v:
-                    if 'pkgconfig' in vi:
-                        if k == 'BuildRequires':
-                            for m in re.finditer('pkgconfig\s*\(\s*([^\)]*)\s*\)', vi):
-                                if m and m.group(1):
-                                    nbr.append(m.group(1))
-                        else:
-                            nv.append(vi)
-                    elif ',' in vi:
+                    if ',' in vi:
                         reqs = []
                         for entry in re.findall('\S+\s+[<>=]+\s+[^,\s]+|[^,\s]+', vi):
                             reqs.append(entry)
@@ -556,6 +549,14 @@ class SpecParser(object):
                         nv += reqs
                     else:
                         nv.append(vi)
+
+                    if 'pkgconfig' in vi and k == 'BuildRequires':
+                        for nvi in nv:
+                            pkgbr = re.sub(r'pkgconfig\s*\(\s*([^\)]*)\s*\)', r'\1', nvi)
+                            if pkgbr != nvi:
+                                nbr.append(pkgbr)
+                                nv.remove(nvi)
+
                 ck_items[k] = nv
                 if nbr:
                     ck_items['PkgConfigBR'] = nbr
