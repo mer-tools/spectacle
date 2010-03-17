@@ -22,6 +22,7 @@ import sys
 import logger
 
 ORDER_ENTRIES = ['Name',
+                 'AsWholeName',
                  'Summary',
                  'Version',
                  'Release',

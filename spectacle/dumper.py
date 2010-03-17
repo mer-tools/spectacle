@@ -135,6 +135,11 @@ class SpectacleDumper(object):
                         fp.write("\n")
                     else:
                         fp.write(cur_indent + TAB + "- %s\n" % (self.__esc_value(item)))
+            elif isinstance(value, bool):
+                if value:
+                    fp.write(cur_indent + "%s: yes\n" % (key))
+                else:
+                    fp.write(cur_indent + "%s: no\n" % (key))
             else:
                 lines_to_write = value.splitlines()
 
