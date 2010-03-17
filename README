@@ -281,6 +281,15 @@ placeholder lines will be generated in .spec.
 **NOTE**: The placeholder lines will NOT generated in spec by default. If
 you need customized %pre scripts, it need be added manually, and only once.
 
+* Scriptlets for %preun section
+
+    With placeholder:
+
+        # >> preun
+        # << preun
+**NOTE**: The placeholder lines will NOT generated in spec by default. If
+you need customized %preun scripts, it need be added manually, and only once.
+
 * Scriptlets for %post section
 
     With placeholder:
@@ -313,11 +322,8 @@ from yaml file. But the end users need not tackle it.
   remove this key according the buildlog.
 
 * When using spec2spectacle/ini2spectacle to generate spectacle, the following
-  problems should be checked **manually**:
+  problems should be checked:
 
-     * Remove '%{name} = %{version}-%{release}' in sub-packages' Requires,
-       which will be added automatically.
-     * Remove "--disable-static" in ConfigOptions if present.
      * Remove duplicate Requires(include pre/post/preun/postun) which were
        added automatically based on the analysis of file list.
 
