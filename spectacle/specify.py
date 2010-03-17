@@ -356,8 +356,7 @@ class RPMWriter():
             pcbr = []
             br = []
             for p in self.metadata['PkgBR']:
-                px = p.split(" ")[0]
-                px = px.strip()
+                px = p.split()[0]
                 pl = self.packages
                 if pl.has_key(px):
                     if len(pl[px]) == 1:
@@ -764,7 +763,7 @@ PkgBR:
                 pkg_extra = self.extra['subpkgs'][pkg_name]
 
             for l in v:
-                for item in l.split(' '):
+                for item in l.split():
                     if re.match('.*\.info.*', item) or \
                        re.match('.*(usr/share/info|%{_infodir}).*', item):
                         pkg_extra['Info'] = True
@@ -788,7 +787,8 @@ PkgBR:
         postun = {}
         check = {} # extra headers
 
-        for i in file(spec_fpath).read().split("\n"):
+        for i in file(spec_fpath):
+            i = i.strip()
             matchin = sin.match(i)
             matchout = sout.match(i)
 

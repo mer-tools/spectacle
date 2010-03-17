@@ -481,8 +481,11 @@ make check
 #end if
 
 ############################ Pre
-#if $extra.Schema
+#set $has_extra_pre = $extra.content.has_key("pre") and $extra.content.pre.has_key("main")
+#if $extra.Schema or $has_extra_pre
 %pre
+## -Schema
+#if $extra.Schema
 if [ "$1" -gt 1 ]; then
 #for $schema in $extra.Schemas
   export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
@@ -492,11 +495,20 @@ if [ "$1" -gt 1 ]; then
 #end for
 fi
 #end if
+## -Extra pre
+#if $has_extra_pre
+# >> pre
+$str_newline.join($extra.content.pre.main)
+# << pre
+#end if
+#end if
 
 ############################ PreUn
-#if $extra.Schema
+#set $has_extra_preun = $extra.content.has_key("preun") and $extra.content.preun.has_key("main")
+#if $extra.Schema or $has_extra_preun
 %preun
-## TODO: confirm? if [ "$1" -gt 1 ]; then
+## -Schema
+#if $extra.Schema
 if [ "$1" -eq 0 ]; then
 #for $schema in $extra.Schemas
   export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
@@ -506,13 +518,12 @@ if [ "$1" -eq 0 ]; then
 #end for
 fi
 #end if
-
-############################ Pre
-#if $extra.content.has_key("pre") and $extra.content.pre.has_key("main")
-%pre
-# >> pre
-$str_newline.join($extra.content.pre.main)
-# << pre
+## -Extra preun
+#if $has_extra_preun
+# >> preun
+$str_newline.join($extra.content.preun.main)
+# << preun
+#end if
 #end if
 
 ############################ Post

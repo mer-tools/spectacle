@@ -148,7 +148,7 @@ class Convertor(object):
 
         if extra:
             try:
-                # clean up empty lines
+                # clean up empty lines in %files
                 files = [s.strip() for s in extra['Files'] if s.strip()]
                 if files:
                     extra['Files'] = files
