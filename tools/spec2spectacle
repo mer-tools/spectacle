@@ -155,15 +155,15 @@ class SpecParser(object):
 
         return self.items['SubPackages'][subpkg]
 
-    def _do_package(self, items, pkg, v):
+    def _do_package(self, items, pkg, h, v):
         # skip
         pass
 
-    def _do_prep(self, items, pkg, v):
+    def _do_prep(self, items, pkg, h, v):
         # skip
         pass
 
-    def _do_build(self, items, pkg, v):
+    def _do_build(self, items, pkg, h, v):
         """ to handle build script:
             trying to find out the most of the generic cases
         """
@@ -274,7 +274,7 @@ class SpecParser(object):
             if parts['post']:
                 items['extra']['PostMakeExtras'] = parts['post']
 
-    def _do_install(self, items, pkg, v):
+    def _do_install(self, items, pkg, h, v):
         """ to handle install script:
             trying to find out the most of the generic cases
         """
@@ -336,28 +336,52 @@ class SpecParser(object):
         # false safe case
         items['extra']['PostMakeInstallExtras'] = lines
 
-    def _do_clean(self, items, pkg, v):
+    def _do_clean(self, items, pkg, h, v):
         # skip
         pass
 
-    def _do_check(self, items, pkg, v):
+    def _do_check(self, items, pkg, h, v):
         items['extra']['check'] = v.strip()
         items['Check'] = True
 
-    def _do_pre(self, items, pkg, v):
-        items['extra']['pre'] = v.strip()
+    def _do_pre(self, items, pkg, h, v):
+        inline_prog = ''
+        ls = h.split()
+        if '-p' in ls:
+            try:
+                inline_prog = ls[ls.index('-p')+1]
+            except IndexError:
+                raise SpecFormatError(h)
 
-    def _do_post(self, items, pkg, v):
-        items['extra']['post'] = v.strip()
+        items['extra']['pre'] = inline_prog + v.strip()
 
-    def _do_postun(self, items, pkg, v):
-        items['extra']['postun'] = v.strip()
+    def _do_post(self, items, pkg, h, v):
+        inline_prog = ''
+        ls = h.split()
+        if '-p' in ls:
+            try:
+                inline_prog = ls[ls.index('-p')+1]
+            except IndexError:
+                raise SpecFormatError(h)
 
-    def _do_changelog(self, items, pkg, v):
+        items['extra']['post'] = inline_prog + v.strip()
+
+    def _do_postun(self, items, pkg, h, v):
+        inline_prog = ''
+        ls = h.split()
+        if '-p' in ls:
+            try:
+                inline_prog = ls[ls.index('-p')+1]
+            except IndexError:
+                raise SpecFormatError(h)
+
+        items['extra']['postun'] = inline_prog + v.strip()
+
+    def _do_changelog(self, items, pkg, h, v):
         # TODO, do it automatically
         logger.warning('Please move changelog in %changelog to *.changes file.')
 
-    def _do_files(self, items, pkg, v):
+    def _do_files(self, items, pkg, h, v):
         files = map(str.strip, v.strip().split('\n'))
 
         # skip option line
@@ -369,7 +393,7 @@ class SpecParser(object):
         else:
             items['extra']['Files'] = files
 
-    def _do_description(self, items, pkg, v):
+    def _do_description(self, items, pkg, h, v):
         items['Description'] = v.strip()
 
     def read(self, filename):
@@ -451,11 +475,12 @@ class SpecParser(object):
 
                         cur_block = header
                         if cur_block not in items:
-                            items[cur_block] = ''
-
+                            items[cur_block] = line+'\n'
+                            """
                             # options in header line as the first line
-                            if ' -' in opt:
-                                items[cur_block] = opt[opt.index(' -'):] + '\n'
+                            if ' -' in line:
+                                items[cur_block] = line[line.index(' -'):] + '\n'
+                            """
 
                 else:
                     # unparsed line
@@ -541,7 +566,8 @@ class SpecParser(object):
         for hdr in HEADERS:
             if hdr in items:
                 routine = getattr(self, '_do_' + hdr)
-                routine(ck_items, pkg_name, items[hdr])
+                hdr_line, Drop, content = items[hdr].partition('\n')
+                routine(ck_items, pkg_name, hdr_line, content)
 
         if pkg_name != 'main':
             # shortcut for subpkg
