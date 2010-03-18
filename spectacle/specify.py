@@ -55,11 +55,11 @@ BOOLNO_KEYS = ('Check',
                'NoAutoReq',
                'NoAutoProv',
                'NoSetup',
+               'NoAutoLocale',
                'AsWholeName',
               )
 # boolean keys with the default 'True' value
 BOOLYES_KEYS = ('UseAsNeeded',
-                'NoLocale',
                 'AutoDepend',
                )
 BOOL_KEYS = BOOLNO_KEYS + BOOLYES_KEYS
@@ -118,6 +118,7 @@ DROP_KEYS = ('PostScripts',
             )
 
 RENAMED_KEYS = {'NeedCheckSection': 'Check',
+                'NoLocale': 'NoAutoLocale',
                }
 
 class GitAccess():

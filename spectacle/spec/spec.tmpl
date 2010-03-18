@@ -131,7 +131,7 @@ BuildRequires:  pkgconfig($br_comps[0])
 #set $br_desktop = True
 #if $metadata.has_key("PkgBR")
 #for $br in $metadata.PkgBR
-#if $br == 'intltool' and not $metadata.has_key("LocaleName") and not $metadata.has_key("NoLocale")
+#if $br == 'intltool' and not $metadata.has_key("LocaleName") and not $metadata.has_key("NoAutoLocale")
 #set $br_locale = $metadata.Name
 #end if
 #if $br == 'desktop-file-utils'
