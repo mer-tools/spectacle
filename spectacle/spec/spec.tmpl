@@ -123,7 +123,13 @@ Requires(pre): GConf2
 #if $len($br_comps) > 1
 BuildRequires:  pkgconfig($br_comps[0])$br[$len($br_comps[0]):]
 #else
+#if 'ix86' in $br_comps[0]
+%ifarch %{ix86}
+BuildRequires:  pkgconfig($br_comps[0][5:len($br_comps[0])])
+%endif
+#else
 BuildRequires:  pkgconfig($br_comps[0])
+#end if
 #end if
 #end for
 #end if
@@ -364,15 +370,29 @@ fi
 #for $opt in $metadata.ConfigOptions
 #if 'arm:' in $opt
 %ifarch %{arm}
-    $opt[4:len($opt)]
-%endif#slurp
-#else
-    $opt#slurp
-#end if
+    $opt[4:len($opt)]#slurp
 #if $idx == $length
 
 #else
  \
+#end if
+%endif
+#else if 'ix86' in $opt
+%ifarch %{ix86}
+    $opt[5:len($opt)]#slurp
+#if $idx == $length
+
+#else
+ \
+#end if
+%endif
+#else
+    $opt#slurp
+#if $idx == $length
+
+#else
+ \
+#end if
 #end if
 #set $idx = $idx + 1
 #end for

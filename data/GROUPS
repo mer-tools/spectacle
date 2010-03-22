@@ -34,6 +34,7 @@ System/Libraries/Perl
 System/Networking
 System/Shells
 System/X11
+System/X11/Applications
 System/X11/Fonts
 System/X11/Icons
 System/X Hardware Support
