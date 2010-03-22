@@ -167,7 +167,7 @@ All available directives for spectacle are listed as the following:
 
 * NoSetup: **boolean**, whether to skip using ``%setup`` in ``%prep``
 
-* NoLocale: **boolean**, whether to use ``%find_lang`` to search locale data
+* NoAutoLocale: **boolean**, whether to use ``%find_lang`` to search locale data when found 'inittool' in PkgBR
 
 * AutoDepend: **boolean**, for subpackages only, whether to add Require to main package automatically
 

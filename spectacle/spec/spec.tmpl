@@ -569,8 +569,8 @@ $str_newline.join($extra.content.post.main)
 
 ############################ PostUn
 #set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key("main")
-#if $extra.Info or $extra.Lib or $has_extra_postun
-#set $only_Lib = not ($extra.Info or $has_extra_postun)
+#if $extra.Lib or $extra.Info or $extra.Icon or $has_extra_postun
+#set $only_Lib = not ($extra.Info or $extra.Icon or $has_extra_postun)
 #if $only_Lib
 %postun -p /sbin/ldconfig
 #else
@@ -586,6 +586,12 @@ if [ $1 = 0 ] ;then
 %install_info_delete --info-dir=%{_infodir} $inf
 #end for
 fi
+#end if
+## -Icon
+#if $extra.Icon
+/bin/touch --no-create %{_datadir}/icons/hicolor || :
+%{_bindir}/gtk-update-icon-cache \
+  --quiet %{_datadir}/icons/hicolor 2> /dev/null|| :
 #end if
 ## -Extra Postun Script
 #if $has_extra_postun
