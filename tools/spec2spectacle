@@ -406,16 +406,22 @@ class SpecParser(object):
         for line in file(filename):
 
             if state == ST_DEFINE:
-                m = define_re.match(line.strip())
+                line = line.strip()
+                if not line or comment.match(line):
+                    # skip comment line and empty line
+                    continue
+
+                m = define_re.match(line)
                 if m:
                     if self.replace_macros:
                         self.table[m.group(1)] = m.group(2)
                     else:
-                        self.macros.append(line.strip())
+                        self.macros.append(line)
 
                     continue #short-cut
                 else:
                     state = ST_MAIN
+                    # fall through
 
             if state == ST_INLINE:
                 if header_re.match(line):
@@ -427,7 +433,7 @@ class SpecParser(object):
 
             if state == ST_MAIN:
                 line = line.strip()
-                if comment.match(line) or not line:
+                if not line or comment.match(line):
                     # skip comment line and empty line
                     continue
 
@@ -481,7 +487,7 @@ class SpecParser(object):
 
                 else:
                     # unparsed line
-                    logger.warning('Warning: un-parsed spec line skipped: %s' % line)
+                    logger.warning('un-parsed spec line skipped: %s' % line)
 
     def cooked_items(self):
         """ return all items, cooked to the input of convertor """
