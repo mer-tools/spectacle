@@ -210,7 +210,7 @@ Group:      ${metadata.Group}
 #if 'NoAutoReq' in $metadata
 AutoReq:    0
 #end if
-#if $sp.has_key("AutoDepend")
+#if $sp.has_key("AutoDepend") and not $metadata.has_key("NoFiles")
 Requires:   %{name} = $auto_depend
 #end if
 #if $sp.has_key("Requires")
@@ -676,6 +676,7 @@ fi
 #end for ## per subpackage
 #end if ## has subpackages
 
+#if not $metadata.has_key("NoFiles")
 #if $metadata.has_key("LocaleName")
 %files -f ${metadata.LocaleName}.lang
 #else if $br_locale != ""
@@ -686,6 +687,7 @@ fi
 %files
 #end if
 %defattr(-,root,root,-)
+## TODO to be cleanup
 #if $metadata.has_key("Documents")
 #for $doc in $metadata.Documents
 %doc $doc
@@ -701,6 +703,7 @@ $f
 $str_newline.join($extra.content.files.main)
 #end if
 # << files
+#end if ## not NoFiles
 
 #if $metadata.has_key("AutoSubPackages")
 #for $sp in $metadata.AutoSubPackages
@@ -728,6 +731,7 @@ $str_newline.join($extra.content.files[$sp])
 %files $pkg_name
 #end if
 %defattr(-,root,root,-)
+## TODO to be cleanup
 #if $sp.has_key("Documents")
 #for $doc in $sp.Documents
 %doc $doc

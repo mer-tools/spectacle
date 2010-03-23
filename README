@@ -153,6 +153,8 @@ All available directives for spectacle are listed as the following:
 
 * FilesInput: **string**, *optional*, extra input source for %files
 
+* NoFiles: **boolean**, *optional*, if to be set as True, means no %files section for this package and it cause no rpm generated
+
 * RunFdupes: **string**, parameters of ``fdupes`` in %install
 
 * Check: **boolean**, whether need ``%check`` section in spec

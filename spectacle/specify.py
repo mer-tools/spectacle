@@ -57,6 +57,7 @@ BOOLNO_KEYS = ('Check',
                'NoSetup',
                'NoAutoLocale',
                'AsWholeName',
+               'NoFiles',
               )
 # boolean keys with the default 'True' value
 BOOLYES_KEYS = ('UseAsNeeded',
@@ -769,6 +770,7 @@ PkgBR:
                     pkg_extra['Icon'] = True
 
         # files listed in '%doc' need handling
+        # TODO to be cleanup
         for pkg_name,v in docs.iteritems():
             if pkg_name == 'main':
                 pkg_extra = self.extra
