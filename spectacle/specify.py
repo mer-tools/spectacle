@@ -244,7 +244,7 @@ class RPMWriter():
 
             return keys
 
-        def _check_group(metadata):
+        def _check_key_group(metadata):
             if metadata.has_key("Group"):
                 warn = True
                 for line in open("/usr/share/spectacle/GROUPS"):
@@ -266,7 +266,7 @@ class RPMWriter():
                 else:
                     self.packages[row[0]] = [m]
 
-        def _check_desc(metadata):
+        def _check_key_desc(metadata):
             """ sub-routine for 'description' checking """
             if 'Description' not in metadata or \
                 metadata['Description'] == '%{summary}':
@@ -291,17 +291,17 @@ class RPMWriter():
                 return False
             return True
 
-        def _check_localename(metadata):
+        def _check_key_localename(metadata):
             """ sub-routine for 'LocaleName' checking """
             if 'LocaleOptions' in metadata and 'LocaleName' not in metadata:
                 return False
             return True
 
-        def _check_dup_files(metadata):
+        def _check_key_files(metadata):
             # try to remove duplicate '%defattr' in files list
             dup = '%defattr(-,root,root,-)'
-            if 'Files' in metadata and dup in metadata['Files']:
-                logger.warning('found duplicate "%s" in file list of YAML, removed!' % dup)
+            if dup in metadata['Files']:
+                logger.warning('found duplicate "%s" in file list, removed!' % dup)
                 metadata['Files'].remove(dup)
 
         def _check_dropped_keys(metadata):
@@ -315,6 +315,20 @@ class RPMWriter():
                     metadata[RENAMED_KEYS[key]] = metadata[key]
                     del metadata[key]
                     logger.warning('Renamed key: %s found, please use %s instead' % (key, RENAMED_KEYS[key]))
+
+        def _check_key_nofiles(metadata):
+            if 'Files' in metadata:
+                logger.error('both "NoFiles" and "Files" exists in YAML, please correct it')
+            for req in ('Requires',
+                        'RequiresPre',
+                        'RequiresPreUn',
+                        'RequiresPost',
+                        'RequiresPostUn',
+                        'Provides',
+                        'Conflicts',
+                        'Obsoletes'):
+                if req in metadata and metadata[req]:
+                    logger.warning('"NoFiles" exists, key %s has no effect any more' % req)
 
         # checking for empty keys
         keys = _check_empty_keys(self.metadata)
@@ -352,55 +366,8 @@ class RPMWriter():
         # checking for renamed keys
         _check_renamed_keys(self.metadata)
 
-        # checking for proposal pkgconfig requires
-        if self.metadata.has_key("PkgBR"):
-            _check_pkgconfig()
-            pcbr = []
-            br = []
-            for p in self.metadata['PkgBR']:
-                px = p.split()[0]
-                pl = self.packages
-                if pl.has_key(px):
-                    if len(pl[px]) == 1:
-                        pcbr.append(pl[px][0])
-                    else:
-                        br.append(p)
-                    logger.warning("""Please use one of the followings:
-           - %s
-         in PkgConfigBR instead of %s in PkgBR""" %('\n           - '.join(pl[px]), px))
-                else:
-                    br.append(p)
-            
-            if len(pcbr) > 0:
-                if self.metadata.has_key('PkgConfigBR'):
-                    pcbr.extend(self.metadata['PkgConfigBR'])
-                print """
-Proposal (multiple values skipped, please insert them manually):
-PkgConfigBR: 
-    - %s
-PkgBR:
-    - %s
-                    """ %('\n    - '.join(pcbr), '\n    - '.join(br))
 
-        # checking for meego valid groups
-        _check_group(self.metadata)
-        if "SubPackages" in self.metadata:
-            for sp in self.metadata["SubPackages"]:
-                _check_group(sp)
-
-        # checking for validation of 'Description'
-        if not _check_desc(self.metadata):
-            logger.warning('main package has no qualified "Description" tag')
-        if "SubPackages" in self.metadata:
-            for sp in self.metadata["SubPackages"]:
-                if not _check_desc(sp):
-                    logger.warning('sub-pkg: %s has no qualified "Description" tag' % sp['Name'])
-
-        # checking for validation of 'LocaleName' and 'LocaleOptions'
-        if not _check_localename(self.metadata):
-            self.metadata['LocaleName'] = "%{name}"
-            logger.warning('lost "LocaleName" keyword, use "%{name}" as default')
-
+        ######### Type checkings ##########
         # checking for LIST expected keys
         for key in LIST_KEYS:
             if not _check_listkey(self.metadata, key):
@@ -435,8 +402,63 @@ PkgBR:
                         logger.warning('the value of "%s" in %s sub-package is expected as bool typed, dropped!' % (key, sp['Name']))
                         del sp[key]
 
+        ######### checkings for special keys ##########
+        # checking for proposal pkgconfig requires
+        if self.metadata.has_key("PkgBR"):
+            _check_pkgconfig()
+            pcbr = []
+            br = []
+            for p in self.metadata['PkgBR']:
+                px = p.split()[0]
+                pl = self.packages
+                if pl.has_key(px):
+                    if len(pl[px]) == 1:
+                        pcbr.append(pl[px][0])
+                    else:
+                        br.append(p)
+                    logger.warning("""Please use one of the followings:
+           - %s
+         in PkgConfigBR instead of %s in PkgBR""" %('\n           - '.join(pl[px]), px))
+                else:
+                    br.append(p)
+            
+            if len(pcbr) > 0:
+                if self.metadata.has_key('PkgConfigBR'):
+                    pcbr.extend(self.metadata['PkgConfigBR'])
+                print """
+Proposal (multiple values skipped, please insert them manually):
+PkgConfigBR: 
+    - %s
+PkgBR:
+    - %s
+                    """ %('\n    - '.join(pcbr), '\n    - '.join(br))
+
+        # checking for meego valid groups
+        _check_key_group(self.metadata)
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                _check_key_group(sp)
+
+        # checking for validation of 'Description'
+        if not _check_key_desc(self.metadata):
+            logger.warning('main package has no qualified "Description" tag')
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                if not _check_key_desc(sp):
+                    logger.warning('sub-pkg: %s has no qualified "Description" tag' % sp['Name'])
+
+        # checking for validation of 'LocaleName' and 'LocaleOptions'
+        if not _check_key_localename(self.metadata):
+            self.metadata['LocaleName'] = "%{name}"
+            logger.warning('lost "LocaleName" keyword, use "%{name}" as default')
+
+        # checking for validation of 'NoFiles'
+        if 'NoFiles' in self.metadata:
+            _check_key_nofiles(self.metadata)
+
         # checking duplicate 'Files' items
-        _check_dup_files(self.metadata)
+        if 'Files' in self.metadata:
+            _check_key_files(self.metadata)
 
     def __get_scm_latest_release(self):
 
