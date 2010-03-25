@@ -131,7 +131,7 @@ class SpecParser(object):
         self.replace_macros = replace_macros
         self.macros = []
 
-    def __switch_subpkg(self, subpkg):
+    def __switch_subpkg(self, subpkg, create=False):
 
         # whether '-n subpkg'?
         wholename = False
@@ -143,17 +143,23 @@ class SpecParser(object):
             except IndexError:
                 raise SpecFormatError(subpkg)
 
+        subpkg_new = 'SubPackages' not in self.items or subpkg not in self.items['SubPackages']
 
-        if 'SubPackages' not in self.items:
-            self.items['SubPackages'] = {}
-        if subpkg not in self.items['SubPackages']:
-            self.items['SubPackages'][subpkg] = {}
-        if wholename:
-            self.items['SubPackages'][subpkg]['AsWholeName'] = True
+
+        if subpkg_new and not create:
+            logger.warning('un-declared subpkg %s found in spec' % subpkg)
+            return None
+
+        if subpkg_new:
+            if 'SubPackages' not in self.items:
+                self.items['SubPackages'] = {}
+            if subpkg not in self.items['SubPackages']:
+                self.items['SubPackages'][subpkg] = {}
+            if wholename:
+                self.items['SubPackages'][subpkg]['AsWholeName'] = True
 
         # switch
         self.cur_pkg = subpkg
-
         return self.items['SubPackages'][subpkg]
 
     def _do_package(self, items, pkg, h, v):
@@ -428,7 +434,8 @@ class SpecParser(object):
                     state = ST_MAIN
                     # fall through
                 else:
-                    items[cur_block] += line
+                    if items:
+                        items[cur_block] += line
                     continue
 
             if state == ST_MAIN:
@@ -465,7 +472,7 @@ class SpecParser(object):
                     if header == 'package':
                         if not opt:
                             raise SpecFormatError(line)
-                        items = self.__switch_subpkg(opt)
+                        items = self.__switch_subpkg(opt, True)
                     else:
                         # inline sections of other headers
                         state = ST_INLINE
@@ -476,14 +483,15 @@ class SpecParser(object):
                             # for 'main' package
                             items = self.items
 
-                        cur_block = header
-                        if cur_block not in items:
-                            items[cur_block] = line+'\n'
-                            """
-                            # options in header line as the first line
-                            if ' -' in line:
-                                items[cur_block] = line[line.index(' -'):] + '\n'
-                            """
+                        if items:
+                            cur_block = header
+                            if cur_block not in items:
+                                items[cur_block] = line+'\n'
+                                """
+                                # options in header line as the first line
+                                if ' -' in line:
+                                    items[cur_block] = line[line.index(' -'):] + '\n'
+                                """
 
                 else:
                     # unparsed line
