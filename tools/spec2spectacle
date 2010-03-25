@@ -142,6 +142,8 @@ class SpecParser(object):
                 wholename = True
             except IndexError:
                 raise SpecFormatError(subpkg)
+        else:
+            subpkg = ls[0]
 
         subpkg_new = 'SubPackages' not in self.items or subpkg not in self.items['SubPackages']
 
