@@ -621,12 +621,33 @@ $str_newline.join($extra.content.postun.main)
 #end if
 #end if ## need postun
 
-## Post for SubPackages
+## Pre/Preun/Post/Postun for SubPackages
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
+#######################
+## Pre for SubPackages
+#if $extra.content.has_key("pre") and $extra.content.pre.has_key($sp.Name)
+%pre $sp.Name
+# >> pre $sp.Name
+$str_newline.join($extra.content.pre[$sp.Name])
+# << pre $sp.Name
+#end if
+
+#######################
+## Preun for SubPackages
+#if $extra.content.has_key("preun") and $extra.content.preun.has_key($sp.Name)
+%preun $sp.Name
+# >> preun $sp.Name
+$str_newline.join($extra.content.preun[$sp.Name])
+# << preun $sp.Name
+#end if
+
+#######################
+## Post for SubPackages
+#set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key($sp.Name)
 #set $sub_extra = $extra.subpkgs[$sp.Name]
-#if $sub_extra.Info or $sub_extra.Lib or $sub_extra.Schema
-#set $only_Lib = not ($sub_extra.Info or $sub_extra.Schema)
+#if $sub_extra.Lib or $sub_extra.Info or $sub_extra.Schema or $has_extra_post
+#set $only_Lib = not ($sub_extra.Info or $sub_extra.Schema or $has_extra_post)
 #if $only_Lib
 %post $sp.Name -p /sbin/ldconfig
 #else
@@ -644,19 +665,25 @@ gconftool-2 --makefile-install-rule \
     $schema  > /dev/null || :
 #end for
 #end if
-## -Extra Post Script
-### TODO
 ## -Info
 #if $sub_extra.Info
 #for $inf in $sub_extra.Infos
 %install_info --info-dir=%_infodir $inf
 #end for
 #end if ## Info
+## -Extra Post Script
+#if $has_extra_post
+# >> post $sp.Name
+$str_newline.join($extra.content.post[$sp.Name])
+# << post $sp.Name
+#end if
 #end if ## need post
 
+#######################
 ## PostUn for SubPackages
-#if $sub_extra.Info or $sub_extra.Lib
-#set $only_Lib = not $sub_extra.Info
+#set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key($sp.Name)
+#if  $sub_extra.Lib or $sub_extra.Info or $has_extra_postun
+#set $only_Lib = not ($sub_extra.Info or $has_extra_postun)
 #if $only_Lib
 %postun $sp.Name -p /sbin/ldconfig
 #else
@@ -672,6 +699,12 @@ if [ $1 = 0 ] ;then
 #end for
 fi
 #end if ## Info
+## -Extra Postun Script
+#if $has_extra_postun
+# >> postun $sp.Name
+$str_newline.join($extra.content.postun[$sp.Name])
+# << postun $sp.Name
+#end if
 #end if ## need postun
 #end for ## per subpackage
 #end if ## has subpackages

@@ -93,6 +93,7 @@ STR_KEYS =  ('Name',
              'Group',
              'License',
              'URL',
+             'SCM',
              'BuildArch',
              'ExclusiveArch',
              'SourcePrefix',
@@ -840,10 +841,31 @@ PkgBR:
                 record = False
                 if not recording: continue # empty
 
-                if matchout.group(1) == "files" and not matchout.group(2):
-                    files['main'] = recording
-                elif matchout.group(1) == "files" and matchout.group(2):
-                    files[matchout.group(2)] = recording
+                if matchout.group(1) == "files":
+                    if matchout.group(2):
+                        files[matchout.group(2)] = recording
+                    else:
+                        files['main'] = recording
+                elif matchout.group(1) == "post":
+                    if matchout.group(2):
+                        post[matchout.group(2)] = recording
+                    else:
+                        post['main'] = recording
+                elif matchout.group(1) == "postun":
+                    if matchout.group(2):
+                        postun[matchout.group(2)] = recording
+                    else:
+                        postun['main'] = recording
+                elif matchout.group(1) == "pre":
+                    if matchout.group(2):
+                        pre[matchout.group(2)] = recording
+                    else:
+                        pre['main'] = recording
+                elif matchout.group(1) == "preun":
+                    if matchout.group(2):
+                        preun[matchout.group(2)] = recording
+                    else:
+                        preun['main'] = recording
                 elif matchout.group(1) == "install":
                     install[matchout.group(2)] = recording
                 elif matchout.group(1) == "build":
@@ -852,14 +874,6 @@ PkgBR:
                     macros['main'] = recording
                 elif matchout.group(1) == "setup":
                     setup['main'] = recording
-                elif matchout.group(1) == "post":
-                    post['main'] = recording
-                elif matchout.group(1) == "postun":
-                    postun['main'] = recording
-                elif matchout.group(1) == "pre":
-                    pre['main'] = recording
-                elif matchout.group(1) == "preun":
-                    preun['main'] = recording
                 elif matchout.group(1) == "check" or \
                      matchout.group(1) == "check_scriptlets": #TODO, remove it whenever cleanup
                     check['main'] = recording
@@ -873,20 +887,20 @@ PkgBR:
                  }
 
         if macros:
-           content["macros"] = macros
+            content["macros"] = macros
         if setup:
-           content["setup"] = setup
+            content["setup"] = setup
         if post:
-           content["post"] = post
+            content["post"] = post
         if postun:
-           content["postun"] = postun
+            content["postun"] = postun
         if pre:
-           content["pre"] = pre
+            content["pre"] = pre
         if preun:
-           content["preun"] = preun
+            content["preun"] = preun
 
         if check and 'Check' in self.metadata:
-           content["check"] = check
+            content["check"] = check
 
         # checking whether both 'Files' key and inline files exists
         if files:
