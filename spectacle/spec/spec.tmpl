@@ -8,7 +8,7 @@
 $str_newline.join($extra.content.macros.main)
 #end if
 # << macros
-#if $extra.has_key("HasStatic") and $extra.HasStatic
+#if $extra.HasStatic
 %define keepstatic 1
 #set $cfgstatic = ""
 #else
@@ -128,32 +128,6 @@ Requires(post): $req
 Requires(postun): $req
 #end for
 #end if
-#if $extra.Lib
-Requires(post):  /sbin/ldconfig
-Requires(postun):  /sbin/ldconfig
-#end if
-#if $extra.Icon
-Requires(post):  /bin/touch
-#end if
-#if $extra.Desktop
-Requires(post): desktop-file-utils
-Requires(postun): desktop-file-utils
-#end if
-#if $extra.Info
-Requires(post): /sbin/install-info
-Requires(postun):  /sbin/install-info
-#end if
-#if $extra.Service
-Requires(post):  /sbin/service
-Requires(postun):  /sbin/service
-Requires(post):  /sbin/chkconfig
-Requires(postun):  /sbin/chkconfig
-#end if
-#if $extra.Schema
-Requires(post): GConf2
-Requires(preun): GConf2
-Requires(pre): GConf2
-#end if
 ## BuildRequires
 #if $metadata.has_key("PkgConfigBR")
 #for $br in $metadata.PkgConfigBR
@@ -183,7 +157,6 @@ BuildRequires:  pkgconfig($br_comps[0])
 #end for
 #end if
 #set $br_locale = ""
-#set $br_desktop = True
 #if $metadata.has_key("PkgBR")
 #for $br in $metadata.PkgBR
 ## checking arch namespace prefix
@@ -200,9 +173,6 @@ BuildRequires:  pkgconfig($br_comps[0])
 #if $br == 'intltool' and not $metadata.has_key("LocaleName") and not $metadata.has_key("NoAutoLocale")
 #set $br_locale = $metadata.Name
 #end if
-#if $br == 'desktop-file-utils'
-#set $br_desktop = False
-#end if
 #if $arch
 %ifarch $arch
 #end if
@@ -211,9 +181,6 @@ BuildRequires:  $br
 %endif
 #end if
 #end for
-#end if
-#if $extra.Desktop and $br_desktop
-BuildRequires: desktop-file-utils
 #end if
 #if $metadata.has_key("RunFdupes")
 BuildRequires:  fdupes
@@ -320,27 +287,6 @@ Requires(post): $req
 #for $req in $sp.RequiresPostUn
 Requires(postun): $req
 #end for
-#end if
-#if $sub_extra.Lib
-Requires(post):  /sbin/ldconfig
-Requires(postun):  /sbin/ldconfig
-#end if
-#if $sub_extra.Icon
-Requires(post):  /bin/touch
-#end if
-#if $sub_extra.Desktop
-Requires(post): desktop-file-utils
-Requires(postun): desktop-file-utils
-#end if
-#if $sub_extra.Info
-Requires(post):  /sbin/install-info
-Requires(postun):  /sbin/install-info
-#end if
-#if $sub_extra.Service
-Requires(post):  /sbin/service
-Requires(post):  /sbin/chkconfig
-Requires(postun): /sbin/service
-Requires(postun): /sbin/chkconfig
 #end if
 ## Provides
 #if $sp.has_key("Provides")

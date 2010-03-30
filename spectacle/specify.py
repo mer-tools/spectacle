@@ -659,6 +659,45 @@ PkgBR:
             else:
                 items[bopt] = True
 
+    def _gen_auto_requires(self, metadata, extra, pkg_name = 'main'):
+        auto_requires = {
+                'Lib': {'RequiresPost': ['/sbin/ldconfig'],
+                        'RequiresPostUn': ['/sbin/ldconfig'],
+                       },
+                'Icon': {'RequiresPost': ['/bin/touch'],
+                        },
+                'Desktop': {'RequiresPost': ['desktop-file-utils'],
+                            'RequiresPostUn': ['desktop-file-utils'],
+                            'PkgBR': ['desktop-file-utils'],
+                           },
+                'Info': {'RequiresPost': ['/sbin/install-info'],
+                         'RequiresPostUn': ['/sbin/install-info'],
+                        },
+                'Service': {'RequiresPost': ['/sbin/service', '/sbin/chkconfig'],
+                            'RequiresPostUn': ['/sbin/service', '/sbin/chkconfig'],
+                           },
+                'Schema': {'RequiresPost': ['GConf2'],
+                           'RequiresPreUn': ['GConf2'],
+                           'RequiresPre': ['GConf2'],
+                          },
+        }
+
+        for key,reqs in auto_requires.iteritems():
+            if extra[key]:
+                for req,items in reqs.iteritems():
+                    if req in metadata:
+                        for i in items:
+                            # e.g. GConf2 >= 0.14
+                            yaml_reqs = map(lambda s: s.split()[0], metadata[req])
+                            if i in yaml_reqs:
+                                if i in metadata[req]:
+                                    logger.warning('duplicate item: %s for %s in package %s' % (i,req,pkg_name))
+                                # else do nothing
+                            else:
+                                metadata[req].append(i)
+                    else:
+                        metadata[req] = items
+
     def parse(self):
 
         # customized Resolver for Loader, in PyYAML
@@ -765,7 +804,6 @@ PkgBR:
                 del self.metadata['ConfigOptions']
 
         # check duplicate requires for base package
-        # TODO remove autodep code from tmpl
         if "SubPackages" in self.metadata:
             if 'Epoch' in self.metadata:
                 autodep = "%{name} = %{epoch}:%{version}-%{release}"
@@ -773,7 +811,7 @@ PkgBR:
                 autodep = "%{name} = %{version}-%{release}"
 
             for sp in self.metadata["SubPackages"]:
-                if 'Requires' in sp and autodep in sp['Requires']:
+                if 'Requires' in sp and autodep in sp['Requires'] and 'AutoDepend' in sp:
                     logger.warning('found duplicate Requires for %s in sub-pkg:%s, please remove it' %(autodep, sp['Name']))
                     sp['Requires'].remove(autodep)
                     if not sp['Requires']:
@@ -1033,6 +1071,12 @@ PkgBR:
             self.parse_files(files, docs)
         except KeyError:
             pass
+
+        # adding automatic requires according %files
+        self._gen_auto_requires(self.metadata, self.extra)
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                self._gen_auto_requires(sp, self.extra['subpkgs'][sp['Name']], sp['Name'])
 
         spec_content = str(
                 spec.spec(searchList=[{
