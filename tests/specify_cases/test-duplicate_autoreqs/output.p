@@ -1,5 +1,5 @@
---- output.orig.spec	2010-03-30 19:56:43.000000000 +0800
-+++ output.spec	2010-03-30 19:56:43.000000000 +0800
+--- output.orig.spec	2010-03-30 19:58:04.000000000 +0800
++++ output.spec	2010-03-30 19:58:43.000000000 +0800
 @@ -14,6 +14,8 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz

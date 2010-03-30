@@ -1,12 +1,12 @@
---- output.orig.spec	2010-03-30 18:39:30.000000000 +0800
-+++ output.spec	2010-03-30 18:39:30.000000000 +0800
+--- output.orig.spec	2010-03-30 19:56:35.000000000 +0800
++++ output.spec	2010-03-30 19:56:35.000000000 +0800
 @@ -14,6 +14,9 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
  Source100:  testpkg.yaml
 +Requires(post): desktop-file-utils
 +Requires(postun): desktop-file-utils
-+BuildRequires: desktop-file-utils
++BuildRequires:  desktop-file-utils
  
  %description
  Sample package for spectacle testings, which will be used as
