@@ -123,6 +123,15 @@ RENAMED_KEYS = {'NeedCheckSection': 'Check',
                 'NoLocale': 'NoAutoLocale',
                }
 
+ARCHED_KEYS = ('Requires',
+               'PkgBR',
+               'PkgConfigBR',
+               'Patches',
+               'ConfigOptions',
+              )
+ARCHS = ('ix86', 'arm')
+
+
 class GitAccess():
     def __init__(self, path):
         self.path = path
@@ -199,7 +208,7 @@ class RPMWriter():
 
     def dump(self):
         print yaml.dump(yaml.load(self.stream))
-            
+
     def sanity_check(self):
 
         def _check_empty_keys(metadata):
@@ -261,7 +270,7 @@ class RPMWriter():
                 pc = re.search('pkgconfig\(([^)]+)\)', row[1])
                 m = pc.group(1)
                 if self.packages.has_key(row[0]):
-                    ll = self.packages[row[0]] 
+                    ll = self.packages[row[0]]
                     ll.append(m)
                     self.packages[row[0]] = ll
                 else:
@@ -291,6 +300,22 @@ class RPMWriter():
             if key in metadata and not isinstance(metadata[key], bool):
                 return False
             return True
+
+        def _check_arched_keys(metadata):
+            """ sub-routine for ARCH namespace available keys """
+            def __check_arch(key, item):
+                if ':' in item and '::' not in item:
+                    arch = item.split(':')[0].strip()
+                    if arch not in ARCHS:
+                        logger.warning('unsupport arch namespace: %s in key %s' % (arch, key))
+
+            for key in ARCHED_KEYS:
+                if key in metadata:
+                    if key in STR_KEYS:
+                        __check_arch(key, metadata[key])
+                    elif key in LIST_KEYS:
+                        for item in metadata[key]:
+                            __check_arch(key, item)
 
         def _check_key_localename(metadata):
             """ sub-routine for 'LocaleName' checking """
@@ -404,6 +429,12 @@ class RPMWriter():
                         del sp[key]
 
         ######### checkings for special keys ##########
+        # checking for arch namespace enabled keys
+        _check_arched_keys(self.metadata)
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                _check_arched_keys(sp)
+
         # checking for proposal pkgconfig requires
         if self.metadata.has_key("PkgBR"):
             _check_pkgconfig()
@@ -422,13 +453,13 @@ class RPMWriter():
          in PkgConfigBR instead of %s in PkgBR""" %('\n           - '.join(pl[px]), px))
                 else:
                     br.append(p)
-            
+
             if len(pcbr) > 0:
                 if self.metadata.has_key('PkgConfigBR'):
                     pcbr.extend(self.metadata['PkgConfigBR'])
                 print """
 Proposal (multiple values skipped, please insert them manually):
-PkgConfigBR: 
+PkgConfigBR:
     - %s
 PkgBR:
     - %s
@@ -570,7 +601,7 @@ PkgBR:
                 if member.type == tarfile.DIRTYPE:
                     prefix = member.name.rstrip('/')
                     break
-            
+
             #analyze_path = tempfile.mkdtemp(dir=os.getcwd(), prefix=".spectacle_")
             #tf.extractll(path=analyze_path, members=pc_files(tf))
             for member in tf.getmembers():
