@@ -35,5 +35,9 @@ def error(msg):
 
 def ask(msg):
     print >> sys.stdout, colored('Q:', 'blue'),
-    return raw_input(msg)
+    try:
+        return raw_input(msg)
+    except KeyboardInterrupt:
+        print '\nQuit with ^C pressed.'
+        sys.exit(2)
 
