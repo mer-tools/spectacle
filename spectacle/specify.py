@@ -442,6 +442,11 @@ class RPMWriter():
             br = []
             for p in self.metadata['PkgBR']:
                 px = p.split()[0]
+                for arch in ARCHS:
+                    prefix = arch + ':'
+                    if px.startswith(prefix):
+                        px = px[len(prefix):]
+
                 pl = self.packages
                 if pl.has_key(px):
                     if len(pl[px]) == 1:
