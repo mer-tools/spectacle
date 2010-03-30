@@ -712,7 +712,10 @@ PkgBR:
                         yaml.loader.Loader.yaml_implicit_resolvers.get(ch).remove(tp)
 
         # loading data from YAML
-        self.metadata.update(yaml.load(self.stream))
+        try:
+            self.metadata.update(yaml.load(self.stream))
+        except yaml.scanner.ScannerError, e:
+            logger.error('syntax error found in yaml: %s' % str(e))
 
         # verifying the sanity
         self.sanity_check()
