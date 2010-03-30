@@ -1,5 +1,5 @@
---- output.orig.spec	2010-03-17 21:15:07.000000000 +0800
-+++ output.spec	2010-03-17 21:15:07.000000000 +0800
+--- output.orig.spec	2010-03-30 17:21:05.000000000 +0800
++++ output.spec	2010-03-30 17:21:05.000000000 +0800
 @@ -14,6 +14,8 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
@@ -9,7 +9,7 @@
  
  %description
  Sample package for spectacle testings, which will be used as
-@@ -55,12 +57,19 @@ rm -rf %{buildroot}
+@@ -55,7 +57,13 @@ rm -rf %{buildroot}
  
  
  
@@ -22,6 +22,8 @@
 +fi
  
  
+ 
+@@ -63,6 +71,7 @@ rm -rf %{buildroot}
  
  %files
  %defattr(-,root,root,-)
