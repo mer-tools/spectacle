@@ -58,7 +58,24 @@ Source100:  ${metadata.Name}.yaml
 #if $metadata.has_key("Patches")
 #set $idx = 0
 #for $patch in $metadata.Patches
+## checking arch namespace prefix
+#if $patch.startswith('arm:')
+#set $arch = '%{arm}'
+#set $patch = $patch[4:]
+#else if $patch.startswith('ix86:')
+#set $arch = '%{ix86}'
+#set $patch = $patch[5:]
+#else
+#set $arch = ""
+#end if
+## end of checking
+#if $arch
+%ifarch $arch
+#end if
 Patch${idx}:     $patch
+#if $arch
+%endif
+#end if
 #set $idx = $idx + 1
 #end for
 #end if
@@ -366,11 +383,28 @@ Description: %{summary}
 #if $metadata.has_key("Patches")
 #set $idx = 0
 #for $patch in $metadata.Patches
+## checking arch namespace prefix
+#if $patch.startswith('arm:')
+#set $arch = '%{arm}'
+#set $patch = $patch[4:]
+#else if $patch.startswith('ix86:')
+#set $arch = '%{ix86}'
+#set $patch = $patch[5:]
+#else
+#set $arch = ""
+#end if
+## end of checking
+#if $arch
+%ifarch $arch
+#end if
 $metadata.PatchCmts[$idx]
 #if 'PatchOpts' in $metadata
 %patch${idx} $metadata.PatchOpts[$idx]
 #else
 %patch${idx} -p1
+#end if
+#if $arch
+%endif
 #end if
 #set $idx = $idx + 1
 #end for
