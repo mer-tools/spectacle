@@ -624,10 +624,15 @@ $str_newline.join($extra.content.postun.main)
 ## Pre/Preun/Post/Postun for SubPackages
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
+#if $sp.has_key("AsWholeName")
+#set $pkg_name = "-n " + $sp.Name
+#else
+#set $pkg_name = $sp.Name
+#end if
 #######################
 ## Pre for SubPackages
 #if $extra.content.has_key("pre") and $extra.content.pre.has_key($sp.Name)
-%pre $sp.Name
+%pre $pkg_name
 # >> pre $sp.Name
 $str_newline.join($extra.content.pre[$sp.Name])
 # << pre $sp.Name
@@ -636,7 +641,7 @@ $str_newline.join($extra.content.pre[$sp.Name])
 #######################
 ## Preun for SubPackages
 #if $extra.content.has_key("preun") and $extra.content.preun.has_key($sp.Name)
-%preun $sp.Name
+%preun $pkg_name
 # >> preun $sp.Name
 $str_newline.join($extra.content.preun[$sp.Name])
 # << preun $sp.Name
@@ -649,9 +654,9 @@ $str_newline.join($extra.content.preun[$sp.Name])
 #if $sub_extra.Lib or $sub_extra.Info or $sub_extra.Schema or $has_extra_post
 #set $only_Lib = not ($sub_extra.Info or $sub_extra.Schema or $has_extra_post)
 #if $only_Lib
-%post $sp.Name -p /sbin/ldconfig
+%post $pkg_name -p /sbin/ldconfig
 #else
-%post $sp.Name
+%post $pkg_name
 #end if
 ## -Lib
 #if $sub_extra.Lib and not $only_Lib
@@ -685,9 +690,9 @@ $str_newline.join($extra.content.post[$sp.Name])
 #if  $sub_extra.Lib or $sub_extra.Info or $has_extra_postun
 #set $only_Lib = not ($sub_extra.Info or $has_extra_postun)
 #if $only_Lib
-%postun $sp.Name -p /sbin/ldconfig
+%postun $pkg_name -p /sbin/ldconfig
 #else
-%postun $sp.Name
+%postun $pkg_name
 #end if
 #if $sub_extra.Lib and not $only_Lib
 /sbin/ldconfig
@@ -751,6 +756,7 @@ $str_newline.join($extra.content.files[$sp])
 #end for
 #end if
 
+## files for subpkgs
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
 #if $sp.has_key("AsWholeName")
