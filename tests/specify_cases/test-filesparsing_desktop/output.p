@@ -1,14 +1,16 @@
---- output.orig.spec	2010-03-17 21:15:07.000000000 +0800
-+++ output.spec	2010-03-17 21:15:07.000000000 +0800
-@@ -14,6 +14,7 @@ License:    BSD
+--- output.orig.spec	2010-03-30 18:39:30.000000000 +0800
++++ output.spec	2010-03-30 18:39:30.000000000 +0800
+@@ -14,6 +14,9 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
  Source100:  testpkg.yaml
++Requires(post): desktop-file-utils
++Requires(postun): desktop-file-utils
 +BuildRequires: desktop-file-utils
  
  %description
  Sample package for spectacle testings, which will be used as
-@@ -52,6 +53,9 @@ rm -rf %{buildroot}
+@@ -52,10 +55,17 @@ rm -rf %{buildroot}
  
  # >> install post
  # << install post
@@ -18,7 +20,15 @@
  
  
  
-@@ -61,6 +65,7 @@ rm -rf %{buildroot}
++%post
++update-desktop-database %{_datadir}/applications &> /dev/null || :
+ 
++%postun
++update-desktop-database %{_datadir}/applications &> /dev/null || :
+ 
+ 
+ 
+@@ -63,6 +73,7 @@ rm -rf %{buildroot}
  
  %files
  %defattr(-,root,root,-)
