@@ -128,14 +128,18 @@ Requires(post): $req
 Requires(postun): $req
 #end for
 #end if
-#if $extra.has_key("Lib") and $extra.Lib
+#if $extra.Lib
 Requires(post):  /sbin/ldconfig
 Requires(postun):  /sbin/ldconfig
 #end if
-#if $extra.has_key("Icon") and $extra.Icon
+#if $extra.Icon
 Requires(post):  /bin/touch
 #end if
-#if $extra.has_key("Info") and $extra.Info
+#if $extra.Desktop
+Requires(post): desktop-file-utils
+Requires(postun): desktop-file-utils
+#end if
+#if $extra.Info
 Requires(post): /sbin/install-info
 Requires(postun):  /sbin/install-info
 #end if
@@ -317,14 +321,18 @@ Requires(post): $req
 Requires(postun): $req
 #end for
 #end if
-#if $sub_extra.has_key("Lib") and $sub_extra.Lib
+#if $sub_extra.Lib
 Requires(post):  /sbin/ldconfig
 Requires(postun):  /sbin/ldconfig
 #end if
-#if $sub_extra.has_key("Icon") and $sub_extra.Icon
+#if $sub_extra.Icon
 Requires(post):  /bin/touch
 #end if
-#if $sub_extra.has_key("Info") and $sub_extra.Info
+#if $sub_extra.Desktop
+Requires(post): desktop-file-utils
+Requires(postun): desktop-file-utils
+#end if
+#if $sub_extra.Info
 Requires(post):  /sbin/install-info
 Requires(postun):  /sbin/install-info
 #end if
@@ -641,8 +649,8 @@ $str_newline.join($extra.content.preun.main)
 
 ############################ Post
 #set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key("main")
-#if $extra.Lib or $extra.Info or $extra.Schema or $extra.Icon or $has_extra_post
-#set $only_Lib = not ($extra.Info or $extra.Schema or $extra.Icon or $has_extra_post)
+#if $extra.Lib or $extra.Info or $extra.Schema or $extra.Icon or $extra.Desktop or $has_extra_post
+#set $only_Lib = not ($extra.Info or $extra.Schema or $extra.Icon or $extra.Desktop or $has_extra_post)
 #if $only_Lib
 %post -p /sbin/ldconfig
 #else
@@ -672,6 +680,10 @@ gconftool-2 --makefile-install-rule \
 %{_bindir}/gtk-update-icon-cache \
   --quiet %{_datadir}/icons/hicolor 2> /dev/null|| :
 #end if
+## -Desktop
+#if $extra.Desktop
+update-desktop-database %{_datadir}/applications &> /dev/null || :
+#end if
 ## -Extra Post Script
 #if $has_extra_post
 # >> post
@@ -682,8 +694,8 @@ $str_newline.join($extra.content.post.main)
 
 ############################ PostUn
 #set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key("main")
-#if $extra.Lib or $extra.Info or $extra.Icon or $has_extra_postun
-#set $only_Lib = not ($extra.Info or $extra.Icon or $has_extra_postun)
+#if $extra.Lib or $extra.Info or $extra.Icon or $extra.Desktop or $has_extra_postun
+#set $only_Lib = not ($extra.Info or $extra.Icon or $extra.Desktop or $has_extra_postun)
 #if $only_Lib
 %postun -p /sbin/ldconfig
 #else
@@ -705,6 +717,10 @@ fi
 /bin/touch --no-create %{_datadir}/icons/hicolor || :
 %{_bindir}/gtk-update-icon-cache \
   --quiet %{_datadir}/icons/hicolor 2> /dev/null|| :
+#end if
+## -Desktop
+#if $extra.Desktop
+update-desktop-database %{_datadir}/applications &> /dev/null || :
 #end if
 ## -Extra Postun Script
 #if $has_extra_postun
@@ -744,8 +760,8 @@ $str_newline.join($extra.content.preun[$sp.Name])
 ## Post for SubPackages
 #set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key($sp.Name)
 #set $sub_extra = $extra.subpkgs[$sp.Name]
-#if $sub_extra.Lib or $sub_extra.Info or $sub_extra.Schema or $has_extra_post
-#set $only_Lib = not ($sub_extra.Info or $sub_extra.Schema or $has_extra_post)
+#if $sub_extra.Lib or $sub_extra.Info or $sub_extra.Schema or $sub_extra.Desktop or $has_extra_post
+#set $only_Lib = not ($sub_extra.Info or $sub_extra.Schema or $sub_extra.Desktop or $has_extra_post)
 #if $only_Lib
 %post $pkg_name -p /sbin/ldconfig
 #else
@@ -769,6 +785,10 @@ gconftool-2 --makefile-install-rule \
 %install_info --info-dir=%_infodir $inf
 #end for
 #end if ## Info
+## -Desktop
+#if $sub_extra.Desktop
+update-desktop-database %{_datadir}/applications &> /dev/null || :
+#end if
 ## -Extra Post Script
 #if $has_extra_post
 # >> post $sp.Name
@@ -780,8 +800,8 @@ $str_newline.join($extra.content.post[$sp.Name])
 #######################
 ## PostUn for SubPackages
 #set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key($sp.Name)
-#if  $sub_extra.Lib or $sub_extra.Info or $has_extra_postun
-#set $only_Lib = not ($sub_extra.Info or $has_extra_postun)
+#if  $sub_extra.Lib or $sub_extra.Info or $sub_extra.Desktop or $has_extra_postun
+#set $only_Lib = not ($sub_extra.Info or $sub_extra.Desktop or $has_extra_postun)
 #if $only_Lib
 %postun $pkg_name -p /sbin/ldconfig
 #else
@@ -797,6 +817,10 @@ if [ $1 = 0 ] ;then
 #end for
 fi
 #end if ## Info
+## -Desktop
+#if $sub_extra.Desktop
+update-desktop-database %{_datadir}/applications &> /dev/null || :
+#end if
 ## -Extra Postun Script
 #if $has_extra_postun
 # >> postun $sp.Name
