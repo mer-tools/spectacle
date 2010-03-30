@@ -71,7 +71,24 @@ Requires:   perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo \$version)
 #end if
 #if $metadata.has_key("Requires")
 #for $req in $metadata.Requires
+## checking arch namespace prefix
+#if $req.startswith('arm:')
+#set $arch = '%{arm}'
+#set $req = $req[4:]
+#else if $req.startswith('ix86:')
+#set $arch = '%{ix86}'
+#set $req = $req[5:]
+#else
+#set $arch = ""
+#end if
+## end of checking
+#if $arch
+%ifarch $arch
+#end if
 Requires:   $req
+#if $arch
+%endif
+#end if
 #end for
 #end if
 #if $metadata.has_key("RequiresPre")
@@ -243,7 +260,24 @@ Requires:   %{name} = $auto_depend
 #end if
 #if $sp.has_key("Requires")
 #for $req in $sp.Requires
+## checking arch namespace prefix
+#if $req.startswith('arm:')
+#set $arch = '%{arm}'
+#set $req = $req[4:]
+#else if $req.startswith('ix86:')
+#set $arch = '%{ix86}'
+#set $req = $req[5:]
+#else
+#set $arch = ""
+#end if
+## end of checking
+#if $arch
+%ifarch $arch
+#end if
 Requires:   $req
+#if $arch
+%endif
+#end if
 #end for
 #end if
 #if $sp.has_key("RequiresPre")
