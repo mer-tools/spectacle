@@ -38,6 +38,6 @@ def ask(msg):
     try:
         return raw_input(msg)
     except KeyboardInterrupt:
-        print '\nQuit with ^C pressed.'
+        print
         sys.exit(2)
 

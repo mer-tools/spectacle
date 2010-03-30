@@ -137,17 +137,22 @@ class GitAccess():
         self.path = path
 
     def _gettags(self):
-          tags = {}
-          fh = os.popen('git ls-remote --tags "%s" 2>/dev/null' % self.path)
-          prefix = 'refs/tags/'
-          for line in fh:
-              line = line.strip()
-              node, tag = line.split(None, 1)
-              if not tag.startswith(prefix):
-                  continue
-              tagx = tag[len(prefix):len(tag)]
-              tags[tagx] = node
-          return tags
+        tags = {}
+        try:
+            fh = os.popen('git ls-remote --tags "%s" 2>/dev/null' % self.path)
+
+            prefix = 'refs/tags/'
+            for line in fh:
+                line = line.strip()
+                node, tag = line.split(None, 1)
+                if not tag.startswith(prefix):
+                    continue
+                tagx = tag[len(prefix):len(tag)]
+                tags[tagx] = node
+        except KeyboardInterrupt:
+            sys.exit(2)
+
+        return tags
 
     def get_toptag(self):
         vers = [_V.LooseVersion(tag) for tag in self._gettags()]
@@ -179,7 +184,7 @@ class RPMWriter():
                         'Infos': [],
                     }
 
-    def __init__(self, yaml_fpath, spec_fpath=None, clean_old=False, download_new=True):
+    def __init__(self, yaml_fpath, spec_fpath=None, clean_old=False, download_new=True, skip_scm=False):
         self.yaml_fpath = yaml_fpath
         now = datetime.datetime.now()
         self.metadata = {'MyVersion': __version__.VERSION, 'Date': now.strftime("%Y-%m-%d")}
@@ -191,6 +196,7 @@ class RPMWriter():
 
         self.clean_old = clean_old
         self.download_new = download_new
+        self.skip_scm = skip_scm
 
         # initialize extra info for spec
         self.extra = { 'subpkgs': {}, 'content': {} }
@@ -516,32 +522,35 @@ PkgBR:
         scm = GitAccess(scm_url)
         logger.info("Getting tags from SCM...")
         top = scm.get_toptag()
-        if top and top != self.version:
-            logger.warning('Version in YAML shoud be updated according SCM tags')
-            self.version = top
-            self.metadata['Version'] = self.version
+        if not top or top == self.version:
+            # no need to fetch from SCM
+            return
 
-            pwd = os.getcwd()
-            if os.path.exists("%s/%s-%s.tar.%s" %(pwd, self.pkg, self.version, appendix )):
-                logger.info("Archive already exists, will not creating a new one")
-            else:
-                logger.info("Creating archive %s/%s-%s.tar.%s ..." % (pwd, self.pkg, self.version, appendix))
-                tmp = tempfile.mkdtemp()
-                os.chdir(tmp)
-                os.system('git clone %s' % scm_url)
-                os.chdir( "%s/%s" %(tmp, self.pkg))
-                os.system(' git archive --format=tar --prefix=%s-%s/ %s | %s  > %s/%s-%s.tar.%s' \
-                        % (self.pkg,
-                           self.version,
-                           self.version,
-                           archive,
-                           pwd,
-                           self.pkg,
-                           self.version,
-                           appendix ))
-                shutil.rmtree(tmp)
+        logger.warning('Version in YAML shoud be updated according SCM tags')
+        self.version = top
+        self.metadata['Version'] = self.version
 
-            os.chdir(pwd)
+        pwd = os.getcwd()
+        if os.path.exists("%s/%s-%s.tar.%s" %(pwd, self.pkg, self.version, appendix )):
+            logger.info("Archive already exists, will not creating a new one")
+        else:
+            logger.info("Creating archive %s/%s-%s.tar.%s ..." % (pwd, self.pkg, self.version, appendix))
+            tmp = tempfile.mkdtemp()
+            os.chdir(tmp)
+            os.system('git clone %s' % scm_url)
+            os.chdir( "%s/%s" %(tmp, self.pkg))
+            os.system(' git archive --format=tar --prefix=%s-%s/ %s | %s  > %s/%s-%s.tar.%s' \
+                    % (self.pkg,
+                       self.version,
+                       self.version,
+                       archive,
+                       pwd,
+                       self.pkg,
+                       self.version,
+                       appendix ))
+            shutil.rmtree(tmp)
+
+        os.chdir(pwd)
 
     def __download_sources(self):
         pkg = self.pkg
@@ -573,7 +582,6 @@ PkgBR:
                     for ext in ('.md5', '.gpg', '.sig', '.sha1sum'):
                         urllib.urlretrieve(target + ext, f_name + ext)
                     """
-
 
     def analyze_source(self):
         tarball = None
@@ -753,9 +761,10 @@ PkgBR:
             self.metadata['ExtraInstall'] = extra_install
 
         if self.download_new:
-            # update to SCM latest release
-            if "SCM" in self.metadata:
-                self.__get_scm_latest_release()
+            if not self.skip_scm:
+                # update to SCM latest release
+                if "SCM" in self.metadata:
+                    self.__get_scm_latest_release()
 
             # if no srcpkg with yaml.version exists in cwd, trying to download
             self.__download_sources()
@@ -1091,8 +1100,8 @@ PkgBR:
         file.write(spec_content)
         file.close()
 
-def generate_rpm(yaml_fpath, clean_old = False, extra_content = None, spec_fpath=None, download_new=True):
-    rpm_writer = RPMWriter(yaml_fpath, spec_fpath, clean_old, download_new)
+def generate_rpm(yaml_fpath, clean_old = False, extra_content = None, spec_fpath=None, download_new=True, skip_scm=False):
+    rpm_writer = RPMWriter(yaml_fpath, spec_fpath, clean_old, download_new, skip_scm)
     rpm_writer.parse()
     rpm_writer.process(extra_content)
 
