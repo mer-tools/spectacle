@@ -45,8 +45,12 @@ Several methods available for spectacle installation:
     Usage: specify [options] [yaml-path]
 
     Options:
-      --version   show program's version number and exit
-      -h, --help  show this help message and exit
+      --version             show program's version number and exit
+      -h, --help            show this help message and exit
+      -o OUTFILE_PATH, --output=OUTFILE_PATH
+                            Path of output spec file
+      -s, --skip-scm        Skip to check upstream SCM when specified in YAML
+      -N, --not-download    Do not try to download newer source files
 
 ### ini2spectacle
     Usage: ini2spectacle [options] [ini-path]
@@ -197,6 +201,32 @@ directives for sub packages:
 **Then these string values need to be quoted by ``'``(single-quote) or ``"``
 (double-quote), and the choice of quote char should not conflict with the value
 string self.**
+
+## Namespace support for multi-architecture in several keywords
+For the following YAML keywords:
+
+* Requires
+* PkgBR
+* PkgConfigBR
+* Patches
+* ConfigOptions
+
+If one of the items need to be architecture specified, we can add arch prefix to
+it. The supported prefix and the corresponding architectures as the followings:
+
+* ``ix86:`` -   x86 platform
+* ``arm:``  -   arm platform
+
+Here's some samples:
+
+    Requires:
+        - arm:pkg-need-in-arm-image
+        - ix86:pkg-need-in-x86-image
+        - normal-pkg
+    ConfigOptions:
+        - arm:--arm-specific-opt
+        - ix86:--ix86-specific-opt
+        - --common-opt
 
 ## Customizations in spec
 Generated spec files by specify will have many placeholders for customizations,
