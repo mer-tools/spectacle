@@ -348,6 +348,16 @@ class RPMWriter():
                     del metadata[key]
                     logger.warning('Renamed key: %s found, please use %s instead' % (key, RENAMED_KEYS[key]))
 
+        def _check_key_setups(metadata):
+            if 'NoSetup' in metadata:
+                if 'SetupOptions' in metadata:
+                    logger.warning('"SetupOptions" will have NO effect when "NoSetup" specified in YAML')
+                if 'SourcePrefix' in metadata:
+                    logger.warning('"SourcePrefix" will have NO effect when "NoSetup" specified in YAML')
+            else:
+                if 'SetupOptions' in metadata and 'SourcePrefix' in metadata:
+                    logger.warning('"SourcePrefix" will have NO effect when "SetupOptions" specified in YAML')
+
         def _check_key_nofiles(metadata):
             if 'Files' in metadata:
                 logger.error('both "NoFiles" and "Files" exists in YAML, please correct it')
@@ -494,6 +504,9 @@ PkgBR:
         if not _check_key_localename(self.metadata):
             self.metadata['LocaleName'] = "%{name}"
             logger.warning('lost "LocaleName" keyword, use "%{name}" as default')
+
+        # checking for validation of 'NoSetup', 'SetupOptions' and 'SourcePrefix'
+        _check_key_setups(self.metadata)
 
         # checking for validation of 'NoFiles'
         if 'NoFiles' in self.metadata:

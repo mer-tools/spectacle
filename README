@@ -114,7 +114,7 @@ All available directives for spectacle are listed as the following:
 
 * ExtraSources: **list** of **string**, *optional*
 
-* SetupOptions: **string**, *optional*
+* SetupOptions: **string**, *optional*, the options string for %setup
 
 * ExtraInstall: **string**, *optional*
 

@@ -495,7 +495,7 @@ class SpecParser(object):
 
                 else:
                     # unparsed line
-                    known_skips = ('python_sitelib', 'python_sitedir')
+                    known_skips = ('python_sitelib', 'python_sitearch')
                     msg = True
                     for skip in known_skips:
                         if skip in line:
