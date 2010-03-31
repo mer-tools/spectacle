@@ -332,7 +332,7 @@ Description: %{summary}
 %setup -q -n $metadata.SourcePrefix
 #end if
 
-#end if
+#end if ## has Sources
 ## Applying patches
 #if $metadata.has_key("Patches")
 #set $idx = 0

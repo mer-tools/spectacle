@@ -169,8 +169,7 @@ class SpecParser(object):
         pass
 
     def _do_prep(self, items, pkg, h, v):
-        # skip
-        pass
+        logger.info('the following is the content of PREP in original spec, please compare them with the generated carefully: \n%s' % v)
 
     def _do_build(self, items, pkg, h, v):
         """ to handle build script:
@@ -185,7 +184,7 @@ class SpecParser(object):
             items['extra']['PostMakeExtras'] = lines
 
         ### Sub START
-        lines = v.split('\n')
+        lines = v.splitlines()
         if lines[0].startswith('-'):
             lines.pop(0)
 
@@ -288,7 +287,7 @@ class SpecParser(object):
             trying to find out the most of the generic cases
         """
 
-        lines = v.split('\n')
+        lines = v.splitlines()
         if lines[0].startswith('-'):
             lines.pop(0)
 
@@ -383,11 +382,10 @@ class SpecParser(object):
         self.__do_extra_scripts(items, h, v)
 
     def _do_changelog(self, items, pkg, h, v):
-        # TODO, do it automatically
         logger.warning('Please move changelog in %changelog to *.changes file.')
 
     def _do_files(self, items, pkg, h, v):
-        files = map(str.strip, v.strip().split('\n'))
+        files = map(str.strip, v.strip().splitlines())
 
         # skip option line
         if files[0].startswith('-'):
@@ -497,7 +495,15 @@ class SpecParser(object):
 
                 else:
                     # unparsed line
-                    logger.warning('un-parsed spec line skipped: %s' % line)
+                    known_skips = ('python_sitelib', 'python_sitedir')
+                    msg = True
+                    for skip in known_skips:
+                        if skip in line:
+                            msg = False
+                            break
+
+                    if msg:
+                        logger.warning('un-parsed spec line skipped: %s' % line)
 
     def cooked_items(self):
         """ return all items, cooked to the input of convertor """
