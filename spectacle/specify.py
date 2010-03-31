@@ -310,7 +310,7 @@ class RPMWriter():
         def _check_arched_keys(metadata):
             """ sub-routine for ARCH namespace available keys """
             def __check_arch(key, item):
-                if ':' in item and '::' not in item:
+                if re.match('^\w+:[^:]+', item):
                     arch = item.split(':')[0].strip()
                     if arch not in ARCHS:
                         logger.warning('unsupport arch namespace: %s in key %s' % (arch, key))
