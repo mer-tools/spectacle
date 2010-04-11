@@ -82,6 +82,7 @@ LIST_KEYS = ('Sources',
              'AutoSubPackages',
              'Files',
              'Documents',
+             'RpmLintIgnore'
              )
 
 STR_KEYS =  ('Name',
@@ -749,6 +750,18 @@ PkgBR:
         if not self.specfile:
             self.specfile = "%s.spec" % self.pkg
         self.newspec = True
+
+
+        if "RpmLintIgnore" in self.metadata:
+            rpmlintrc = "%s-rpmlintrc" %self.metadata['Name']
+            rpmlint = "from Config import *\n"
+            for lint in self.metadata['RpmLintIgnore']:
+                rpmlint = rpmlint + "addFilter(\"%s\")\n" %lint
+            
+            file = open(rpmlintrc, "w")
+            file.write(rpmlint)
+            file.close()
+            
 
         # handling 'ExtraSources', extra separated files which need to be install
         # specific paths

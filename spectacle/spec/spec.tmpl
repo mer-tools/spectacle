@@ -54,6 +54,9 @@ Source${idx}:    $source
 #end for
 #end if
 Source100:  ${metadata.Name}.yaml
+#if $metadata.has_key("RpmLintIgnore")
+Source101:  ${metadata.Name}-rpmlintrc
+#end if
 ## Patches
 #if $metadata.has_key("Patches")
 #set $idx = 0
