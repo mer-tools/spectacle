@@ -1,7 +1,7 @@
 # Spectacle Tutorial
 
 ## Introduction
-Spectacle is the toolset for packaging maintenance of Moblin, including the tool
+Spectacle is the toolset for packaging maintenance of MeeGo, including the tool
 to generate spec files from metadata file in YAML format, and tools to convert
 spec files or spec-builder's ini files to YAML format.
 
@@ -21,9 +21,9 @@ Several methods available for spectacle installation:
 
 * rpm/deb packages for several supported Linux distributions
 
-    From [M2 Repos](http://repo.mobile-central.org/repositories/Tools:/Building/), repo urls can be found for:
+    From [MeeGo Repos](http://repo.meego.com/tools/repo/), repo urls can be found for:
 
-    * Moblin
+    * MeeGo
     * Fedora 10,11,12
     * openSUSE(s)
     * xUbuntu 8.10/9.04/9.10
@@ -32,7 +32,7 @@ Several methods available for spectacle installation:
 * Download the latest source package, and install it by ``make install``
 
     The latest code in git tree can be accessed at:
-    [git tree](ssh://git@git.moblin.org/spectacle.git)
+    [git tree](git://gitorious.org/meego-developer-tools/spectacle.git)
 
 ### Requirements
 * python 2.x, above 2.5
@@ -163,7 +163,7 @@ All available directives for spectacle are listed as the following:
 
 * Check: **boolean**, whether need ``%check`` section in spec
 
-* SupportOtherDistros: **boolean**, whether need to check for other distros (besides Moblin)
+* SupportOtherDistros: **boolean**, whether need to check for other distros (besides MeeGo)
 
 * UseAsNeeded: **boolean**, whether export LD_AS_NEEDED=1 env when building
 
@@ -192,7 +192,7 @@ directives for sub packages:
     * FilesInput, *optional*
     * etc.
 
-**CAUTION**: The following cases of value string have special meaning in YAML:
+**CAUTION**: The following cases of value string have special meaning in YAML syntax:
 
 * string with leading **``%``** charactor
 * string with leading **``*``** charactor
@@ -203,7 +203,7 @@ directives for sub packages:
 string self.**
 
 ## Namespace support for multi-architecture in several keywords
-For the following YAML keywords:
+For the following spectacle YAML keywords:
 
 * Requires
 * PkgBR
@@ -237,7 +237,7 @@ such as:
 
 You can add any custom code between the markers, next time when you run
 ``specify``, the text between the markers will be kept as is, all other sections
-relying on the meta data from the yaml file will be changed depending on the
+relying on the meta data from the YAML file will be changed depending on the
 values in the YAML file.
 
 The following placeholders in spec can be customized:
@@ -342,11 +342,11 @@ you need customized %postun scripts, it need be added manually, and only once.
 
 ## Internal Implementation
 Spectacle uses cheetah templates to generate the spec file, based the metadata
-from yaml file. But the end users need not tackle it.
+from YAML file. But the end users need not tackle it.
 
-## Tips * If to upgrade the pkg to a newer version, you can just edit the version str
-  in yaml, and when you run ``specify``, it will download the needed files for
-  you automatically.
+## Tips * If to upgrade the pkg to a newer version, you can just edit the
+  version string in spectacle YAML file, and when you run ``specify``, it
+  will download the needed files for you automatically.
 
 * In most original spec-builder packages, *LocaleName* will be specified in
   spite whether they need it. After converted to spectacle, we will check it
