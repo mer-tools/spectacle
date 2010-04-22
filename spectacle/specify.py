@@ -26,7 +26,6 @@ import datetime
 import csv
 import tarfile
 
-
 # third-party modules
 import yaml
 
@@ -58,6 +57,7 @@ BOOLNO_KEYS = ('Check',
                'NoAutoLocale',
                'AsWholeName',
                'NoFiles',
+               'NoDesktop',
               )
 # boolean keys with the default 'True' value
 BOOLYES_KEYS = ('UseAsNeeded',
@@ -883,7 +883,8 @@ PkgBR:
                     pkg_extra['Info'] = True
                 if re.match('.*(usr/share|%{_datadir}).*\.desktop$', l) or \
                    re.match('.*(usr/share|%{_datadir})/applications/.*', l):
-                    pkg_extra['Desktop'] = True
+                    if 'NoDesktop' not in self.metadata:
+                        pkg_extra['Desktop'] = True
                 if re.match('.*\.a$', l):
                     pkg_extra['Static'] = True
                 if re.match('.*etc/rc.d/init.d.*', l) or re.match('.*etc/init.d.*', l):

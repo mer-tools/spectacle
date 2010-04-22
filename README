@@ -175,6 +175,8 @@ All available directives for spectacle are listed as the following:
 
 * NoAutoLocale: **boolean**, whether to use ``%find_lang`` to search locale data when found 'inittool' in PkgBR
 
+* NoDesktop: **boolean**, whether to install the desktop files in package
+
 * AutoDepend: **boolean**, for subpackages only, whether to add Require to main package automatically
 
 * AsWholeName: **boolean**, for subpackages only, whether to use **Name** as the whole package name
