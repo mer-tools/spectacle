@@ -514,7 +514,7 @@ $str_newline.join($extra.content.install.post)
 #if $extra.Desktop
 desktop-file-install --delete-original       \
   --dir %{buildroot}%{_datadir}/applications             \
-   %{buildroot}%{_datadir}/applications/*
+   %{buildroot}%{_datadir}/applications/*.desktop
 #end if
 #if $metadata.has_key("LocaleName")
 #if $metadata.has_key("LocaleOptions")
