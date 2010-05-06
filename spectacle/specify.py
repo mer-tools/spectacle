@@ -599,6 +599,15 @@ PkgBR:
                     """
 
     def analyze_source(self):
+        def pc_files(members):
+            for tarinfo in members:
+                f = os.path.split(tarinfo.name)[1]
+                xx = f.split(".pc.")
+                if len(xx) > 1 and xx[1] == "in":
+                    extractfile
+                    buf = tarinfo.tobuf()
+                    #print buf
+
         tarball = None
         for uri in self.metadata['Sources']:
             fpath = os.path.basename(uri)
@@ -612,15 +621,6 @@ PkgBR:
                 except:
                     logger.warning('Corrupt tarball %s found!' % fpath)
                     pass
-
-        def pc_files(members):
-            for tarinfo in members:
-                f = os.path.split(tarinfo.name)[1]
-                xx = f.split(".pc.")
-                if len(xx) > 1 and xx[1] == "in":
-                    extractfile
-                    buf = tarinfo.tobuf()
-                    #print buf
 
         prefix = None
         if tarball:
@@ -749,7 +749,8 @@ PkgBR:
         try:
             self.release = self.metadata['Release']
         except KeyError:
-            self.release = '1'
+            logger.warning('"Release" not specified, use "1" as the default value')
+            self.release = self.metadata['Release'] = '1'
 
         if not self.specfile:
             self.specfile = "%s.spec" % self.pkg
@@ -770,6 +771,11 @@ PkgBR:
         # handling 'ExtraSources', extra separated files which need to be install
         # specific paths
         if "ExtraSources" in self.metadata:
+
+            # confirm 'Sources' valid
+            if 'Sources' not in self.metadata:
+                self.metadata['Sources'] = []
+
             extra_srcs = []
             extra_install = ''
             count = len(self.metadata['Sources'])
@@ -797,7 +803,8 @@ PkgBR:
                     self.__get_scm_latest_release()
 
             # if no srcpkg with yaml.version exists in cwd, trying to download
-            self.__download_sources()
+            if 'Sources' in self.metadata:
+                self.__download_sources()
 
         # handle patches with extra options
         if "Patches" in self.metadata:
@@ -829,7 +836,8 @@ PkgBR:
                 self.__parse_series(self.metadata['Patches'],
                                     self.metadata['PatchCmts'])
 
-        self.analyze_source()
+        if 'Sources' in self.metadata:
+            self.analyze_source()
 
         # clean up all boolean type keys, use the exists status to present bool value
         self.__cleanup_boolkeys(self.metadata)
