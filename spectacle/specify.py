@@ -95,6 +95,7 @@ STR_KEYS =  ('Name',
              'License',
              'URL',
              'SCM',
+             'Archive',
              'BuildArch',
              'ExclusiveArch',
              'SourcePrefix',
@@ -745,7 +746,10 @@ PkgBR:
         # for convenience
         self.pkg = self.metadata['Name']
         self.version = self.metadata['Version']
-        self.release = self.metadata['Release']
+        try:
+            self.release = self.metadata['Release']
+        except KeyError:
+            self.release = '1'
 
         if not self.specfile:
             self.specfile = "%s.spec" % self.pkg
