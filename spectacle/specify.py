@@ -888,7 +888,7 @@ PkgBR:
                 pkg_extra = self.extra['subpkgs'][pkg_name]
 
             for l in v:
-                if re.match('.*\.info\..*', l) or re.match('.*(usr/share/info|%{_infodir}).*info.gz$', l):
+                if re.match('.*\.info\..*', l) or re.match('.*(usr/share/info|%{_infodir}).*info\..*$', l):
                     p1 = re.compile('^%doc\s+(.*)')
                     l1 = p1.sub(r'\1', l)
                     pkg_extra['Infos'].append(l1)
