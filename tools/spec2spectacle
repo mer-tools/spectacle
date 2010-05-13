@@ -404,7 +404,7 @@ class SpecParser(object):
 
         comment = re.compile('^#.*')
         directive = re.compile('^([\w()]+):[ \t]*(.*)')
-        define_re = re.compile('^%define\s+(\w+)\s+(.*)')
+        define_re = re.compile('^%(define|global)\s+(\w+)\s+(.*)')
         header_re = re.compile('^%(' + '|'.join(HEADERS) + ')\s*(.*)')
 
         state = ST_DEFINE
@@ -420,7 +420,7 @@ class SpecParser(object):
                 m = define_re.match(line)
                 if m:
                     if self.replace_macros:
-                        self.table[m.group(1)] = m.group(2)
+                        self.table[m.group(2)] = m.group(3)
                     else:
                         self.macros.append(line)
 
