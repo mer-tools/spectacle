@@ -209,6 +209,10 @@ Conflicts:   $cfl
 Obsoletes:   $obs
 #end for
 #end if
+#if 'SupportOtherDistros' in $metadata
+BuildRoot:  %{_tmppath}/%{name}-%{version}-build
+#end if
+
 
 %description
 #if $metadata.has_key("Description")
@@ -466,9 +470,9 @@ $str_newline.join($extra.content.build.post)
 ############################ installation scripts
 %install
 #if 'SupportOtherDistros' in $metadata
-rm -rf %{buildroot}
+rm -rf \$RPM_BUILD_ROOT
 #else
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 #end if
 # >> install pre
 #if $extra.content.has_key("install") and  $extra.content.install.has_key("pre")
@@ -478,9 +482,9 @@ $str_newline.join($extra.content.install.pre)
 #if $Builder == 'python'
 #if 'SupportOtherDistros' in $metadata
 %if 0%{?suse_version}
-%{__python} setup.py install --root=$RPM_BUILD_ROOT --prefix=%{_prefix}
+%{__python} setup.py install --root=\$RPM_BUILD_ROOT --prefix=%{_prefix}
 %else
-%{__python} setup.py install --root=$RPM_BUILD_ROOT -O1
+%{__python} setup.py install --root=\$RPM_BUILD_ROOT -O1
 %endif
 #else
 %{__python} setup.py install --root=%{buildroot} -O1
