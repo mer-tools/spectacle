@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
+import sys
 from distutils.core import setup
+
+# For debian based systems, '--install-layout=deb' is needed after 2.6
+if sys.version_info[:2] <= (2, 5) and '--install-layout=deb' in sys.argv:
+    del sys.argv[sys.argv.index('--install-layout=deb')]
 
 version_path = 'VERSION'
 try:
