@@ -177,6 +177,8 @@ All available directives for spectacle are listed as the following:
 
 * NoDesktop: **boolean**, whether to install the desktop files in package
 
+* UpdateDesktopDB: **boolean**, whether to run 'update-desktop-database' to flush cache when package (un)installation
+
 * AutoDepend: **boolean**, for subpackages only, whether to add Require to main package automatically
 
 * AsWholeName: **boolean**, for subpackages only, whether to use **Name** as the whole package name

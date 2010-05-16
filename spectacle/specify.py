@@ -58,6 +58,7 @@ BOOLNO_KEYS = ('Check',
                'AsWholeName',
                'NoFiles',
                'NoDesktop',
+               'UpdateDesktopDB',
               )
 # boolean keys with the default 'True' value
 BOOLYES_KEYS = ('UseAsNeeded',
@@ -175,6 +176,7 @@ class RPMWriter():
 
     extra_per_pkg = {
                         'Desktop': False,
+                        'DesktopDB': False,
                         'Static': False,
                         'Schema': False,
                         'Schemas': [],
@@ -689,10 +691,11 @@ PkgBR:
                        },
                 'Icon': {'RequiresPost': ['/bin/touch'],
                         },
-                'Desktop': {'RequiresPost': ['desktop-file-utils'],
-                            'RequiresPostUn': ['desktop-file-utils'],
-                            'PkgBR': ['desktop-file-utils'],
+                'Desktop': {'PkgBR': ['desktop-file-utils'],
                            },
+                'DesktopDB': {'RequiresPost': ['desktop-file-utils'],
+                              'RequiresPostUn': ['desktop-file-utils'],
+                             },
                 'Info': {'RequiresPost': ['/sbin/install-info'],
                          'RequiresPostUn': ['/sbin/install-info'],
                         },
@@ -916,6 +919,10 @@ PkgBR:
                     pkg_extra['Schemas'].append(l)
                 if re.match('.*\/icons\/.*', l):
                     pkg_extra['Icon'] = True
+
+        # check whether need to update desktop database
+        if self.extra['Desktop'] == True and 'UpdateDesktopDB' in self.metadata:
+            self.extra['DesktopDB'] = True
 
         # files listed in '%doc' need handling
         # TODO to be cleanup
