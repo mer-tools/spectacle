@@ -4,7 +4,7 @@
  
  Configure: none
  Builder: none
-+NoDesktop: yes
++UpdateDesktopDB: yes
 +Files:
 +    - "%{_datadir}/applications/*.desktop"
  

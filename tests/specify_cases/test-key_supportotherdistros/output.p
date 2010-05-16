@@ -1,5 +1,5 @@
---- output.orig.spec	2010-03-17 21:15:13.000000000 +0800
-+++ output.spec	2010-03-17 21:15:13.000000000 +0800
+--- output.orig.spec	2010-05-16 19:03:04.000000000 +0800
++++ output.spec	2010-05-16 19:03:04.000000000 +0800
 @@ -5,6 +5,7 @@
  # >> macros
  # << macros
@@ -8,7 +8,15 @@
  Name:       testpkg
  Summary:    Sample package for spectacle testings
  Version:    1.0
-@@ -41,7 +42,7 @@ This package contains development files 
+@@ -14,6 +15,7 @@ License:    BSD
+ URL:        http://www.testpkg.org/
+ Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
+ Source100:  testpkg.yaml
++BuildRoot:  %{_tmppath}/%{name}-%{version}-build
+ 
+ 
+ %description
+@@ -42,14 +44,19 @@ This package contains development files 
  # >> build pre
  # << build pre
  
@@ -17,14 +25,15 @@
  
  # >> build post
  # << build post
-@@ -49,6 +50,11 @@ This package contains development files 
- rm -rf %{buildroot}
+ %install
+-rm -rf %{buildroot}
++rm -rf $RPM_BUILD_ROOT
  # >> install pre
  # << install pre
 +%if 0%{?suse_version}
-+%{__python} setup.py install --root=%{buildroot} --prefix=%{_prefix}
++%{__python} setup.py install --root=$RPM_BUILD_ROOT --prefix=%{_prefix}
 +%else
-+%{__python} setup.py install --root=%{buildroot} -O1
++%{__python} setup.py install --root=$RPM_BUILD_ROOT -O1
 +%endif
  
  # >> install post

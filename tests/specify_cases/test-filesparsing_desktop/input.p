@@ -5,7 +5,7 @@
  Configure: none
  Builder: none
 +Files:
-+    - "%{_datadir}/*.desktop"
++    - "%{_datadir}/applications/*.desktop"
  
  SubPackages:
      - Name: devel
