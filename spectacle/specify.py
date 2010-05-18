@@ -882,6 +882,15 @@ PkgBR:
         """
 
     def parse_files(self, files = {}, docs = {}):
+
+        py_path_check = False
+        if 'Builder' in self.metadata and self.metadata['Builder'] == 'python':
+            py_path_check = True
+            if 'BuildArch' in self.metadata and self.metadata['BuildArch'] == 'noarch':
+                py_path = '%{python_sitelib}'
+            else:
+                py_path = '%{python_sitearch}'
+
         for pkg_name,v in files.iteritems():
             if pkg_name == 'main':
                 pkg_extra = self.extra
@@ -915,6 +924,12 @@ PkgBR:
                     pkg_extra['Schemas'].append(l)
                 elif re.match('.*\/icons\/.*', l):
                     pkg_extra['Icon'] = True
+
+                # special checking for python packages
+                if py_path_check:
+                    if '%{python_sitelib}' in l or '%{python_sitearch}' in l:
+                        if py_path not in l:
+                            logger.error('please use %s in %%files to specify module installation path' % py_path)
 
         # check whether need to update desktop database
         if self.extra['Desktop'] == True and 'UpdateDesktopDB' in self.metadata:

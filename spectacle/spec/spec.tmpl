@@ -22,7 +22,11 @@ $str_newline.join($extra.content.macros.main)
 #end if
 
 #if $Builder == 'python'
+#if $metadata.has_key("BuildArch") and $metadata.BuildArch == 'noarch'
+%{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+#else
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
+#end if
 #end if
 Name:       ${metadata.Name}
 Summary:    ${metadata.Summary}
