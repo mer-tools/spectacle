@@ -177,7 +177,6 @@ class RPMWriter():
     extra_per_pkg = {
                         'Desktop': False,
                         'DesktopDB': False,
-                        'Static': False,
                         'Schema': False,
                         'Schemas': [],
                         'Lib': False,
@@ -765,11 +764,10 @@ PkgBR:
             rpmlint = "from Config import *\n"
             for lint in self.metadata['RpmLintIgnore']:
                 rpmlint = rpmlint + "addFilter(\"%s\")\n" %lint
-            
+
             file = open(rpmlintrc, "w")
             file.write(rpmlint)
             file.close()
-            
 
         # handling 'ExtraSources', extra separated files which need to be install
         # specific paths
@@ -896,28 +894,26 @@ PkgBR:
                     l1 = p1.sub(r'\1', l)
                     pkg_extra['Infos'].append(l1)
                     pkg_extra['Info'] = True
-                if re.match('.*(usr/share|%{_datadir})/applications/.*\.desktop$', l): 
+                elif re.match('.*(usr/share|%{_datadir})/applications/.*\.desktop$', l):
                     if 'NoDesktop' not in self.metadata:
                         pkg_extra['Desktop'] = True
-                if re.match('.*\.a$', l):
-                    pkg_extra['Static'] = True
-                if re.match('.*etc/rc.d/init.d.*', l) or re.match('.*etc/init.d.*', l):
+                elif re.match('.*etc/rc.d/init.d.*', l) or re.match('.*etc/init.d.*', l):
                     pkg_extra['Service'] = True
-                if re.match('.*(%{_libdir}|%{_lib}|/lib|/usr/lib)/[^/]*[.*?]+so([.*?]+.*$|$)', l) or \
+                elif re.match('.*(%{_libdir}|%{_lib}|/lib|/usr/lib)/[^/]*[.*?]+so([.*?]+.*$|$)', l) or \
                    re.match('.*(/ld.so.conf.d/).*', l):
                     if pkg_name != 'devel' and not pkg_name.endswith('-devel'):
                         # 'devel' sub pkgs should not set Lib flags
                         pkg_extra['Lib'] = True
-                if re.match('.*(%{_libdir}|%{_lib}).*', l) and re.match('.*\.a$', l):
+                elif re.match('.*(%{_libdir}|%{_lib}).*', l) and re.match('.*\.a$', l):
                     # if *.a found, set 'HasStatic' flag for MAIN pkg
                     self.extra['HasStatic'] = True
-                if re.match('.*\.schema.*', l):
+                elif re.match('.*\.schema.*', l):
                     comp = l.split()
                     if len(comp) > 1:
                         l = comp[1]
                     pkg_extra['Schema'] = True
                     pkg_extra['Schemas'].append(l)
-                if re.match('.*\/icons\/.*', l):
+                elif re.match('.*\/icons\/.*', l):
                     pkg_extra['Icon'] = True
 
         # check whether need to update desktop database
