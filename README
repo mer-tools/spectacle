@@ -161,6 +161,8 @@ All available directives for spectacle are listed as the following:
 
 * RunFdupes: **string**, parameters of ``fdupes`` in %install
 
+* RpmLintIgnore: **list**, *optional*, list of skip items for ``rpmlint``
+
 * Check: **boolean**, whether need ``%check`` section in spec
 
 * SupportOtherDistros: **boolean**, whether need to check for other distros (besides MeeGo)
