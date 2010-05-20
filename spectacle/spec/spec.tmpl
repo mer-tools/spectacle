@@ -504,16 +504,21 @@ find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null ';'
 find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %{_fixperms} %{buildroot}/*
 #else if $Builder == 'make' or $Builder == 'single-make' or $Builder == 'qmake'
+#if $Builder == 'qmake'
+#set $extra_install_param="INSTALL_ROOT=%{buildroot}"
+#else
+#set $extra_install_param=""
+#end if
 #if 'SupportOtherDistros' in $metadata
 %if 0%{?moblin_version}
-%make_install
+%make_install $extra_install_param
 %else
 %makeinstall
 %endif
 #else
-%make_install
+%make_install $extra_install_param
 #end if
-#end if ## of Builder==python
+#end if ## of Builder==???
 #if $metadata.has_key("ExtraInstall")
 $metadata.ExtraInstall
 #end if
