@@ -107,7 +107,6 @@ STR_KEYS =  ('Name',
              'LocaleOptions',
              'FilesInput',
              'PostScripts',
-             'ExtraInstall',
              'RunFdupes',
             )
 
@@ -374,6 +373,13 @@ class RPMWriter():
                         'Obsoletes'):
                 if req in metadata and metadata[req]:
                     logger.warning('"NoFiles" exists, key %s has no effect any more' % req)
+
+        def _check_key_configure(metadata):
+            #TODO
+            pass
+        def _check_key_builder(metadata):
+            #TODO
+            pass
 
         # checking for empty keys
         keys = _check_empty_keys(self.metadata)
@@ -688,7 +694,7 @@ PkgBR:
                 'Lib': {'RequiresPost': ['/sbin/ldconfig'],
                         'RequiresPostUn': ['/sbin/ldconfig'],
                        },
-                'Icon': {'RequiresPost': ['/bin/touch'],
+                'Icon': {'RequiresPost': ['/bin/touch', 'gtk2'],
                         },
                 'Desktop': {'PkgBR': ['desktop-file-utils'],
                            },

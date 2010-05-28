@@ -90,7 +90,7 @@ All available directives for spectacle are listed as the following:
 
 * Summary: **string**
 
-* Version: **string**, version string (not version NUMBER)
+* Version: **string**, version string
 
 * Release: **string**
 
@@ -120,8 +120,6 @@ All available directives for spectacle are listed as the following:
 
 * SetupOptions: **string**, *optional*, the options string for %setup
 
-* ExtraInstall: **string**, *optional*
-
 * Patches: **list** of **string**, all patches need to be in 'p1' level
 
 * Requires: **list** of **string**
@@ -149,7 +147,7 @@ All available directives for spectacle are listed as the following:
   **If not specified, the default value ``configure`` will be used**
 
 * Builder: **string**, *optional*, valid values: **make**, **single-make**,
-  **python**, **perl**, **none**<br>
+  **python**, **perl**, **qmake**, **none**<br>
   **If not specified, the deault value ``make`` will be used. If do not want a
   automatic builder, please use ``none``.**
 
@@ -167,7 +165,7 @@ All available directives for spectacle are listed as the following:
 
 * SupportOtherDistros: **boolean**, whether need to check for other distros (besides MeeGo)
 
-* UseAsNeeded: **boolean**, whether export LD_AS_NEEDED=1 env when building
+* UseAsNeeded: **boolean**, whether export LD\_AS\_NEEDED=1 environ variable before building
 
 * NoAutoReq: **boolean**, whether add 'AutoReq: 0' to spec
 
@@ -175,7 +173,7 @@ All available directives for spectacle are listed as the following:
 
 * NoSetup: **boolean**, whether to skip using ``%setup`` in ``%prep``
 
-* NoAutoLocale: **boolean**, whether to use ``%find_lang`` to search locale data when found 'inittool' in PkgBR
+* NoAutoLocale: **boolean**, whether to use ``%find_lang`` to search locale data when found 'intltool' in PkgBR
 
 * NoDesktop: **boolean**, whether to install the desktop files in package
 
@@ -294,14 +292,14 @@ The following placeholders in spec can be customized:
 
     With placeholder:
 
-        # >> files [sub-package]
-        # << files [sub-package]
+        # >> files [[-p] sub-package]
+        # << files [[-p] sub-package]
 **NOTE**: "sub-packge" stands for the name of sub-package, and it is optional.
 If no sub-package name specified, it means the files of **main** package.
 **NOTE**: If the file list is simple enough, you can use YAML *Files* keyword
 instead to record it.
 
-* Scriptlets for %check section
+* Scripts for %check section
 
     With placeholder:
 
@@ -350,7 +348,8 @@ you need customized %postun scripts, it need be added manually, and only once.
 Spectacle uses cheetah templates to generate the spec file, based the metadata
 from YAML file. But the end users need not tackle it.
 
-## Tips * If to upgrade the pkg to a newer version, you can just edit the
+## Tips
+* If to upgrade the pkg to a newer version, you can just edit the
   version string in spectacle YAML file, and when you run ``specify``, it
   will download the needed files for you automatically.
 
