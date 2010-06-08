@@ -556,7 +556,9 @@ class SpecParser(object):
                 nbr = [] # new 'PkgConfigBR' list
                 nv = []
                 for vi in v:
-                    if ',' in vi:
+                    if 'perl' in vi:
+                        nv.append(vi)
+                    elif ',' in vi:
                         reqs = []
                         for entry in re.findall('\S+\s+[<>=]+\s+[^,\s]+|[^,\s]+', vi):
                             reqs.append(entry)
