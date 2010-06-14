@@ -246,6 +246,9 @@ Development files for %{name}
 %package $sp.Name
 #end if
 Summary:    $sp.Summary
+#if $sp.has_key("License")
+License:    $sp.License
+#end if
 #if $sp.has_key("Group")
 Group:      $sp.Group
 #else
