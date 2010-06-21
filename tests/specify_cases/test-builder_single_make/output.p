@@ -1,6 +1,6 @@
---- output.orig.spec	2010-03-17 21:15:03.000000000 +0800
-+++ output.spec	2010-03-17 21:15:03.000000000 +0800
-@@ -41,7 +41,8 @@ This package contains development files 
+--- output.orig.spec	2010-06-21 16:42:01.000000000 +0800
++++ output.spec	2010-06-21 16:42:01.000000000 +0800
+@@ -42,7 +42,8 @@ This package contains development files 
  # >> build pre
  # << build pre
  
@@ -10,11 +10,11 @@
  
  # >> build post
  # << build post
-@@ -49,6 +50,7 @@ This package contains development files 
+@@ -50,6 +51,7 @@ This package contains development files 
  rm -rf %{buildroot}
  # >> install pre
  # << install pre
-+%make_install
++%make_install 
  
  # >> install post
  # << install post

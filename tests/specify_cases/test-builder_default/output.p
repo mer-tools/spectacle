@@ -1,5 +1,5 @@
---- output.orig.spec	2010-06-21 16:40:59.000000000 +0800
-+++ output.spec	2010-06-21 16:40:59.000000000 +0800
+--- output.orig.spec	2010-06-21 16:39:53.000000000 +0800
++++ output.spec	2010-06-21 16:39:53.000000000 +0800
 @@ -43,6 +43,7 @@ This package contains development files 
  # << build pre
  
