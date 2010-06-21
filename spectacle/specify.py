@@ -79,6 +79,7 @@ LIST_KEYS = ('Sources',
              'PkgConfigBR',
              'Provides',
              'Conflicts',
+             'BuildConflicts',
              'Obsoletes',
              'AutoSubPackages',
              'Files',
@@ -370,6 +371,7 @@ class RPMWriter():
                         'RequiresPostUn',
                         'Provides',
                         'Conflicts',
+                        'BuildConflicts',
                         'Obsoletes'):
                 if req in metadata and metadata[req]:
                     logger.warning('"NoFiles" exists, key %s has no effect any more' % req)

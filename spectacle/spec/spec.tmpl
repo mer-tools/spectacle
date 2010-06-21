@@ -189,6 +189,12 @@ BuildRequires:  $br
 #end if
 #end for
 #end if
+## BuildConflicts
+#if $metadata.has_key("BuildConflicts")
+#for $bcfl in $metadata.BuildConflicts
+BuildConflicts: $bcfl
+#end for
+#end if
 #if $metadata.has_key("RunFdupes")
 BuildRequires:  fdupes
 #end if
