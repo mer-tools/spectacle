@@ -218,6 +218,15 @@ class RPMWriter():
     def dump(self):
         print yaml.dump(yaml.load(self.stream))
 
+    def _check_dup_files(self, files):
+        # try to remove duplicate '%defattr' in files list
+        dup = '%defattr(-,root,root,-)'
+        dup2 = '%defattr(-,root,root)'
+        found_dup = dup if dup in files else dup2 if dup2 in files else None
+        if found_dup:
+            logger.warning('found duplicate "%s" in file list, removed!' % found_dup)
+            files.remove(found_dup)
+
     def sanity_check(self):
 
         def _check_empty_keys(metadata):
@@ -331,13 +340,6 @@ class RPMWriter():
             if 'LocaleOptions' in metadata and 'LocaleName' not in metadata:
                 return False
             return True
-
-        def _check_key_files(metadata):
-            # try to remove duplicate '%defattr' in files list
-            dup = '%defattr(-,root,root,-)'
-            if dup in metadata['Files']:
-                logger.warning('found duplicate "%s" in file list, removed!' % dup)
-                metadata['Files'].remove(dup)
 
         def _check_dropped_keys(metadata):
             for key in DROP_KEYS:
@@ -525,7 +527,11 @@ PkgBR:
 
         # checking duplicate 'Files' items
         if 'Files' in self.metadata:
-            _check_key_files(self.metadata)
+            self._check_dup_files(self.metadata['Files'])
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                if 'Files' in sp:
+                    self._check_dup_files(sp['Files'])
 
     def __get_scm_latest_release(self):
 
@@ -1067,11 +1073,8 @@ PkgBR:
                 logger.warning('both "Files" YAML keyword and inline %file content in spec present')
 
         # try to remove duplicate '%defattr' in files list
-        dup = '%defattr(-,root,root,-)'
         for key in content['files']:
-            if dup in content['files'][key]:
-                logger.warning('found duplicate "%s" in file list, removed!' % dup)
-                content['files'][key].remove(dup)
+            self._check_dup_files(content['files'][key])
 
         return content
 

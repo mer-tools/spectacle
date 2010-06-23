@@ -384,12 +384,23 @@ class SpecParser(object):
     def _do_changelog(self, items, pkg, h, v):
         logger.warning('Please move changelog in %changelog to *.changes file.')
 
+    def _remove_attrs(self, files):
+        # try to remove duplicate '%defattr' in files list
+        dup = '%defattr(-,root,root,-)'
+        dup2 = '%defattr(-,root,root)'
+        if dup in files:
+            files.remove(dup)
+        if dup2 in files:
+            files.remove(dup2)
+
     def _do_files(self, items, pkg, h, v):
         files = map(str.strip, v.strip().splitlines())
 
         # skip option line
         if files[0].startswith('-'):
             files.pop(0)
+
+        self._remove_attrs(files)
 
         if self.include_files:
             items['Files'] = files
