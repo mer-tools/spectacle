@@ -134,6 +134,8 @@ ARCHED_KEYS = ('Requires',
               )
 ARCHS = ('ix86', 'arm')
 
+CONFIGURES = ('configure', 'reconfigure', 'autogen', 'none')
+BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'none')
 
 class GitAccess():
     def __init__(self, path):
@@ -379,11 +381,14 @@ class RPMWriter():
                     logger.warning('"NoFiles" exists, key %s has no effect any more' % req)
 
         def _check_key_configure(metadata):
-            #TODO
-            pass
+            cfg = metadata['Configure']
+            if cfg not in CONFIGURES:
+                logger.warning('"%s" is not a valid choice of Configure(%s)' % (cfg, '/'.join(CONFIGURES)))
+
         def _check_key_builder(metadata):
-            #TODO
-            pass
+            builder = metadata['Builder']
+            if builder not in BUILDERS:
+                logger.warning('"%s" is not a valid choice of Builder(%s)' % (builder, '/'.join(BUILDERS)))
 
         # checking for empty keys
         keys = _check_empty_keys(self.metadata)
@@ -532,6 +537,12 @@ PkgBR:
             for sp in self.metadata["SubPackages"]:
                 if 'Files' in sp:
                     self._check_dup_files(sp['Files'])
+
+        # checking for validation of 'Configure and Builder'
+        if 'Configure' in self.metadata:
+            _check_key_configure(self.metadata)
+        if 'Builder' in self.metadata:
+            _check_key_builder(self.metadata)
 
     def __get_scm_latest_release(self):
 
