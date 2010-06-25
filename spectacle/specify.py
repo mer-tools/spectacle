@@ -222,12 +222,34 @@ class RPMWriter():
 
     def _check_dup_files(self, files):
         # try to remove duplicate '%defattr' in files list
-        dup = '%defattr(-,root,root,-)'
+        dup1 = '%defattr(-,root,root,-)'
         dup2 = '%defattr(-,root,root)'
-        found_dup = dup if dup in files else dup2 if dup2 in files else None
+        found_dup = dup1 if dup1 in files else dup2 if dup2 in files else None
         if found_dup:
             logger.warning('found duplicate "%s" in file list, removed!' % found_dup)
             files.remove(found_dup)
+
+    def _check_dup_ldconfig(self, pkgname = None):
+        if not pkgname:
+            pkgname = 'main'
+            if not self.extra['Lib']:
+                return
+        else:
+            if not self.extra['subpkgs'][pkgname]['Lib']:
+                return
+
+        dup1 = '/sbin/ldconfig'
+        dup2 = 'ldconfig'
+
+        for sec in ('post', 'postun'):
+            try:
+                extra = self.extra['content'][sec][pkgname]
+            except KeyError:
+                continue
+            found_dup = dup1 if dup1 in extra else dup2 if dup2 in extra else None
+            if found_dup:
+                extra.remove(found_dup)
+                logger.warning('Found duplicate "%s" calling in "%%%s" of %s package, removed!' % (found_dup, sec, pkgname))
 
     def sanity_check(self):
 
@@ -1167,6 +1189,16 @@ PkgBR:
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 self._gen_auto_requires(sp, self.extra['subpkgs'][sp['Name']], sp['Name'])
+
+        # check duplicate 'ldconfig' in %post/%postun
+        #   actually, all auto generated scripts in %post like sections should be checked
+        #   for duplicate issue, but it's not nice to do that according current design.
+        #   But for 'ldconfig', there're too many issues with it, the following code
+        #   is just a workaround to fix them.
+        self._check_dup_ldconfig()
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                self._check_dup_ldconfig(sp['Name'])
 
         spec_content = str(
                 spec.spec(searchList=[{

@@ -623,7 +623,7 @@ $str_newline.join($extra.content.preun.main)
 #end if
 
 ############################ Post
-#set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key("main")
+#set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key("main") and $extra.content.post.main
 #if $extra.Lib or $extra.Info or $extra.Schema or $extra.Icon or $extra.DesktopDB or $has_extra_post
 #set $only_Lib = not ($extra.Info or $extra.Schema or $extra.Icon or $extra.DesktopDB or $has_extra_post)
 #if $only_Lib
@@ -668,7 +668,7 @@ $str_newline.join($extra.content.post.main)
 #end if ## need post
 
 ############################ PostUn
-#set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key("main")
+#set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key("main") and $extra.content.postun.main
 #if $extra.Lib or $extra.Info or $extra.Icon or $extra.DesktopDB or $has_extra_postun
 #set $only_Lib = not ($extra.Info or $extra.Icon or $extra.DesktopDB or $has_extra_postun)
 #if $only_Lib
@@ -733,7 +733,7 @@ $str_newline.join($extra.content.preun[$sp.Name])
 
 #######################
 ## Post for SubPackages
-#set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key($sp.Name)
+#set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key($sp.Name) and $extra.content.post[$sp.Name]
 #set $sub_extra = $extra.subpkgs[$sp.Name]
 #if $sub_extra.Lib or $sub_extra.Info or $sub_extra.Schema or $sub_extra.DesktopDB or $has_extra_post
 #set $only_Lib = not ($sub_extra.Info or $sub_extra.Schema or $sub_extra.DesktopDB or $has_extra_post)
@@ -774,7 +774,7 @@ $str_newline.join($extra.content.post[$sp.Name])
 
 #######################
 ## PostUn for SubPackages
-#set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key($sp.Name)
+#set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key($sp.Name) and $extra.content.postun[$sp.Name]
 #if  $sub_extra.Lib or $sub_extra.Info or $sub_extra.DesktopDB or $has_extra_postun
 #set $only_Lib = not ($sub_extra.Info or $sub_extra.DesktopDB or $has_extra_postun)
 #if $only_Lib
