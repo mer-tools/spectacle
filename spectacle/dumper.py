@@ -75,7 +75,8 @@ class SpectacleDumper(object):
         if val.startswith('%') or \
            val.startswith('*') or \
            ": " in val or \
-           ":\t" in val:
+           ":\t" in val or \
+           val.endswith(':'):
 
             if '"' in val:
                 quote_char = '\''
