@@ -46,6 +46,9 @@ ExclusiveArch:  ${metadata.ExclusiveArch}
 #if $metadata.has_key("BuildArch")
 BuildArch:  ${metadata.BuildArch}
 #end if
+#if $metadata.has_key("Prefix")
+Prefix:  ${metadata.Prefix}
+#end if
 #if $metadata.has_key("URL")
 URL:        ${metadata.URL}
 #end if
@@ -274,6 +277,9 @@ URL:    $sp.URL
 #end if
 #if $sp.has_key("BuildArch")
 BuildArch:    $sp.BuildArch
+#end if
+#if $sp.has_key("Prefix")
+Prefix:    $sp.Prefix
 #end if
 #if 'NoAutoReq' in $sp
 AutoReq:    0
