@@ -117,11 +117,13 @@ SUBONLY_KEYS = ('AsWholeName',
 
 SUBWARN_KEYS = ('PkgBR',
                 'PkgConfigBR',
+                'BuildConflicts',
                )
-SUBAVAIL_KEYS = ('Summary',
+SUBAVAIL_KEYS = ('Name',
+                 'Summary',
                  'Description',
-                 'Group'
-                 'License'
+                 'Group',
+                 'License',
                  'Files',
                  'Requires',
                  'RequiresPre',
@@ -316,6 +318,11 @@ class RPMWriter():
 
             return keys
 
+        def _check_subwarn_keys(metadata, subpkg):
+            for key in SUBWARN_KEYS:
+                if key in metadata:
+                    logger.warning('"%s" found in sub-pkg: %s, please consider to move it to main package' %(key, subpkg))
+
         def _check_key_group(metadata):
             if metadata.has_key("Group"):
                 warn = True
@@ -461,6 +468,11 @@ class RPMWriter():
                 keys = _check_invalid_keys(sp, sp['Name'])
                 if keys:
                     logger.warning('Unexpected keys for sub-pkg %s found: %s' % (sp['Name'], ', '.join(keys)))
+
+        # checking for questionable sub-package keys
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                keys = _check_subwarn_keys(sp, sp['Name'])
 
         # checking for deprecated keys
         _check_dropped_keys(self.metadata)
