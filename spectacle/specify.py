@@ -115,8 +115,27 @@ SUBONLY_KEYS = ('AsWholeName',
                 'AutoDepend',
                 )
 
-# TODO
-MAINONLY_KEYS = ()
+SUBWARN_KEYS = ('PkgBR',
+                'PkgConfigBR',
+               )
+SUBAVAIL_KEYS = ('Summary',
+                 'Description',
+                 'Group'
+                 'License'
+                 'Files',
+                 'Requires',
+                 'RequiresPre',
+                 'RequiresPreUn',
+                 'RequiresPost',
+                 'RequiresPostUn',
+                 'Provides',
+                 'Conflicts',
+                 'BuildConflicts',
+                 'Obsoletes',
+                 'NoAutoReq',
+                 'NoAutoProv',
+                 'Version', 'Release', 'Epoch', 'URL', 'BuildArch' # very rare
+                )
 
 DROP_KEYS = ('PostScripts',
              'Documents',
@@ -279,15 +298,16 @@ class RPMWriter():
 
         def _check_invalid_keys(metadata, subpkg = None):
             """ return list of invalid keys """
-            all_keys = list(LIST_KEYS + STR_KEYS + BOOL_KEYS + ('Date', 'MyVersion'))
-            all_keys += RENAMED_KEYS.keys()
             if not subpkg:
+                # main package
+                all_keys = list(LIST_KEYS + STR_KEYS + BOOL_KEYS + ('Date', 'MyVersion'))
+                all_keys += RENAMED_KEYS.keys()
                 all_keys.append('SubPackages')
                 for key in SUBONLY_KEYS:
                     all_keys.remove(key)
             else:
-                for key in MAINONLY_KEYS:
-                    all_keys.remove(key)
+                # sub package
+                all_keys = list(SUBAVAIL_KEYS + SUBWARN_KEYS)
 
             keys = []
             for key in metadata:
