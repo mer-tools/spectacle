@@ -273,6 +273,80 @@ class RPMWriter():
                 extra.remove(found_dup)
                 logger.warning('Found duplicate "%s" calling in "%%%s" of %s package, removed!' % (found_dup, sec, pkgname))
 
+    def _check_dup_scriptlets(self, pkgname = None):
+        if not pkgname:
+            pkgname = 'main'
+            extra = self.extra
+        else:
+            extra = self.extra['subpkgs'][pkgname]
+
+        if extra['Desktop']:
+            re_idstr = re.compile('^desktop-file-install\s+')
+            try:
+                lines = extra['content']['install']['pre'] + \
+                        extra['content']['install']['post']
+            except KeyError:
+                pass
+            else:
+                for line in lines:
+                    if re_idstr.match(line):
+                        logger.warning('Found possible duplicate "desktop-file-install" script in post install')
+                        break
+
+            if extra['DesktopDB']:
+                re_idstr = re.compile('^update-desktop-database\s+')
+                for sec in ('post', 'postun'):
+                    try:
+                        lines = self.extra['content'][sec][pkgname]
+                    except KeyError:
+                        continue
+
+                    for line in lines:
+                        if re_idstr.match(line):
+                            logger.warning('Found possible duplicate "update-desktop-database" script in %%%s of %s package'%(sec, pkgname))
+                            break
+
+        if extra['Info']:
+            re_idstr = re.compile('^%install_info')
+            for sec in ('post', 'postun'):
+                try:
+                    lines = self.extra['content'][sec][pkgname]
+                except KeyError:
+                    continue
+
+                for line in lines:
+                    if re_idstr.match(line):
+                        logger.warning('Found possible duplicate "%%install_info..." script in %%%s of %s package'%(sec, pkgname))
+                        break
+
+        if extra['Icon']:
+            re_idstr = re.compile('^/bin/touch\s+.*%{_datadir}/icons/hicolor.*')
+            re_idstr2 = re.compile('gtk-update-icon-cache\s+')
+            for sec in ('post', 'postun'):
+                try:
+                    lines = self.extra['content'][sec][pkgname]
+                except KeyError:
+                    continue
+
+                for line in lines:
+                    if re_idstr.match(line):
+                        logger.warning('Found possible duplicate script to touch icons in %%%s of %s package'%(sec, pkgname))
+                    elif re_idstr2.search(line):
+                        logger.warning('Found possible duplicate "gtk-update-icon-cache" script in %%%s of %s package'%(sec, pkgname))
+
+        if extra['Schema']:
+            re_idstr = re.compile('gconftool-2\s+')
+            for sec in ('post', 'pre', 'preun'):
+                try:
+                    lines = self.extra['content'][sec][pkgname]
+                except KeyError:
+                    continue
+
+                for line in lines:
+                    if re_idstr.search(line):
+                        logger.warning('Found possible duplicate "gconftool-2" script in %%%s of %s package'%(sec, pkgname))
+                        break
+
     def sanity_check(self):
 
         def _check_empty_keys(metadata):
@@ -1232,6 +1306,12 @@ PkgBR:
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 self._check_dup_ldconfig(sp['Name'])
+
+        # check duplicate other auto-scriptlets in %post/%postun
+        self._check_dup_scriptlets()
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                self._check_dup_scriptlets(sp['Name'])
 
         spec_content = str(
                 spec.spec(searchList=[{
