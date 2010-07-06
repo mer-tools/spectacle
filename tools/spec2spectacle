@@ -73,15 +73,16 @@ SINGLES = ( 'Summary',
             'ExclusiveArch',
             'License' )
 REQUIRES = ('BuildRequires',
-            'PreRequires',
             'Requires',
             'Requires(post)',
             'Requires(postun)',
             'Requires(pre)',
+            'PreRequires', 'PreReq', 'Prereq', # alias in old spec
             'Requires(preun)',
             'Provides',
             'Obsoletes',
             'Conflicts',
+            'BuildConflicts',
            )
 SKIPS   = ( 'BuildRoot',)
 
@@ -108,6 +109,9 @@ class SpecConvertor(Convertor):
                 'Requires(post)': 'RequiresPost',
                 'Requires(postun)': 'RequiresPostUn',
                 'Requires(pre)': 'RequiresPre',
+                'PreRequires': 'RequiresPre',
+                'PreReq': 'RequiresPre',
+                'Prereq': 'RequiresPre',
                 'Requires(preun)': 'RequiresPreUn',
                 'Url': 'URL',
                 }
