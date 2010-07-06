@@ -78,13 +78,13 @@ Source101:  ${metadata.Name}-rpmlintrc
 ## end of checking
 #if $arch
 %ifarch $arch
-#end if
 Patch${idx}:     $patch
-#if $arch
 %endif
+#else
+Patch${idx}:     $patch
 #end if
 #set $idx = $idx + 1
-#end for
+#end for ## each patch
 #end if
 #if 'NoAutoReq' in $metadata
 AutoReq: 0
@@ -108,12 +108,12 @@ Requires:   perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo \$version)
 ## end of checking
 #if $arch
 %ifarch $arch
-#end if
 Requires:   $req
-#if $arch
 %endif
+#else
+Requires:   $req
 #end if
-#end for
+#end for ## each req
 #end if
 #if $metadata.has_key("RequiresPre")
 #for $req in $metadata.RequiresPre
@@ -161,7 +161,7 @@ BuildRequires:  pkgconfig($br_comps[0])
 #if $arch
 %endif
 #end if
-#end for
+#end for ## each br
 #end if
 #set $br_locale = ""
 #if $metadata.has_key("PkgBR")
@@ -182,12 +182,12 @@ BuildRequires:  pkgconfig($br_comps[0])
 #end if
 #if $arch
 %ifarch $arch
-#end if
 BuildRequires:  $br
-#if $arch
 %endif
+#else
+BuildRequires:  $br
 #end if
-#end for
+#end for ## each br
 #end if
 ## BuildConflicts
 #if $metadata.has_key("BuildConflicts")
@@ -260,8 +260,26 @@ Group:      $sp.Group
 #else
 Group:      ${metadata.Group}
 #end if
-#if 'NoAutoReq' in $metadata
+#if $sp.has_key("Version")
+Version:    $sp.Version
+#end if
+#if $sp.has_key("Release")
+Release:    $sp.Release
+#end if
+#if $sp.has_key("Epoch")
+Epoch:    $sp.Epoch
+#end if
+#if $sp.has_key("URL")
+URL:    $sp.URL
+#end if
+#if $sp.has_key("BuildArch")
+BuildArch:    $sp.BuildArch
+#end if
+#if 'NoAutoReq' in $sp
 AutoReq:    0
+#end if
+#if 'NoAutoProv' in $sp
+AutoProv:    0
 #end if
 #if $sp.has_key("AutoDepend") and not $metadata.has_key("NoFiles")
 Requires:   %{name} = $auto_depend
@@ -281,12 +299,12 @@ Requires:   %{name} = $auto_depend
 ## end of checking
 #if $arch
 %ifarch $arch
-#end if
 Requires:   $req
-#if $arch
 %endif
+#else
+Requires:   $req
 #end if
-#end for
+#end for ## each req
 #end if
 #if $sp.has_key("RequiresPre")
 #for $req in $sp.RequiresPre
@@ -324,6 +342,63 @@ Conflicts:   $cfl
 #if $sp.has_key("Obsoletes")
 #for $obs in $sp.Obsoletes
 Obsoletes:   $obs
+#end for
+#end if
+## BR
+#if $sp.has_key("PkgBR")
+#for $br in $sp.PkgBR
+## checking arch namespace prefix
+#if $br.startswith('arm:')
+#set $arch = '%{arm}'
+#set $br = $br[4:]
+#else if $br.startswith('ix86:')
+#set $arch = '%{ix86}'
+#set $br = $br[5:]
+#else
+#set $arch = ""
+#end if
+## end of checking
+#if $arch
+%ifarch $arch
+BuildRequires:   $br
+%endif
+#else
+BuildRequires:   $br
+#end if
+#end for ## each br
+#end if
+## PkgConfigBR
+#if $sp.has_key("PkgConfigBR")
+#for $br in $sp.PkgConfigBR
+## checking arch namespace prefix
+#if $br.startswith('arm:')
+#set $arch = '%{arm}'
+#set $br = $br[4:]
+#else if $br.startswith('ix86:')
+#set $arch = '%{ix86}'
+#set $br = $br[5:]
+#else
+#set $arch = ""
+#end if
+## end of checking
+#if $arch
+%ifarch $arch
+#end if
+#set $br_comps = $br.split()
+#if $len($br_comps) > 1
+BuildRequires:  pkgconfig($br_comps[0])$br[$len($br_comps[0]):]
+#else
+BuildRequires:  pkgconfig($br_comps[0])
+#end if
+#if $arch
+%endif
+#end if
+#end for ## each br
+#end if
+## BuildConflicts
+#if $sp.has_key("BuildConflicts")
+#for $bcfl in $sp.BuildConflicts
+BuildConflicts: $bcfl
 #end for
 #end if
 
