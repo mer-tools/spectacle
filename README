@@ -106,6 +106,8 @@ All available directives for spectacle are listed as the following:
 
 * ExclusiveArch: **string**, *optional*
 
+* Prefix: **string**, *optional*
+
 * LocaleName: **string**, *optional*
 
 * LocaleOptions: **string**, *optional*
@@ -194,8 +196,8 @@ directives for sub packages:
     * Summary
     * Description, *optional*
     * Group, *optional*
+    * License, *optional*
     * Requires, *optional*
-    * FilesInput, *optional*
     * etc.
 
 **CAUTION**: The following cases of value string have special meaning in YAML syntax:
@@ -203,6 +205,7 @@ directives for sub packages:
 * string with leading **``%``** charactor
 * string with leading **``*``** charactor
 * string contains **``:``** charactor and one or more spaces/tabs after **``:``**
+* string end with **``:``** charactor
 
 **Then these string values need to be quoted by ``'``(single-quote) or ``"``
 (double-quote), and the choice of quote char should not conflict with the value
