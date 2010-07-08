@@ -384,7 +384,7 @@ class RPMWriter():
                     all_keys.remove(key)
             else:
                 # sub package
-                all_keys = list(SUBAVAIL_KEYS + SUBWARN_KEYS)
+                all_keys = list(SUBAVAIL_KEYS + SUBWARN_KEYS + SUBONLY_KEYS)
 
             keys = []
             for key in metadata:
