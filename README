@@ -161,7 +161,7 @@ All available directives for spectacle are listed as the following:
 
 * NoFiles: **boolean**, *optional*, if to be set as True, means no %files section for this package and it cause no rpm generated
 
-* RunFdupes: **string**, parameters of ``fdupes`` in %install
+* RunFdupes: **string**, path under %buildroot to run ``%fdupes`` macro in %install
 
 * RpmLintIgnore: **list**, *optional*, list of skip items for ``rpmlint``
 
