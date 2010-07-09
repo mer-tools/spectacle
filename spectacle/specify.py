@@ -435,7 +435,7 @@ class RPMWriter():
 
         def _check_strkey(metadata, key):
             """ sub-routine for STR typed keys checking """
-            if key in metadata and not isinstance(metadata[key], str):
+            if key in metadata and not isinstance(metadata[key], str) and not isinstance(metadata[key], unicode):
                 return False
             return True
 
@@ -1313,14 +1313,13 @@ PkgBR:
             for sp in self.metadata["SubPackages"]:
                 self._check_dup_scriptlets(sp['Name'])
 
-        spec_content = str(
-                spec.spec(searchList=[{
+        spec_content = spec.spec(searchList=[{
                                         'metadata': self.metadata,
                                         'extra': self.extra
-                                      }]))
+                                      }]).respond()
 
         file = open(specfile, "w")
-        file.write(spec_content)
+        file.write(spec_content.encode('utf-8'))
         file.close()
 
 def generate_rpm(yaml_fpath, clean_old = False, extra_content = None, spec_fpath=None, download_new=True, skip_scm=False):
