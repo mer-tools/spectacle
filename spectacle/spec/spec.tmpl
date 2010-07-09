@@ -503,14 +503,24 @@ fi
 #######
 #else
 ## default
+#if $Builder == 'cmake'
+#set $Configure = 'cmake'
+#else
 #set $Configure = 'configure'
+#end if
 #end if
 #######
 #if $Configure == 'autogen'
 %autogen $cfgstatic#slurp
+#else if $Configure == 'cmake'
+mkdir meego-build
+cd meego-build
+cmake .. #slurp
 #else if $Configure == 'configure'
 %configure $cfgstatic#slurp
 #else if $Configure == 'reconfigure'
+%reconfigure $cfgstatic#slurp
+#else if $Configure == 'cmake'
 %reconfigure $cfgstatic#slurp
 #end if
 ## any other values fall thru to 'noconfigure'
@@ -546,7 +556,7 @@ fi
 #end for
 #end if ## ConfigOptions
 
-#if $Builder == 'make'
+#if $Builder == 'make' or $Builder == 'cmake'
 make %{?jobs:-j%jobs}
 #else if $Builder == 'single-make'
 make
@@ -593,7 +603,7 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
 find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null ';'
 find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %{_fixperms} %{buildroot}/*
-#else if $Builder == 'make' or $Builder == 'single-make' or $Builder == 'qmake'
+#else if $Builder == 'make' or $Builder == 'single-make' or $Builder == 'qmake' or $Builder == 'cmake'
 #if $Builder == 'qmake'
 #set $extra_install_param="INSTALL_ROOT=%{buildroot}"
 #else
@@ -606,6 +616,9 @@ find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %makeinstall
 %endif
 #else
+#if $Builder == 'cmake'
+cd meego-build
+#end if
 %make_install $extra_install_param
 #end if
 #end if ## of Builder==???

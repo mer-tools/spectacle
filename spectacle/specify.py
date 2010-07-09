@@ -156,8 +156,8 @@ ARCHED_KEYS = ('Requires',
               )
 ARCHS = ('ix86', 'arm')
 
-CONFIGURES = ('configure', 'reconfigure', 'autogen', 'none')
-BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'none')
+CONFIGURES = ('configure', 'reconfigure', 'autogen', 'none', 'cmake')
+BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'none', 'cmake')
 
 class GitAccess():
     def __init__(self, path):
