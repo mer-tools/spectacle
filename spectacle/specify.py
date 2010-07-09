@@ -156,8 +156,8 @@ ARCHED_KEYS = ('Requires',
               )
 ARCHS = ('ix86', 'arm')
 
-CONFIGURES = ('configure', 'reconfigure', 'autogen', 'none', 'cmake')
-BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'none', 'cmake')
+CONFIGURES = ('configure', 'reconfigure', 'autogen', 'cmake', 'none')
+BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'cmake', 'none')
 
 class GitAccess():
     def __init__(self, path):
@@ -513,6 +513,10 @@ class RPMWriter():
             builder = metadata['Builder']
             if builder not in BUILDERS:
                 logger.warning('"%s" is not a valid choice of Builder(%s)' % (builder, '/'.join(BUILDERS)))
+            # checking invalid 'Configure' for special builder
+            if builder in ('python', 'perl', 'qmake') and \
+               'Configure' in metadata:
+                logger.warning('"%s" need no "Configure" setting which will be ignored' % builder)
 
         # checking for empty keys
         keys = _check_empty_keys(self.metadata)
