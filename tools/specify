@@ -83,6 +83,6 @@ if __name__ == '__main__':
 
     spec_fpath, newspec = specify.generate_rpm(yaml_fname, spec_fpath=out_fpath, download_new=not options.not_download, skip_scm=options.skip_scm)
     if newspec:
-        logger.info("Creating new spec file: %s" % spec_fpath)
+        logger.warning("NEW spec file created: %s, maybe customized spec content is needed!" % spec_fpath)
     else:
         logger.info("Old spec file exists, patching %s ..." % spec_fpath)
