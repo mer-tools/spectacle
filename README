@@ -358,10 +358,12 @@ from YAML file. But the end users need not tackle it.
   version string in spectacle YAML file, and when you run ``specify``, it
   will download the needed files for you automatically.
 
-* In most original spec-builder packages, *LocaleName* will be specified in
-  spite whether they need it. After converted to spectacle, we will check it
-  carefully, improper setting will block the rpm packaging. So please add or
-  remove this key according the buildlog.
+* For packages with locale data, *LocaleName* is needed. If package
+  maintainers cannot confirm whether there are locale files, they can just
+  do not use *LocaleName* at first, and whenever "unpackaged files" rpm
+  packaging errors encountered, it means *LocaleName* should be added. And
+  please do not use it for packages without locale data to keep them clean,
+  though it will not block the building and packaging.
 
 * When using spec2spectacle/ini2spectacle to generate spectacle, the following
   problems should be checked:
