@@ -31,6 +31,8 @@ Several methods available for spectacle installation:
 
 * Download the latest source package, and install it by ``make install``
 
+    (Only running ``setup.py install`` is not enough!)
+
     The latest code in git tree can be accessed at:
     [git tree](git://gitorious.org/meego-developer-tools/spectacle.git)
 

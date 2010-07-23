@@ -16,25 +16,40 @@
 #    with this program; if not, write to the Free Software Foundation, Inc., 59
 #    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import sys
+import os,sys
 
-# third-party modules
-from termcolor import colored
 
 __ALL__ = ['info', 'warning', 'error', 'ask']
 
+# COLORs in ANSI
+INFO_COLOR = 32 # green
+WARN_COLOR = 33 # yellow
+ERR_COLOR  = 31 # red
+ASK_COLOR  = 34 # blue
+
+def _color_print(head, color, msg = None, stream = sys.stdout):
+    if os.getenv('ANSI_COLORS_DISABLED') is None:
+        head = '\033[%dm%s:\033[0m' %(color, head)
+    if msg:
+        print >> stream, head, msg
+    else:
+        print >> stream, head,
+
+def _color_perror(head, color, msg):
+    _color_print(head, color, msg, sys.stderr)
+
 def info(msg):
-    print >> sys.stderr, colored('Info:', 'green'), msg
+    _color_perror('Info', INFO_COLOR, msg)
 
 def warning(msg):
-    print >> sys.stderr, colored('Warning:', 'yellow'), msg
+    _color_perror('Warning', WARN_COLOR, msg)
 
 def error(msg):
-    print >> sys.stderr, colored('Error:', 'red'), msg
+    _color_perror('Error', ERR_COLOR, msg)
     sys.exit(1)
 
 def ask(msg):
-    print >> sys.stdout, colored('Q:', 'blue'),
+    _color_print('Q', ASK_COLOR, '')
     try:
         return raw_input(msg)
     except KeyboardInterrupt:
