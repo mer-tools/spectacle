@@ -1,24 +1,7 @@
 Topic
-- [X] LocaleName: iso-codes --all-name (Parsing is still not perfect)
-- [X] devel requires base package (Duplicates..)
-- [X] %defattr(-,root,root,-) duplication
-- [X] calling specify without any arguments should look if there is one
-      yaml file and use it
-- [X] calling ini2spectacle should look for a single ini file and
-      convert it, no need to specify anything as argument
-- [X] Support series.conf file to list and maintain patches with patch
-      descriptions. It should put the description on to of the patch
-      tag in the spec file
-- [X] When converting from ini, also delete the Makefile
-- [ ] and put a new makefile that supports spectacle
-- [X] Check for invalid keywords and complain about them
-- [X] Check if all mandatory keywords are present
-- [X] Maintain a list of RPM Groups (to be provided ) and check if the
-      rpm group in the yaml/spec is valid and if it is one of those
+- [ ] Maintain a list of Licenses (to be provided ) and check if the
+      rpm license in the yaml/spec is valid and if it is one of those
       supported in MeeGo
-- [X] Add %files content to YAML for small packages
-- [X] Testing framework support
-- [ ] Same for licenses (list of licenses TBD)
 - [ ] Calling specify in a directory with no yaml file should open an
       editor ($EDITOR) with a template of mandatory keywords that can
       be filled to create a new yaml file. Probably calling specify

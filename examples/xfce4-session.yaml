@@ -2,7 +2,7 @@ Name: xfce4-session
 Summary: Xfce session manager
 Version: 4.6.1
 Release: 1
-Group: User Interface/Desktops
+Group: System/Desktop
 License: GPLv2+
 URL: http://www.xfce.org/
 Description: |
@@ -19,30 +19,32 @@ Requires:
     - libxfcegui4 >= %{version}
     - xorg-x11-server-utils
     
+PkgConfigBR:
+    - libwnck-1.0
+    - xt
+    - dbus-1
+    - libstartup-notification-1.0
+    - libglade-2.0
+    - libxfcegui4-1.0
 PkgBR:
-    - libxfcegui4-devel >= %{version}
     - gettext
     - intltool
     - imake
     - xorg-x11-server-utils
     - GConf2-devel
-    - libwnck-devel
-PkgConfigBR:
-    - xt
-    - dbus-1
-    - libstartup-notification-1.0
-    - libglade-2.0
+
 Configure: configure
 ConfigOptions:
-    - enable-gnome
-    - enable-final
-    - disable-static
+    - --enable-gnome
+    - --enable-final
+
 LocaleName: xfce4-session
 
 AutoSubPackages:
     - devel
 SubPackages:
     - Name: engines
+      Group: System/Desktop
       Summary: Additional engines for xfce4-session 
       Description: |
             Additional splash screen engines for the Xfce Session Manager.
