@@ -148,6 +148,10 @@ RENAMED_KEYS = {'NeedCheckSection': 'Check',
                 'NoLocale': 'NoAutoLocale',
                }
 
+TYPO_KEYS = {'BuildRequires': 'PkgBR or PkgConfigBR',
+             'Url': 'URL',
+            }
+
 ARCHED_KEYS = ('Requires',
                'PkgBR',
                'PkgConfigBR',
@@ -390,6 +394,12 @@ class RPMWriter():
             for key in metadata:
                 if key not in all_keys:
                     keys.append(key)
+
+            # whether the invalid keys are common typo
+            for key in keys[:]:
+                if key in TYPO_KEYS:
+                    logger.warning('"%s" might be a typo of %s, please correct it' %(key,TYPO_KEYS[key]))
+                    keys.remove(key)
 
             return keys
 
