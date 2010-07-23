@@ -1,6 +1,6 @@
---- output.2.o	2010-03-17 21:15:14.000000000 +0800
-+++ output.2	2010-03-17 21:15:15.000000000 +0800
+--- output.2.o	2010-07-23 11:05:31.354224575 +0800
++++ output.2	2010-07-23 11:05:31.497763030 +0800
 @@ -1,2 +1,2 @@
  [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
--[32mInfo:[0m Creating new spec file: output.spec
+-[33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!
 +[31mError:[0m Missing mandatory keys for main package: Version

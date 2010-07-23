@@ -524,7 +524,7 @@ class RPMWriter():
             if builder not in BUILDERS:
                 logger.warning('"%s" is not a valid choice of Builder(%s)' % (builder, '/'.join(BUILDERS)))
             # checking invalid 'Configure' for special builder
-            if builder in ('python', 'perl', 'qmake') and \
+            if builder in ('python', 'perl', 'qmake', 'cmake') and \
                'Configure' in metadata:
                 logger.warning('"%s" need no "Configure" setting which will be ignored' % builder)
 
