@@ -233,7 +233,7 @@ class SpecParser(object):
                     break
 
             # find builder in current line
-            if re.match('^(%__)?make', whole_line):
+            if re.match('^(%\{__)?make', whole_line):
                 found_bldr = True
                 self._Builder = 'make'
             elif re.search('python\W+setup.py\W+build', whole_line):
@@ -320,7 +320,7 @@ class SpecParser(object):
         elif self._Builder == 'python':
             re_installer = re.compile('python\W+setup.py\W+install')
 
-        re_cleanup = re.compile('rm\W+-rf\W+(\$RPM_BUILD_ROOT|\%\{buildroot\})')
+        re_cleanup = re.compile('(rm|\%\{__rm\})\W+-rf\W+(\$RPM_BUILD_ROOT|\%\{buildroot\})')
 
         if self._Builder:
             # have found 'Builder' in build scripts
