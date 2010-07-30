@@ -63,6 +63,12 @@ if __name__ == '__main__':
         # input file does not exist
         logger.error("%s: File does not exist" % yaml_fpath)
 
+    if options.outfile_path:
+        out_fpath = os.path.abspath(options.outfile_path)
+    else:
+        # %{name}.spec as the default if not specified
+        out_fpath = None
+
     # check the working path
     if yaml_fpath.find('/') != -1 and os.path.dirname(yaml_fpath) != os.path.curdir:
         wdir = os.path.dirname(yaml_fpath)
@@ -74,12 +80,6 @@ if __name__ == '__main__':
     # check Makefile from packaging-tools
     if not os.path.exists('Makefile'):
         logger.warning('There is no "Makefile" for this package, please update it using packaging-tools')
-
-    if options.outfile_path:
-        out_fpath = options.outfile_path
-    else:
-        # %{name}.spec as the default if not specified
-        out_fpath = None
 
     spec_fpath, newspec = specify.generate_rpm(yaml_fname, spec_fpath=out_fpath, download_new=not options.not_download, skip_scm=options.skip_scm)
     if newspec:
