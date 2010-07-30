@@ -1124,6 +1124,8 @@ PkgBR:
         sin = re.compile("^# >> ([^\s]+)\s*(.*)")
         sout = re.compile("^# << ([^\s]+)\s*(.*)")
 
+        version = None
+
         # temp vars
         recording = []
         record = False
@@ -1139,8 +1141,27 @@ PkgBR:
         postun = {}
         check = {} # extra headers
 
+        line_num = 0
         for i in file(spec_fpath):
             i = i.strip()
+            if line_num < 3:
+                if line_num == 2:
+                    m = re.match("^#.*spectacle version ([\d.]+)$", i)
+                    if m:
+                        version = m.group(1)
+                        spec_ver = _V.LooseVersion(version)
+                        cur_ver = _V.LooseVersion(__version__.VERSION)
+                        if cur_ver < spec_ver:
+                            logger.warning('!!! Current spectacle version is lower than the one used for this package last time')
+                            repl = logger.ask('Please upgrade your spectacle firstly, continue?(y/N) ')
+                            if repl != 'y':
+                                sys.exit(1)
+                    else:
+                        repl = logger.ask('The exist spec file might be not a spectacle generated one, continue?(y/N) ')
+                        if repl != 'y':
+                            sys.exit(1)
+                line_num += 1
+
             matchin = sin.match(i)
             matchout = sout.match(i)
 
