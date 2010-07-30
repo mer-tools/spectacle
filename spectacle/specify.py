@@ -418,6 +418,10 @@ class RPMWriter():
                 if warn:
                     logger.warning('Group \'%s\' is not in the list of approved groups. See /usr/share/spectacle/GROUPS for the complete list.' % (metadata['Group']))
 
+        def _check_key_epoch(metadata):
+            if 'Epoch' in metadata:
+                logger.warning('Please consider to remove "Epoch"')
+
         def _check_pkgconfig():
             pkgcfg = csv.reader(open('/usr/share/spectacle/pkgconfig-provides.csv'), delimiter=',')
             for row in pkgcfg:
@@ -646,6 +650,8 @@ PkgConfigBR:
 PkgBR:
     - %s
                     """ %('\n    - '.join(pcbr), '\n    - '.join(br))
+
+        _check_key_epoch(self.metadata)
 
         # checking for meego valid groups
         _check_key_group(self.metadata)
