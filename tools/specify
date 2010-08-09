@@ -64,7 +64,10 @@ if __name__ == '__main__':
         logger.error("%s: File does not exist" % yaml_fpath)
 
     if options.outfile_path:
-        out_fpath = os.path.abspath(options.outfile_path)
+        if os.path.sep in options.outfile_path:
+            out_fpath = os.path.abspath(options.outfile_path)
+        else:
+            out_fpath = options.outfile_path
     else:
         # %{name}.spec as the default if not specified
         out_fpath = None
