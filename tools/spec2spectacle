@@ -136,7 +136,7 @@ class SpecParser(object):
         self.replace_macros = replace_macros
         self.macros = []
 
-    def __switch_subpkg(self, subpkg, create=False):
+    def _switch_subpkg(self, subpkg, create=False):
 
         # whether '-n subpkg'?
         wholename = False
@@ -181,7 +181,7 @@ class SpecParser(object):
             trying to find out the most of the generic cases
         """
 
-        def __save_raw_in_post(items, lines):
+        def _save_raw_in_post(items, lines):
             # make sure no 'make' generated auto
             items['Configure'] = 'none'
             items['Builder'] = 'none'
@@ -194,7 +194,7 @@ class SpecParser(object):
             lines.pop(0)
 
         if not self.builder_parsing:
-            __save_raw_in_post(items, lines)
+            _save_raw_in_post(items, lines)
             return
 
         # parts of build script
@@ -266,7 +266,7 @@ class SpecParser(object):
 
         if cur_part == PRE:
             # means match failed
-            __save_raw_in_post(items, lines)
+            _save_raw_in_post(items, lines)
         else:
             if self._Configure:
                 items['Configure'] = self._Configure
@@ -357,7 +357,7 @@ class SpecParser(object):
         items['extra']['check'] = v.strip()
         items['Check'] = True
 
-    def __parse_prog_in_opt(self, header):
+    def _parse_prog_in_opt(self, header):
         ls = header.split()
         if '-p' in ls:
             try:
@@ -367,24 +367,24 @@ class SpecParser(object):
         else:
             return ''
 
-    def __do_extra_scripts(self, items, h, v):
+    def _do_extra_scripts(self, items, h, v):
         section = h.split()[0][1:]
         items['extra'][section] = v.strip().splitlines()
-        inline_prog = self.__parse_prog_in_opt(h)
+        inline_prog = self._parse_prog_in_opt(h)
         if inline_prog:
             items['extra'][section].insert(0, inline_prog)
 
     def _do_pre(self, items, pkg, h, v):
-        self.__do_extra_scripts(items, h, v)
+        self._do_extra_scripts(items, h, v)
 
     def _do_preun(self, items, pkg, h, v):
-        self.__do_extra_scripts(items, h, v)
+        self._do_extra_scripts(items, h, v)
 
     def _do_post(self, items, pkg, h, v):
-        self.__do_extra_scripts(items, h, v)
+        self._do_extra_scripts(items, h, v)
 
     def _do_postun(self, items, pkg, h, v):
-        self.__do_extra_scripts(items, h, v)
+        self._do_extra_scripts(items, h, v)
 
     def _do_changelog(self, items, pkg, h, v):
         logger.warning('Please move changelog in %changelog to *.changes file.')
@@ -488,13 +488,13 @@ class SpecParser(object):
                     if header == 'package':
                         if not opt:
                             raise SpecFormatError(line)
-                        items = self.__switch_subpkg(opt, True)
+                        items = self._switch_subpkg(opt, True)
                     else:
                         # inline sections of other headers
                         state = ST_INLINE
                         if opt and (not opt.startswith('-') or '-n' in opt):
                             # section with sub-pkg specified
-                            items = self.__switch_subpkg(opt)
+                            items = self._switch_subpkg(opt)
                         else:
                             # for 'main' package
                             items = self.items
@@ -523,9 +523,9 @@ class SpecParser(object):
 
     def cooked_items(self):
         """ return all items, cooked to the input of convertor """
-        return self.__cook_items('main', self.items)
+        return self._cook_items('main', self.items)
 
-    def __cook_items(self, pkg_name, items):
+    def _cook_items(self, pkg_name, items):
         """ helper function to transfer data structure
             <recursive>
         """
@@ -615,7 +615,7 @@ class SpecParser(object):
         if 'SubPackages' in items:
             ck_items['SubPackages'] = []
             for sub, sub_items in items['SubPackages'].iteritems():
-                ck_items['SubPackages'].append(self.__cook_items(sub, sub_items))
+                ck_items['SubPackages'].append(self._cook_items(sub, sub_items))
 
         # check must-have keys
         for key, default in MUSTHAVE.iteritems():

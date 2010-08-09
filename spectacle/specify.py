@@ -461,7 +461,7 @@ class RPMWriter():
 
         def _check_arched_keys(metadata):
             """ sub-routine for ARCH namespace available keys """
-            def __check_arch(key, item):
+            def _check_arch(key, item):
                 if re.match('^\w+:[^:]+', item):
                     arch = item.split(':')[0].strip()
                     if arch not in ARCHS:
@@ -470,10 +470,10 @@ class RPMWriter():
             for key in ARCHED_KEYS:
                 if key in metadata:
                     if key in STR_KEYS:
-                        __check_arch(key, metadata[key])
+                        _check_arch(key, metadata[key])
                     elif key in LIST_KEYS:
                         for item in metadata[key]:
-                            __check_arch(key, item)
+                            _check_arch(key, item)
 
         def _check_key_localename(metadata):
             """ sub-routine for 'LocaleName' checking """
@@ -693,7 +693,7 @@ PkgBR:
         if 'Builder' in self.metadata:
             _check_key_builder(self.metadata)
 
-    def __get_scm_latest_release(self):
+    def _get_scm_latest_release(self):
 
         if "Archive" in self.metadata:
             archive = self.metadata['Archive']
@@ -742,7 +742,7 @@ PkgBR:
 
         os.chdir(pwd)
 
-    def __download_sources(self):
+    def _download_sources(self):
         pkg = self.pkg
         rev = self.version
         sources = self.metadata['Sources']
@@ -829,7 +829,7 @@ PkgBR:
                 prefix = prefix.replace(self.version, '%{version}')
                 self.metadata['SourcePrefix'] = prefix
 
-    def __parse_series(self, patches, comments):
+    def _parse_series(self, patches, comments):
         comment = ""
         for line in file(SERIES_PATH):
             if not line.strip():
@@ -842,7 +842,7 @@ PkgBR:
                 comments.append(comment + '# ' + line)
                 comment = ''
 
-    def __cleanup_boolkeys(self, items):
+    def _cleanup_boolkeys(self, items):
         """ clean up all boolean type keys,
             use the exists status to present bool value
         """
@@ -971,11 +971,11 @@ PkgBR:
             if not self.skip_scm:
                 # update to SCM latest release
                 if "SCM" in self.metadata:
-                    self.__get_scm_latest_release()
+                    self._get_scm_latest_release()
 
             # if no srcpkg with yaml.version exists in cwd, trying to download
             if 'Sources' in self.metadata:
-                self.__download_sources()
+                self._download_sources()
 
         # handle patches with extra options
         if "Patches" in self.metadata:
@@ -1004,17 +1004,17 @@ PkgBR:
             else:
                 self.metadata['Patches'] = []
                 self.metadata['PatchCmts'] = []
-                self.__parse_series(self.metadata['Patches'],
+                self._parse_series(self.metadata['Patches'],
                                     self.metadata['PatchCmts'])
 
         if 'Sources' in self.metadata:
             self.analyze_source()
 
         # clean up all boolean type keys, use the exists status to present bool value
-        self.__cleanup_boolkeys(self.metadata)
+        self._cleanup_boolkeys(self.metadata)
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
-                self.__cleanup_boolkeys(sp)
+                self._cleanup_boolkeys(sp)
 
         # check duplicate default configopts
         dup = '--disable-static'

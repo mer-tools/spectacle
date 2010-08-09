@@ -101,9 +101,9 @@ class SBConfigParser(RawConfigParser):
 
         self.record_used_files = []
 
-        self.__check_Makefile()
+        self._check_Makefile()
 
-    def __check_Makefile(self):
+    def _check_Makefile(self):
         """ Check whether Makefile in working dir should be moved """
         if os.path.exists('Makefile'):
             try:
@@ -132,7 +132,7 @@ class SBConfigParser(RawConfigParser):
         else:
             return option
 
-    def __expand_single(self, filename):
+    def _expand_single(self, filename):
         """ Helper function to expand *.desc """
         if os.path.exists(filename):
             self.record_used_files.append(filename)
@@ -141,7 +141,7 @@ class SBConfigParser(RawConfigParser):
             logger.warning("Warning: missing expected file %s" % filename)
             return None
 
-    def __cook_config(self):
+    def _cook_config(self):
         """ Helper function to update fields for spec-builder specific ones
         """
         all_items = {}
@@ -184,7 +184,7 @@ class SBConfigParser(RawConfigParser):
             # Convert keys which need expanding from external file
             for key in self.expand_keys:
                 if key in items:
-                    content = self.__expand_single(items[key])
+                    content = self._expand_single(items[key])
                     if content:
                         if key == 'Files':
                             # 'Files' need split to list
@@ -236,7 +236,7 @@ class SBConfigParser(RawConfigParser):
 
     def cooked_items(self):
         """ return all items, cooked to the input of convertor """
-        return self.__cook_config()
+        return self._cook_config()
 
 def parse_options(args):
     import spectacle.__version__
