@@ -563,7 +563,7 @@ class RPMWriter():
                     logger.warning('Unexpected keys for sub-pkg %s found: %s' % (sp['Name'], ', '.join(keys)))
 
         # checking for questionable sub-package keys
-        if "SubPackages" in self.metadata:
+        if "SubPackages" in self.metadata and 'NoFiles' not in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 keys = _check_subwarn_keys(sp, sp['Name'])
 
