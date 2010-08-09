@@ -372,4 +372,9 @@ from YAML file. But the end users need not tackle it.
 
      * Remove duplicate Requires(include pre/post/preun/postun) which were
        added automatically based on the analysis of file list.
+     * Review and clean up the reserved scripts in "build|install pre|post"
+       sections in new generated spec file.
 
+* User can use "series.conf" file to specify multiple patches under package directory.
+  The "series.conf" can be used by ``quilt`` and the content can be updated to spec
+  automatically when running ``specify``.
