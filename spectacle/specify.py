@@ -137,6 +137,7 @@ SUBAVAIL_KEYS = ('Name',
                  'Obsoletes',
                  'NoAutoReq',
                  'NoAutoProv',
+                 'FilesInput',
                  'Version', 'Release', 'Epoch', 'URL', 'BuildArch' # very rare
                 )
 
