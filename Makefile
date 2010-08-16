@@ -34,6 +34,9 @@ test:
 install: all install-data
 	python setup.py install
 
+develop: all install-data
+	python setup.py develop
+
 install-data:
 	install -d ${DESTDIR}/usr/share/spectacle/
 	install -m 644 data/*csv ${DESTDIR}/usr/share/spectacle/

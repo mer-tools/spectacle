@@ -2,6 +2,11 @@
 
 import os, sys
 from distutils.core import setup
+try:
+    import setuptools
+    # enable "setup.py develop", optional
+except ImportError:
+    pass
 
 if 'MAKEFLAGS' not in os.environ:
     repl = raw_input('WARNING: Please use `make install` for installation, continue(y/N)? ')
