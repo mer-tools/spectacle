@@ -912,6 +912,9 @@ PkgBR:
             self.metadata.update(yaml.load(self.stream))
         except yaml.scanner.ScannerError, e:
             logger.error('syntax error found in yaml: %s' % str(e))
+        except TypeError:
+            # empty can lead here
+            logger.error('Empty yaml file: %s' % self.yaml_fpath)
 
         # verifying the sanity
         self.sanity_check()
