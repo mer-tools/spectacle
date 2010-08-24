@@ -412,10 +412,14 @@ class RPMWriter():
         def _check_key_group(metadata):
             if metadata.has_key("Group"):
                 warn = True
-                for line in open("/usr/share/spectacle/GROUPS"):
-                    if metadata['Group'] in line:
-                        warn = False
-                        break
+                try:
+                    for line in open("/usr/share/spectacle/GROUPS"):
+                        if metadata['Group'] in line:
+                            warn = False
+                            break
+                except IOError:
+                    logger.error('Cannot open "/usr/share/spectacle/GROUPS", maybe the pkg was not installed correctly.')
+
                 if warn:
                     logger.warning('Group \'%s\' is not in the list of approved groups. See /usr/share/spectacle/GROUPS for the complete list.' % (metadata['Group']))
 
@@ -424,7 +428,11 @@ class RPMWriter():
                 logger.warning('Please consider to remove "Epoch"')
 
         def _check_pkgconfig():
-            pkgcfg = csv.reader(open('/usr/share/spectacle/pkgconfig-provides.csv'), delimiter=',')
+            try:
+                pkgcfg = csv.reader(open('/usr/share/spectacle/pkgconfig-provides.csv'), delimiter=',')
+            except IOError:
+                logger.error('Cannot open "/usr/share/spectacle/pkgconfig-provides.csv", maybe the pkg was not installed correctly.')
+
             for row in pkgcfg:
                 pc = re.search('pkgconfig\(([^)]+)\)', row[1])
                 m = pc.group(1)
