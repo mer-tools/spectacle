@@ -5,7 +5,7 @@
  # << build pre
  
 -
-+qmake-qt4 install_prefix=/usr
++%qmake
 +make %{?jobs:-j%jobs}
  
  # >> build post
@@ -14,7 +14,7 @@
  rm -rf %{buildroot}
  # >> install pre
  # << install pre
-+%make_install INSTALL_ROOT=%{buildroot}
++%qmake_install
  
  # >> install post
  # << install post
