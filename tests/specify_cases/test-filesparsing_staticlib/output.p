@@ -22,7 +22,7 @@
  rm -rf %{buildroot}
  # >> install pre
  # << install pre
-+%make_install 
++%make_install
  
  # >> install post
  # << install post

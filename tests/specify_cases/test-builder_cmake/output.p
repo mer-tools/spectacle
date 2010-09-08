@@ -17,7 +17,7 @@
  # >> install pre
  # << install pre
 +cd meego-build
-+%make_install 
++%make_install
  
  # >> install post
  # << install post
