@@ -486,7 +486,15 @@ $str_newline.join($extra.content.build.pre)
 CFLAGS="\$RPM_OPT_FLAGS" %{__python} setup.py build
 #else if $Builder == 'qmake'
 #set $Configure = 'none'
+#if 'SupportOtherDistros' in $metadata
+%if 0%{?moblin_version}
+%qmake
+%else
 qmake-qt4 install_prefix=/usr
+%endif
+#else
+%qmake
+#end if
 make %{?jobs:-j%jobs}
 #else if $Builder == 'perl'
 if test -f Makefile.PL; then
@@ -603,15 +611,20 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
 find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null ';'
 find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %{_fixperms} %{buildroot}/*
-#else if $Builder == 'make' or $Builder == 'single-make' or $Builder == 'qmake' or $Builder == 'cmake'
-#if $Builder == 'qmake'
-#set $extra_install_param="INSTALL_ROOT=%{buildroot}"
-#else
-#set $extra_install_param=""
-#end if
+#else if $Builder == 'qmake'
 #if 'SupportOtherDistros' in $metadata
 %if 0%{?moblin_version}
-%make_install $extra_install_param
+%qmake_install
+%else
+%makeinstall
+%endif
+#else
+%qmake_install
+#end if
+#else if $Builder == 'make' or $Builder == 'single-make' or $Builder == 'cmake'
+#if 'SupportOtherDistros' in $metadata
+%if 0%{?moblin_version}
+%make_install
 %else
 %makeinstall
 %endif
@@ -619,7 +632,7 @@ find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 #if $Builder == 'cmake'
 cd meego-build
 #end if
-%make_install $extra_install_param
+%make_install
 #end if
 #end if ## of Builder==???
 #if $metadata.has_key("ExtraInstall")
