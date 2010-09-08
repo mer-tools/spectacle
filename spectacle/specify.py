@@ -1114,8 +1114,10 @@ PkgBR:
                             logger.error('please use %s in %%files to specify module installation path' % py_path)
 
         # check whether need to update desktop database
-        if self.extra['Desktop'] == True and 'UpdateDesktopDB' in self.metadata:
+        if 'UpdateDesktopDB' in self.metadata:
             self.extra['DesktopDB'] = True
+            if self.extra['Desktop'] != True:
+                logger.warning('"UpdateDesktopDB" specified but found no desktop files')
 
         # files listed in '%doc' need handling
         # TODO to be cleanup
