@@ -1160,7 +1160,7 @@ PkgBR:
             i = i.strip()
             if line_num < 3:
                 if line_num == 2:
-                    m = re.match("^#.*spectacle version ([\d.]+)$", i)
+                    m = re.match("^#.*spectacle version ([\d.]+)(~pre|git)?$", i)
                     if m:
                         version = m.group(1)
                         spec_ver = _V.LooseVersion(version)
