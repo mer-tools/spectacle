@@ -22,6 +22,14 @@ import optparse
 from spectacle import specify
 from spectacle import logger
 
+MF_TEMPLATE = """PKG_NAME := %s
+SPECFILE = $(addsuffix .spec, $(PKG_NAME))
+YAMLFILE = $(addsuffix .yaml, $(PKG_NAME))
+
+
+include /usr/share/packaging-tools/Makefile.common
+"""
+
 def parse_options(args):
     import spectacle.__version__
 
@@ -73,19 +81,25 @@ if __name__ == '__main__':
         out_fpath = None
 
     # check the working path
-    if yaml_fpath.find('/') != -1 and os.path.dirname(yaml_fpath) != os.path.curdir:
+    if yaml_fpath.find(os.path.sep) != -1 and os.path.dirname(yaml_fpath) != os.path.curdir:
         wdir = os.path.dirname(yaml_fpath)
         logger.info('Changing to working dir: %s' % wdir)
         os.chdir(wdir)
 
     yaml_fname = os.path.basename(yaml_fpath)
 
-    # check Makefile from packaging-tools
-    if not os.path.exists('Makefile'):
-        logger.warning('There is no "Makefile" for this package, please update it using packaging-tools')
-
     spec_fpath, newspec = specify.generate_rpm(yaml_fname, spec_fpath=out_fpath, download_new=not options.not_download, skip_scm=options.skip_scm)
     if newspec:
         logger.warning("NEW spec file created: %s, maybe customized spec content is needed!" % spec_fpath)
     else:
         logger.info("Old spec file exists, patching %s ..." % spec_fpath)
+
+    # check Makefile from packaging-tools
+    if not os.path.exists('Makefile'):
+        logger.warning('There is no "Makefile" for this package, please update it using packaging-tools')
+        repl = logger.ask('Need to create Makefile from template?(y/N) ?')
+        if repl.lower() == 'y':
+            mf = open('Makefile', 'w')
+            mf.write(MF_TEMPLATE % os.path.basename(spec_fpath).rstrip('.spec'))
+            mf.close()
+
