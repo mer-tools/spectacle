@@ -766,6 +766,7 @@ PkgBR:
                     if repl == 'n': break
 
                     logger.info('Downloading latest source package from: %s' % target)
+                    import glob
                     import urlgrabber
                     from urlgrabber.progress import text_progress_meter
                     try:
@@ -777,12 +778,23 @@ PkgBR:
                             raise e
                     except KeyboardInterrupt:
                         logger.info('Downloading is interrupted by ^C')
-                    """
-                    for ext in ('.md5', '.gpg', '.sig', '.sha1sum'):
-                        urllib.urlretrieve(target + ext, f_name + ext)
-                    """
+                    else:
+                        # After download, asking to remove the possible old tarballs
+                        target = s.replace('%{name}', pkg)
+                        target = target.replace('%{version}', '*')
+                        globname = os.path.basename(target)
+                        for f in glob.glob(globname):
+                            if f == f_name: continue
 
-    def analyze_source(self):
+                            repl = logger.ask('Possible old source: %s, to delete it?(Y/n) ' % f)
+                            if repl == 'n': break
+                            try:
+                                os.remove(f)
+                                logger.info('%s Deleted!' % f)
+                            except OSError:
+                                logger.warning('Cannot delete %s' % f)
+
+    def _analyze_source(self):
         def pc_files(members):
             for tarinfo in members:
                 f = os.path.split(tarinfo.name)[1]
@@ -1020,7 +1032,7 @@ PkgBR:
                                     self.metadata['PatchCmts'])
 
         if 'Sources' in self.metadata:
-            self.analyze_source()
+            self._analyze_source()
 
         # clean up all boolean type keys, use the exists status to present bool value
         self._cleanup_boolkeys(self.metadata)
