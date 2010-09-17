@@ -70,6 +70,7 @@ LIST_KEYS = ('Sources',
              'ExtraSources',
              'Patches',
              'ConfigOptions',
+             'QMakeOptions',
              'Requires',
              'RequiresPre',
              'RequiresPreUn',
@@ -158,6 +159,7 @@ ARCHED_KEYS = ('Requires',
                'PkgConfigBR',
                'Patches',
                'ConfigOptions',
+               'QMakeOptions',
               )
 ARCHS = ('ix86', 'arm')
 

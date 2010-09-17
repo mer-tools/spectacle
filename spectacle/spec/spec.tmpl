@@ -488,13 +488,59 @@ CFLAGS="\$RPM_OPT_FLAGS" %{__python} setup.py build
 #set $Configure = 'none'
 #if 'SupportOtherDistros' in $metadata
 %if 0%{?moblin_version}
-%qmake
+%qmake #slurp
+#if 'QMakeOptions' in $metadata
+ \
+#else
+
+#end if
 %else
-qmake-qt4 install_prefix=/usr
+qmake-qt4 install_prefix=/usr #slurp
+#if 'QMakeOptions' in $metadata
+ \
+#else
+
+#end if
 %endif
 #else
-%qmake
+%qmake #slurp
+#if 'QMakeOptions' in $metadata
+ \
+#else
+
 #end if
+#end if
+#if 'QMakeOptions' in $metadata
+#set $length = len($metadata.QMakeOptions)
+#set $idx = 1
+#for $opt in $metadata.QMakeOptions
+## checking arch namespace prefix
+#if $opt.startswith('arm:')
+#set $arch = '%{arm}'
+#set $opt = $opt[4:]
+#else if $opt.startswith('ix86:')
+#set $arch = '%{ix86}'
+#set $opt = $opt[5:]
+#else
+#set $arch = ""
+#end if
+## end of checking
+#if $arch
+%ifarch $arch
+#end if
+    $opt#slurp
+#if $idx == $length
+
+#else
+ \
+#end if
+#if $arch
+%endif
+#end if
+#set $idx = $idx + 1
+#end for
+#end if  ## QMakeOptions
+
 make %{?jobs:-j%jobs}
 #else if $Builder == 'perl'
 if test -f Makefile.PL; then
