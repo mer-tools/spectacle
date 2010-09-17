@@ -19,13 +19,15 @@
 import os,sys
 
 
-__ALL__ = ['info', 'warning', 'error', 'ask']
+__ALL__ = ['set_mode', 'info', 'warning', 'error', 'ask']
 
 # COLORs in ANSI
 INFO_COLOR = 32 # green
 WARN_COLOR = 33 # yellow
 ERR_COLOR  = 31 # red
 ASK_COLOR  = 34 # blue
+
+INTERACTIVE = True
 
 def _color_print(head, color, msg = None, stream = sys.stdout):
     if os.getenv('ANSI_COLORS_DISABLED') is None:
@@ -38,6 +40,13 @@ def _color_print(head, color, msg = None, stream = sys.stdout):
 def _color_perror(head, color, msg):
     _color_print(head, color, msg, sys.stderr)
 
+def set_mode(interactive):
+    global INTERACTIVE
+    if interactive:
+        INTERACTIVE = True
+    else:
+        INTERACTIVE = False
+
 def info(msg):
     _color_perror('Info', INFO_COLOR, msg)
 
@@ -48,10 +57,29 @@ def error(msg):
     _color_perror('Error', ERR_COLOR, msg)
     sys.exit(1)
 
-def ask(msg):
+def ask(msg, default=True):
     _color_print('Q', ASK_COLOR, '')
     try:
-        return raw_input(msg)
+        if default:
+            msg += '(Y/n) '
+        else:
+            msg += '(y/N) '
+        if INTERACTIVE:
+            repl = raw_input(msg)
+            if repl.lower() == 'y':
+                return True
+            elif repl.lower() == 'n':
+                return False
+            else:
+                return default
+
+        else:
+            print msg,
+            if default:
+                print 'Y'
+            else:
+                print 'N'
+            return default
     except KeyboardInterrupt:
         print
         sys.exit(2)

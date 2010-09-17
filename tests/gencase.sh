@@ -11,11 +11,11 @@ mkdir test-${CaseName}
 cd test-${CaseName}
 
 cp ../base/testpkg.yaml .
-specify -N -o output.spec testpkg.yaml 1>output.1.o 2>output.2.o
+specify -N -n -o output.spec testpkg.yaml 1>output.1.o 2>output.2.o
 vi testpkg.yaml
 diff -upN ../base/testpkg.yaml testpkg.yaml > input.p
 mv output.spec output.orig.spec
-specify -N -o output.spec testpkg.yaml 1>output.1 2>output.2
+specify -N -n -o output.spec testpkg.yaml 1>output.1 2>output.2
 echo 'Input diff:'
 cat input.p
 

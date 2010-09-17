@@ -764,8 +764,8 @@ PkgBR:
                 target = target.replace('%{version}', rev)
                 f_name = os.path.basename(target)
                 if not os.path.isfile(f_name):
-                    repl = logger.ask('Need to download source package: %s ?(Y/n) ' % f_name)
-                    if repl == 'n': break
+                    answer = logger.ask('Need to download source package: %s ?' % f_name)
+                    if not answer: break
 
                     logger.info('Downloading latest source package from: %s' % target)
                     import glob
@@ -788,8 +788,8 @@ PkgBR:
                         for f in glob.glob(globname):
                             if f == f_name: continue
 
-                            repl = logger.ask('Possible old source: %s, to delete it?(Y/n) ' % f)
-                            if repl == 'n': break
+                            answer = logger.ask('Possible old source: %s, to delete it?' % f)
+                            if not answer: break
                             try:
                                 os.remove(f)
                                 logger.info('%s Deleted!' % f)
@@ -1181,12 +1181,12 @@ PkgBR:
                         cur_ver = _V.LooseVersion(__version__.VERSION)
                         if cur_ver < spec_ver:
                             logger.warning('!!! Current spectacle version is lower than the one used for this package last time')
-                            repl = logger.ask('Please upgrade your spectacle firstly, continue?(y/N) ')
-                            if repl != 'y':
+                            answer = logger.ask('Please upgrade your spectacle firstly, continue?', False)
+                            if not answer:
                                 sys.exit(1)
                     else:
-                        repl = logger.ask('The exist spec file might be not a spectacle generated one, continue?(y/N) ')
-                        if repl != 'y':
+                        answer = logger.ask('The exist spec file might be not a spectacle generated one, continue?', False)
+                        if not answer:
                             sys.exit(1)
                 line_num += 1
 
@@ -1305,8 +1305,8 @@ PkgBR:
                     pass
                 bak_spec_fpath = os.path.join(backdir, self.specfile)
                 if os.path.exists(bak_spec_fpath):
-                    repl = logger.ask('%s will be overwritten by the backup, continue?(Y/n) ' % bak_spec_fpath)
-                    if repl == 'n':
+                    answer = logger.ask('%s will be overwritten by the backup, continue?' % bak_spec_fpath)
+                    if not answer:
                         sys.exit(1)
 
                 logger.info('Old spec file is saved as "%s"' % bak_spec_fpath)

@@ -18,14 +18,10 @@
 
 import unittest
 
-#import test_ini2spectacle
-#import test_spec2spectacle
 import test_specify
 
 def main():
     suite = unittest.TestSuite((
-#                test_ini2spectacle.suite(),
-#                test_spec2spectacle.suite(),
                 test_specify.suite(),
             ))
     unittest.TextTestRunner(verbosity=2).run(suite)

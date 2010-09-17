@@ -17,10 +17,10 @@
 #    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 SCRIPTS = """
-specify -N -o output.spec testpkg.yaml 1>output.1.o 2>output.2.o
+specify -N -n -o output.spec testpkg.yaml 1>output.1.o 2>output.2.o
 mv output.spec output.orig.spec
 patch -s < input.p
-specify -N -o output.spec testpkg.yaml 1>ouput.1 2>output.2
+specify -N -n -o output.spec testpkg.yaml 1>ouput.1 2>output.2
 if [ ! -f output.no -a ! -f output.spec ]; then
   mv output.2 output.error
   exit 1

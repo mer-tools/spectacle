@@ -656,11 +656,11 @@ def check_yaml_file(spec_fpath):
 
     yaml_s = glob.glob('*.yaml')
     if yaml_s:
-        repl = logger.ask(""""*.yaml" file(s) exists in working dir: %s
+        answer = logger.ask(""""*.yaml" file(s) exists in working dir: %s
     Maybe this package has been converted to spectacle enabled one.
-    Continue? (N/y) """  % ' '.join(yaml_s))
+    Continue?"""  % ' '.join(yaml_s), False)
 
-        if repl.upper() != 'Y':
+        if not answer:
             sys.exit(1)
 
 def check_ini_file(spec_fpath):
@@ -670,11 +670,11 @@ def check_ini_file(spec_fpath):
 
     ini_s = glob.glob('*.ini')
     if ini_s:
-        repl = logger.ask(""""*.ini" file(s) exists in working dir: %s
+        answer = logger.ask(""""*.ini" file(s) exists in working dir: %s
     If being spec-builder file(s), please use ini2spectacle to convert.
-    Continue? (N/y) """  % ' '.join(ini_s))
+    Continue?"""  % ' '.join(ini_s), False)
 
-        if repl.upper() != 'Y':
+        if not answer:
             sys.exit(1)
 
 def check_spec_file(spec_fpath):

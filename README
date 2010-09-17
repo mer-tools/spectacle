@@ -53,6 +53,8 @@ Several methods available for spectacle installation:
                             Path of output spec file
       -s, --skip-scm        Skip to check upstream SCM when specified in YAML
       -N, --not-download    Do not try to download newer source files
+      -n, --non-interactive
+                        Non interactive running, to use default answers
 
 ### ini2spectacle
     Usage: ini2spectacle [options] [ini-path]

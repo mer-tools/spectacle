@@ -45,6 +45,9 @@ def parse_options(args):
     parser.add_option("-N", "--not-download", action="store_true",
                       dest="not_download", default=False,
                       help="Do not try to download newer source files")
+    parser.add_option("-n", "--non-interactive", action="store_true",
+                      dest="noninteractive", default=False,
+                      help="Non interactive running, to use default answers")
 
     return parser.parse_args()
 
@@ -65,6 +68,9 @@ if __name__ == '__main__':
         yaml_fpath = yamlls[0]
     else:
         yaml_fpath = args[0]
+
+    if options.noninteractive:
+        logger.set_mode(False)
 
     # check if the input file exists
     if not os.path.exists(yaml_fpath):
@@ -88,18 +94,17 @@ if __name__ == '__main__':
 
     yaml_fname = os.path.basename(yaml_fpath)
 
+    # check Makefile from packaging-tools
+    if not os.path.exists('Makefile'):
+        logger.warning('There is no "Makefile" for this package, please update it using packaging-tools')
+        answer = logger.ask('Need to create Makefile from default template?', False)
+        if answer:
+            mf = open('Makefile', 'w')
+            mf.write(MF_TEMPLATE % os.path.basename(yaml_fname).rstrip('.yaml'))
+            mf.close()
+
     spec_fpath, newspec = specify.generate_rpm(yaml_fname, spec_fpath=out_fpath, download_new=not options.not_download, skip_scm=options.skip_scm)
     if newspec:
         logger.warning("NEW spec file created: %s, maybe customized spec content is needed!" % spec_fpath)
     else:
         logger.info("Old spec file exists, patching %s ..." % spec_fpath)
-
-    # check Makefile from packaging-tools
-    if not os.path.exists('Makefile'):
-        logger.warning('There is no "Makefile" for this package, please update it using packaging-tools')
-        repl = logger.ask('Need to create Makefile from template?(y/N) ?')
-        if repl.lower() == 'y':
-            mf = open('Makefile', 'w')
-            mf.write(MF_TEMPLATE % os.path.basename(spec_fpath).rstrip('.spec'))
-            mf.close()
-
