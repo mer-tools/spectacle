@@ -136,9 +136,9 @@ All available directives for spectacle are listed as the following:
 
 * RequiresPostUn: **list** of **string**
 
-* PkgBR: **list** of **string**, packages required by build, or BuildRequires
+* PkgBR: **list** of **string**, packages required in building, or BuildRequires
 
-* PkgConfigBR: **list** of **string**, pkg-config requires by build
+* PkgConfigBR: **list** of **string**, pkg-config requires in building
 
 * Provides: **list** of **string**
 
@@ -150,12 +150,16 @@ All available directives for spectacle are listed as the following:
 
 * Configure: **string**, *optional*, valid values: **autogen**, **configure**,
   **reconfigure**, **none**<br>
-  **If not specified, the default value ``configure`` will be used**
+  **If not specified, the default value "configure" will be used**
+
+* ConfigOptions: **list**, *optional*, extra options for ``Configure``
 
 * Builder: **string**, *optional*, valid values: **make**, **single-make**,
   **python**, **perl**, **qmake**, **none**<br>
-  **If not specified, the deault value ``make`` will be used. If do not want a
-  automatic builder, please use ``none``.**
+  **If not specified, the deault value "make" will be used. If do not want a
+  automatic builder, please use "none".**
+
+* QMakeOptions: **list**, *optional*, extra options for **qmake** ``Builder``
 
 * Files: **list** of **string**, *optional*, content of ``%files`` for small packages
 
@@ -221,6 +225,7 @@ For the following spectacle YAML keywords:
 * PkgConfigBR
 * Patches
 * ConfigOptions
+* QMakeOptions
 
 If one of the items need to be architecture specified, we can add arch prefix to
 it. The supported prefix and the corresponding architectures as the followings:

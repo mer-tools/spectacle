@@ -1,5 +1,5 @@
---- output.orig.spec	2010-09-17 10:54:49.143263355 +0800
-+++ output.spec	2010-09-17 10:54:49.565250470 +0800
+--- output.orig.spec	2010-09-17 10:58:33.783208854 +0800
++++ output.spec	2010-09-17 10:58:53.111333856 +0800
 @@ -14,6 +14,7 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
@@ -8,15 +8,17 @@
  
  
  %description
-@@ -42,14 +43,25 @@ This package contains development files
+@@ -42,14 +43,27 @@ This package contains development files
  # >> build pre
  # << build pre
  
 +%if 0%{?moblin_version}
-+%qmake 
++%qmake  \
 +%else
-+qmake-qt4 install_prefix=/usr 
++qmake-qt4 install_prefix=/usr  \
 +%endif
++    --qmake-one \
++    --qmake-two
  
 +make %{?jobs:-j%jobs}
  
