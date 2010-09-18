@@ -495,7 +495,13 @@ CFLAGS="\$RPM_OPT_FLAGS" %{__python} setup.py build
 
 #end if
 %else
-qmake-qt4 install_prefix=/usr #slurp
+qmake -makefile -nocache \
+  "QMAKE_CFLAGS_RELEASE=\${CFLAGS:-%optflags}" \
+  "QMAKE_CFLAGS_DEBUG=\${CFLAGS:-%optflags}" \
+  "QMAKE_CXXFLAGS_RELEASE=\${CXXFLAGS:-%optflags}" \
+  "QMAKE_CXXFLAGS_DEBUG=\${CXXFLAGS:-%optflags}" \
+  QMAKE_STRIP=: \
+  PREFIX=%{_prefix} #slurp
 #if 'QMakeOptions' in $metadata
  \
 #else
