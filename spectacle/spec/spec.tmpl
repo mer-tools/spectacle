@@ -287,6 +287,9 @@ AutoReq:    0
 #if 'NoAutoProv' in $sp
 AutoProv:    0
 #end if
+#if 'NoAutoReqProv' in $sp
+AutoReqProv:    0
+#end if
 #if $sp.has_key("AutoDepend") and not $metadata.has_key("NoFiles")
 Requires:   %{name} = $auto_depend
 #end if
