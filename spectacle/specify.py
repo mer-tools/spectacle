@@ -21,7 +21,6 @@ import re
 import tempfile
 import shutil
 import copy
-import distutils.version as _V
 import datetime
 import csv
 import tarfile
@@ -33,6 +32,7 @@ import yaml
 import __version__
 import spec
 import logger
+from vercmp import FairVersion as _V
 
 SERIES_PATH = 'series.conf'
 
@@ -189,7 +189,7 @@ class GitAccess():
         return tags
 
     def get_toptag(self):
-        vers = [_V.LooseVersion(tag) for tag in self._gettags()]
+        vers = [_V(tag) for tag in self._gettags()]
         if vers:
             vers.sort()
             return str(vers[-1])
@@ -1174,11 +1174,11 @@ PkgBR:
             i = i.strip()
             if line_num < 3:
                 if line_num == 2:
-                    m = re.match("^#.*spectacle version ([\d.]+)(~pre|git)?$", i)
+                    m = re.match("^#.*spectacle version (\S+)$", i)
                     if m:
                         version = m.group(1)
-                        spec_ver = _V.LooseVersion(version)
-                        cur_ver = _V.LooseVersion(__version__.VERSION)
+                        spec_ver = _V(version)
+                        cur_ver = _V(__version__.VERSION)
                         if cur_ver < spec_ver:
                             logger.warning('!!! Current spectacle version is lower than the one used for this package last time')
                             answer = logger.ask('Please upgrade your spectacle firstly, continue?', False)
