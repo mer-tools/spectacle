@@ -18,6 +18,7 @@
 
 import os,sys
 import optparse
+import glob
 
 from spectacle import specify
 from spectacle import logger
@@ -29,6 +30,35 @@ YAMLFILE = $(addsuffix .yaml, $(PKG_NAME))
 
 include /usr/share/packaging-tools/Makefile.common
 """
+
+def new_yaml(fpath):
+    from spectacle import dumper
+    if not fpath.endswith('.yaml'):
+        fpath += '.yaml'
+
+    autokeys = list(specify.MAND_KEYS) + ['Sources', 'Requires', 'PkgBR', 'PkgConfigBR']
+    items = []
+    for key in autokeys:
+        if key in specify.STR_KEYS:
+            items.append((key, '^^^'))
+        elif key in specify.LIST_KEYS:
+            items.append((key, ['^^^']))
+
+    dumper = dumper.SpectacleDumper(format='yaml', opath = fpath)
+    dumper.dump(items)
+    # append comments
+    with open(fpath, 'a') as f:
+        f.write("""# Please replace all "^^^" with valid values, or remove the unused keys.
+# And cleanup these comments lines for the best.
+""")
+    logger.info('New spectacle yaml file created: %s' % fpath)
+    if logger.ask('Continue to edit the new file?'):
+        if 'EDITOR' in os.environ:
+            editor = sys.environ['EDITOR']
+        else:
+            editor = 'vi'
+        os.system('%s %s' % (editor, fpath))
+
 
 def parse_options(args):
     import spectacle.__version__
@@ -48,6 +78,9 @@ def parse_options(args):
     parser.add_option("-n", "--non-interactive", action="store_true",
                       dest="noninteractive", default=False,
                       help="Non interactive running, to use default answers")
+    parser.add_option("", "--new", type="string",
+                      dest="newyaml", default=None,
+                      help="Create a new yaml from template")
 
     return parser.parse_args()
 
@@ -56,9 +89,20 @@ if __name__ == '__main__':
 
     (options, args) = parse_options(sys.argv[1:])
 
+    if options.newyaml:
+        if glob.glob('*.yaml'):
+            if not logger.ask('Yaml file found in current dir, continue to create a new one?', False):
+                sys.exit(0)
+
+        elif glob.glob('*.spec'):
+            if not logger.ask('Spec file found in current dir, maybe you need spec2spectacle to convert it, continue?', False):
+                sys.exit(0)
+
+        new_yaml(options.newyaml)
+        sys.exit(0)
+
     if not args:
         # no YAML-path specified, search in CWD
-        import glob
         yamlls = glob.glob('*.yaml')
         if not yamlls:
             logger.error('Cannot find valid spectacle file(*.yaml) in current directory, please specify one.')
@@ -97,8 +141,7 @@ if __name__ == '__main__':
     # check Makefile from packaging-tools
     if not os.path.exists('Makefile'):
         logger.warning('There is no "Makefile" for this package, please update it using packaging-tools')
-        answer = logger.ask('Need to create Makefile from default template?', False)
-        if answer:
+        if logger.ask('Need to create Makefile from default template?', False):
             mf = open('Makefile', 'w')
             mf.write(MF_TEMPLATE % os.path.basename(yaml_fname).rstrip('.yaml'))
             mf.close()
