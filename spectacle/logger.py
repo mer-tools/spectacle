@@ -33,9 +33,9 @@ def _color_print(head, color, msg = None, stream = sys.stdout):
     if os.getenv('ANSI_COLORS_DISABLED') is None:
         head = '\033[%dm%s:\033[0m' %(color, head)
     if msg:
-        print >> stream, head, msg
+        stream.write('%s %s\n' % (head, msg))
     else:
-        print >> stream, head,
+        stream.write('%s ' % head)
 
 def _color_perror(head, color, msg):
     _color_print(head, color, msg, sys.stderr)
@@ -74,13 +74,13 @@ def ask(msg, default=True):
                 return default
 
         else:
-            print msg,
+            sys.stdout.write('%s ' % msg)
             if default:
-                print 'Y'
+                sys.stdout.write('Y\n')
             else:
-                print 'N'
+                sys.stdout.write('N\n')
             return default
     except KeyboardInterrupt:
-        print
+        sys.stdout.write('\n')
         sys.exit(2)
 

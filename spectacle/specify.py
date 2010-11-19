@@ -249,7 +249,9 @@ class RPMWriter():
             logger.error('Cannot read file: %s' % yaml_fpath)
 
     def dump(self):
-        print yaml.dump(yaml.load(self.stream))
+        # debugging
+        import pprint
+        pprint.pprint(yaml.dump(yaml.load(self.stream)))
 
     def _check_dup_files(self, files):
         # try to remove duplicate '%defattr' in files list
@@ -663,13 +665,12 @@ class RPMWriter():
             if len(pcbr) > 0:
                 if self.metadata.has_key('PkgConfigBR'):
                     pcbr.extend(self.metadata['PkgConfigBR'])
-                print """
-Proposal (multiple values skipped, please insert them manually):
+                logger.info("""Proposal (multiple values skipped, please insert them manually):
 PkgConfigBR:
     - %s
 PkgBR:
     - %s
-                    """ %('\n    - '.join(pcbr), '\n    - '.join(br))
+                    """ %('\n    - '.join(pcbr), '\n    - '.join(br)))
 
         _check_key_epoch(self.metadata)
 

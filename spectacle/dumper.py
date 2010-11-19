@@ -66,10 +66,6 @@ class SpectacleDumper(object):
 
         self.spec_extra = {}
 
-    def _dump_json(self, data):
-        import json
-        print json.dumps(data, indent=4)
-
     def _esc_value(self, val):
         # ESC for leading '%', for yaml syntax
         if val.startswith('%') or \
@@ -176,8 +172,8 @@ class SpectacleDumper(object):
         try:
             if format == 'yaml':
                 self._dump_yaml(data, fp)
-            elif format == 'json':
-                self._dump_json(data)
+            else:
+                logger.error('Unsupported spectacle data dump format: %s' %format)
         finally:
             fp.close()
 
