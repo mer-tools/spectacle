@@ -17,7 +17,7 @@
 #    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import os,sys
-
+import re
 
 __ALL__ = ['set_mode', 'info', 'warning', 'error', 'ask']
 
@@ -26,6 +26,8 @@ INFO_COLOR = 32 # green
 WARN_COLOR = 33 # yellow
 ERR_COLOR  = 31 # red
 ASK_COLOR  = 34 # blue
+
+PREFIX_RE = re.compile('^<(.*?)>\s*(.*)')
 
 INTERACTIVE = True
 
@@ -40,6 +42,13 @@ def _color_print(head, color, msg = None, stream = sys.stdout):
 def _color_perror(head, color, msg):
     _color_print(head, color, msg, sys.stderr)
 
+def _split_msg(head, msg):
+    m = PREFIX_RE.match(msg)
+    if m:
+        head += ' <%s>' % m.group(1)
+        msg = m.group(2)
+    return head, msg
+
 def set_mode(interactive):
     global INTERACTIVE
     if interactive:
@@ -48,13 +57,16 @@ def set_mode(interactive):
         INTERACTIVE = False
 
 def info(msg):
-    _color_perror('Info', INFO_COLOR, msg)
+    head, msg = _split_msg('Info', msg)
+    _color_perror(head, INFO_COLOR, msg)
 
 def warning(msg):
-    _color_perror('Warning', WARN_COLOR, msg)
+    head, msg = _split_msg('Warning', msg)
+    _color_perror(head, WARN_COLOR, msg)
 
 def error(msg):
-    _color_perror('Error', ERR_COLOR, msg)
+    head, msg = _split_msg('Error', msg)
+    _color_perror(head, ERR_COLOR, msg)
     sys.exit(1)
 
 def ask(msg, default=True):
