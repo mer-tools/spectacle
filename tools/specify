@@ -16,6 +16,8 @@
 #    with this program; if not, write to the Free Software Foundation, Inc., 59
 #    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import with_statement
+
 import os,sys
 import optparse
 import glob
@@ -59,6 +61,28 @@ def new_yaml(fpath):
             editor = 'vi'
         os.system('%s %s' % (editor, fpath))
 
+def new_subpkg(fpath, sub):
+    def _has_subs(path):
+        import re
+        with open(path) as f:
+            lines = f.read()
+        if re.search('^SubPackages:', lines, re.M):
+            return True
+        else:
+            return False
+
+    if _has_subs(fpath):
+        str_sub = '\n'
+    else:
+        str_sub = '\nSubPackages:\n'
+    str_sub +="""    - Name:  %s
+      Summary: ^^^
+      Group: ^^^
+# Please replace all "^^^" with valid values, and cleanup this comment line.
+""" % sub
+
+    with open(fpath, 'a') as f:
+        f.write(str_sub)
 
 def parse_options(args):
     import spectacle.__version__
@@ -81,6 +105,9 @@ def parse_options(args):
     parser.add_option("", "--new", type="string",
                       dest="newyaml", default=None,
                       help="Create a new yaml from template")
+    parser.add_option("", "--newsub", type="string",
+                      dest="newsub", default=None,
+                      help="Append a new sub-package to current yaml")
 
     return parser.parse_args()
 
@@ -88,6 +115,9 @@ if __name__ == '__main__':
     """ Main Function """
 
     (options, args) = parse_options(sys.argv[1:])
+
+    if options.noninteractive:
+        logger.set_mode(False)
 
     if options.newyaml:
         if glob.glob('*.yaml'):
@@ -113,13 +143,15 @@ if __name__ == '__main__':
     else:
         yaml_fpath = args[0]
 
-    if options.noninteractive:
-        logger.set_mode(False)
-
     # check if the input file exists
-    if not os.path.exists(yaml_fpath):
+    if not os.path.isfile(yaml_fpath):
         # input file does not exist
         logger.error("%s: File does not exist" % yaml_fpath)
+
+    if options.newsub:
+        new_subpkg(yaml_fpath, options.newsub)
+        logger.info('Yaml file: %s has been appended with new subpkg: %s' % (yaml_fpath, options.newsub))
+        sys.exit(0)
 
     if options.outfile_path:
         if os.path.sep in options.outfile_path:
