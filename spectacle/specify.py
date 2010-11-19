@@ -53,6 +53,7 @@ BOOLNO_KEYS = ('Check',
                'SupportOtherDistros',
                'NoAutoReq',
                'NoAutoProv',
+               'NoAutoReqProv',
                'NoSetup',
                'NoAutoLocale',
                'AsWholeName',
@@ -138,6 +139,7 @@ SUBAVAIL_KEYS = ('Name',
                  'Obsoletes',
                  'NoAutoReq',
                  'NoAutoProv',
+                 'NoAutoReqProv',
                  'FilesInput',
                  'Version', 'Release', 'Epoch', 'URL', 'BuildArch' # very rare
                 )
@@ -817,7 +819,6 @@ PkgBR:
                 if len(xx) > 1 and xx[1] == "in":
                     extractfile
                     buf = tarinfo.tobuf()
-                    #print buf
 
         tarball = None
         for uri in self.metadata['Sources']:

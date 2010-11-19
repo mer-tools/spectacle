@@ -49,6 +49,7 @@ ORDER_ENTRIES = ['Name',
                  'ConfigOptions',
                  'Builder',
                  'BuildArch',
+                 'ExclusiveArch',
                  'LocaleName',
                  'LocaleOptions',
                  'Files',
@@ -57,6 +58,7 @@ ORDER_ENTRIES = ['Name',
                  'UseAsNeeded',
                  'NoAutoReq',
                  'NoAutoProv',
+                 'NoAutoReqProv',
                 ]
 
 class Convertor(object):
@@ -75,6 +77,28 @@ class Convertor(object):
 
     def __init__(self, cv_table = {}):
         self.cv_table.update(cv_table)
+
+    def _translate_keys(self, dict):
+        # translate AutoReq/AutoProv to spectacle boolean keys
+        autoreq = autoprov = None
+        if 'AutoReq' in dict:
+            autoreq = dict['AutoReq']
+            del dict['AutoReq']
+        if 'AutoProv' in dict:
+            autoprov = dict['AutoProv']
+            del dict['AutoProv']
+        if 'AutoReqProv' in dict:
+            if dict['AutoReqProv'] == '0':
+                autoreq = autoprov = '0'
+            del dict['AutoReqProv']
+
+        if autoreq == '0' and autoprov == '0':
+            dict['NoAutoReqProv'] = 'yes'
+        elif autoreq == '0':
+            dict['NoAutoReq'] = 'yes'
+        elif autoprov == '0':
+            dict['NoAutoProv'] = 'yes'
+        # else: ignore
 
     def _replace_keys(self, dict):
         for k,v in self.cv_table.iteritems():
@@ -112,6 +136,7 @@ class Convertor(object):
 
     def convert(self, dict, need_break = True):
         self._replace_keys(dict)
+        self._translate_keys(dict)
         self._remove_duplicate(dict)
 
         items = []

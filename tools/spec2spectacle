@@ -70,6 +70,12 @@ SINGLES = ( 'Summary',
             'Url',
             'Group',
             'BuildArch',
+            'AutoReq',
+            'AutoProv',
+            'AutoReqProv',
+            'Autoreq',
+            'Autoprov',
+            'Autoreqprov',
             'ExclusiveArch',
             'Prefix',
             'License' )
@@ -115,6 +121,9 @@ class SpecConvertor(Convertor):
                 'Prereq': 'RequiresPre',
                 'Requires(preun)': 'RequiresPreUn',
                 'Url': 'URL',
+                'Autoreq': 'AutoReq',
+                'Autoprov': 'AutoProv',
+                'Autoreqprov': 'AutoReqProv',
                 }
         Convertor.__init__(self, sb_cv_table)
 

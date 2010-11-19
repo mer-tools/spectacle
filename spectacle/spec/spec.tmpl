@@ -92,6 +92,9 @@ Patch${idx}:     $patch
 #if 'NoAutoReq' in $metadata
 AutoReq: 0
 #end if
+#if 'NoAutoReqProv' in $metadata
+AutoReqProv:    0
+#end if
 ## Requires
 #if $Builder == 'perl'
 Requires:   perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo \$version))
