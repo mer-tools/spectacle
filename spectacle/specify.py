@@ -425,6 +425,13 @@ class RPMWriter():
                 if warn:
                     logger.warning('Group \'%s\' is not in the list of approved groups. See /usr/share/spectacle/GROUPS for the complete list.' % (metadata['Group']))
 
+        def _check_key_license(metadata):
+            # warning for gplv3
+            gpl3_re = re.compile('L?GPL\s*v3', re.I)
+            if metadata.has_key("License"):
+                if gpl3_re.search(metadata['License']):
+                    logger.warning('GPLv3 related license might be unacceptable.')
+
         def _check_key_epoch(metadata):
             if 'Epoch' in metadata:
                 logger.warning('Please consider to remove "Epoch"')
@@ -669,6 +676,12 @@ PkgBR:
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 _check_key_group(sp)
+
+        # checking for meego invalid licenses
+        _check_key_license(self.metadata)
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                _check_key_license(sp)
 
         # checking for validation of 'Description'
         if not _check_key_desc(self.metadata):
