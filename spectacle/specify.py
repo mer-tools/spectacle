@@ -86,6 +86,7 @@ LIST_KEYS = ('Sources',
              'AutoSubPackages',
              'Files',
              'Documents',
+             'RunFdupes',
              'RpmLintIgnore'
              )
 
@@ -110,7 +111,6 @@ STR_KEYS =  ('Name',
              'LocaleOptions',
              'FilesInput',
              'PostScripts',
-             'RunFdupes',
              'Prefix',
             )
 

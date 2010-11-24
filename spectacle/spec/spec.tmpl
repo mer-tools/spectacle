@@ -719,7 +719,9 @@ desktop-file-install --delete-original       \
 #end if
 ############################ run fdupes
 #if $metadata.has_key("RunFdupes")
-%fdupes  %{buildroot}/${metadata.RunFdupes}
+#for $fditem in $metadata.RunFdupes
+%fdupes  %{buildroot}/$fditem
+#end for
 #end if
 ############################ optional check scripts
 #if $metadata.has_key("Check")
