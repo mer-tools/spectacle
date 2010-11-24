@@ -605,19 +605,25 @@ class RPMWriter():
             if "SubPackages" in self.metadata:
                 for sp in self.metadata["SubPackages"]:
                     if not _check_listkey(sp, key):
-                        logger.warning('the value of "%s" in %s sub-package is expected as list typed' % (key, sp['Name']))
+                        logger.warning('the value of "%s" in "%s" sub-package is expected as list typed' % (key, sp['Name']))
                         sp[key] = [sp[key]]
 
         # checking for STR expected keys
         for key in STR_KEYS:
             if not _check_strkey(self.metadata, key):
                 logger.warning('the value of "%s" in main package is expected as string typed' % key)
-                self.metadata[key] = ' '.join(self.metadata[key])
+                if isinstance(self.metadata[key], list):
+                    self.metadata[key] = ' '.join(self.metadata[key])
+                else:
+                    del self.metadata[key]
             if "SubPackages" in self.metadata:
                 for sp in self.metadata["SubPackages"]:
                     if not _check_strkey(sp, key):
-                        logger.warning('the value of "%s" in %s sub-package is expected as string typed' % (key, sp['Name']))
-                        sp[key] = ' '.join(sp[key])
+                        logger.warning('the value of "%s" in "%s" sub-package is expected as string typed' % (key, sp['Name']))
+                        if isinstance(sp[key], list):
+                            sp[key] = ' '.join(sp[key])
+                        else:
+                            del sp[key]
 
         # checking for BOOL expected keys
         for key in BOOL_KEYS:
@@ -628,7 +634,7 @@ class RPMWriter():
             if "SubPackages" in self.metadata:
                 for sp in self.metadata["SubPackages"]:
                     if not _check_boolkey(sp, key):
-                        logger.warning('the value of "%s" in %s sub-package is expected as bool typed, dropped!' % (key, sp['Name']))
+                        logger.warning('the value of "%s" in "%s" sub-package is expected as bool typed, dropped!' % (key, sp['Name']))
                         del sp[key]
 
         ######### checkings for special keys ##########
