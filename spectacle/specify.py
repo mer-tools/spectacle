@@ -1303,9 +1303,9 @@ PkgBR:
             self._check_dup_files(content['files'][key])
 
         # checking duplicate 'rm -rf %{buildroot}'
-        re_cleanup = re.compile('(rm|\%\{__rm\})\W+-rf\W+(\$RPM_BUILD_ROOT|\%\{buildroot\})')
+        re_cleanup = re.compile('^(?:rm|\%\{__rm\})\W+-rf\W+(?:\$RPM_BUILD_ROOT|\%\{buildroot\})/?$')
         if 'install' in content and 'post' in content['install']:
-            if re_cleanup.search(content['install']['post'][0]):
+            if re_cleanup.match(content['install']['post'][0]):
                 logger.warning('duplicate buildroot cleanup found in the first line of install_post, remove it')
 
         return content
