@@ -832,7 +832,7 @@ PkgBR:
             fpath = os.path.basename(uri)
             fpath = fpath.replace('%{name}', self.pkg)
             fpath = fpath.replace('%{version}', self.version)
-            if os.path.exists(fpath):
+            if os.path.exists(fpath) and os.path.getsize(fpath):
                 try:
                     if tarfile.is_tarfile(fpath):
                         tarball = fpath
@@ -865,8 +865,13 @@ PkgBR:
             # setting the default value firstly
             self.metadata['SourcePrefix'] = '%{name}-%{version}'
             if not prefix or prefix == '.':
+                # guess prefix from filename
                 if tarball:
-                    prefix, ignore = os.path.basename(tarball).split('.tar.')
+                    if '.tar.' in tarball:
+                        prefix = os.path.basename(tarball).split('.tar.')[0]
+                    else:
+                        # strip the ext name
+                        prefix = os.path.splitext(tarball)[0]
 
             if prefix and prefix != '%s-%s' % (self.pkg, self.version):
                 prefix = prefix.replace(self.pkg, '%{name}')
