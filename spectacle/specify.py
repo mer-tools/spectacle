@@ -163,7 +163,7 @@ ARCHED_KEYS = ('Requires',
                'ConfigOptions',
                'QMakeOptions',
               )
-ARCHS = ('ix86', 'arm')
+ARCHS = ('ix86', 'arm', 'armv5', 'armv7')
 
 CONFIGURES = ('configure', 'reconfigure', 'autogen', 'cmake', 'none')
 BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'cmake', 'none')
@@ -1035,10 +1035,7 @@ PkgBR:
 
             self.metadata['Patches']   = []
             self.metadata['PatchOpts'] = []
-            self.metadata['PatchCmts'] = []
             for patch in patches:
-                self.metadata['PatchCmts'].append('# ' + patch)
-
                 if isinstance(patch, str):
                     self.metadata['Patches'].append(patch)
                     self.metadata['PatchOpts'].append('-p1')
