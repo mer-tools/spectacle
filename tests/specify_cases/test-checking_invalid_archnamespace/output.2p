@@ -1,7 +1,7 @@
---- output.2.o	2010-03-30 17:17:41.000000000 +0800
-+++ output.2	2010-03-30 17:18:28.000000000 +0800
+--- output.2.o	2010-12-09 11:34:14.525023916 +0800
++++ output.2	2010-12-09 11:34:14.645023854 +0800
 @@ -1,2 +1,4 @@
  [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
 +[33mWarning:[0m unsupport arch namespace: ppc in key Requires
 +[33mWarning:[0m unsupport arch namespace: sparc in key PkgBR
- [32mInfo:[0m Creating new spec file: output.spec
+ [33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!

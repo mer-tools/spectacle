@@ -1,5 +1,5 @@
---- output.orig.spec	2010-03-30 17:13:07.000000000 +0800
-+++ output.spec	2010-03-30 17:13:43.000000000 +0800
+--- output.orig.spec	2010-12-09 11:12:44.552909077 +0800
++++ output.spec	2010-12-09 11:12:44.670898482 +0800
 @@ -14,6 +14,13 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
@@ -12,21 +12,21 @@
 +Patch2:     x86-only-patch
 +%endif
  
+ 
  %description
- Sample package for spectacle testings, which will be used as
-@@ -34,6 +41,16 @@ This package contains development files 
+@@ -35,6 +42,16 @@ This package contains development files
  %prep
  %setup -q -n %{name}-%{version}
  
 +# common-patch
-+%patch0 -p1
++%patch0 -p1 
 +%ifarch %{arm}
-+# arm:arm-only-patch
-+%patch1 -p1
++# arm-only-patch
++%patch1 -p1 
 +%endif
 +%ifarch %{ix86}
-+# ix86:x86-only-patch
-+%patch2 -p1
++# x86-only-patch
++%patch2 -p1 
 +%endif
  # >> setup
  # << setup
