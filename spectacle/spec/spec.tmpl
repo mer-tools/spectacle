@@ -455,7 +455,8 @@ fi
 #end if
 #######
 #if $Configure == 'autogen'
-%autogen $cfgstatic#slurp
+%autogen $cfgstatic
+%configure $cfgstatic#slurp
 #else if $Configure == 'cmake'
 mkdir meego-build
 cd meego-build
