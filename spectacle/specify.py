@@ -878,8 +878,11 @@ PkgBR:
                 prefix = prefix.replace(self.version, '%{version}')
                 self.metadata['SourcePrefix'] = prefix
 
-    def _parse_series(self, patches, comments):
-        comment = ""
+    def _parse_series(self):
+        patches = []
+        comments = []
+
+        comment = ''
         for line in file(SERIES_PATH):
             if not line.strip():
                 continue
@@ -888,8 +891,10 @@ PkgBR:
             else:
                 line = line.strip()
                 patches.append(line)
-                comments.append(comment + '# ' + line)
+                comments.append(comment.rstrip())
                 comment = ''
+
+        return patches, comments
 
     def _cleanup_boolkeys(self, items):
         """ clean up all boolean type keys,
@@ -1051,10 +1056,7 @@ PkgBR:
             if "Patches" in self.metadata:
                 logger.warning('Both "Patches" tag in yaml and series.conf exists, please use only one.')
             else:
-                self.metadata['Patches'] = []
-                self.metadata['PatchCmts'] = []
-                self._parse_series(self.metadata['Patches'],
-                                    self.metadata['PatchCmts'])
+                self.metadata['Patches'], self.metadata['PatchCmts'] = self._parse_series()
 
         if 'Sources' in self.metadata:
             self._analyze_source()

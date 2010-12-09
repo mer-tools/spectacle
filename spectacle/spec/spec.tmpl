@@ -359,9 +359,9 @@ Description: %{summary}
 $metadata.PatchCmts[$idx]
 #end if
 #if 'PatchOpts' in $metadata
-$arch_line($patch, "# ", "\n%%patch%d %s "%($idx, $metadata.PatchOpts[$idx]))
+$arch_line($patch, "# ", "\n%%patch%d %s"%($idx, $metadata.PatchOpts[$idx]))
 #else
-$arch_line($patch, "# ", "\n%%patch%d -p1\n# "%$idx)
+$arch_line($patch, "# ", "\n%%patch%d -p1"%$idx)
 #end if
 #set $idx = $idx + 1
 #end for ## each patch
