@@ -163,10 +163,28 @@ ARCHED_KEYS = ('Requires',
                'ConfigOptions',
                'QMakeOptions',
               )
-ARCHS = ('ix86', 'arm', 'armv5', 'armv7')
+ARCHS = {'ix86': '%{ix86}',
+         'arm': '%{arm}',
+         'armv5': 'armv5el armv5tel armv5tejl',
+         'armv7': 'armv7el armv7tel armv7l',
+        }
 
 CONFIGURES = ('configure', 'reconfigure', 'autogen', 'cmake', 'none')
 BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'cmake', 'none')
+
+# global helper functions
+def arch_split(value):
+    m = re.match('^(\w+):([^:]+)', value)
+    if m:
+        arch = m.group(1)
+        left = m.group(2)
+        if arch in ARCHS:
+            return arch, ARCHS[arch], left
+        else:
+            return arch, arch, left
+
+    else:
+        return '', '', value
 
 class GitAccess():
     def __init__(self, path):
@@ -484,10 +502,9 @@ class RPMWriter():
         def _check_arched_keys(metadata):
             """ sub-routine for ARCH namespace available keys """
             def _check_arch(key, item):
-                if re.match('^\w+:[^:]+', item):
-                    arch = item.split(':')[0].strip()
-                    if arch not in ARCHS:
-                        logger.warning('unsupport arch namespace: %s in key %s' % (arch, key))
+                arch = arch_split(item)[0]
+                if arch and arch not in ARCHS:
+                    logger.warning('unsupport arch namespace: %s in key %s' % (arch, key))
 
             for key in ARCHED_KEYS:
                 if key in metadata:
@@ -1411,7 +1428,8 @@ PkgBR:
 
         spec_content = spec.spec(searchList=[{
                                         'metadata': self.metadata,
-                                        'extra': self.extra
+                                        'extra': self.extra,
+                                        'arch_split': arch_split
                                       }]).respond()
 
         file = open(specfile, "w")
