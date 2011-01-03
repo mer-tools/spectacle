@@ -1379,37 +1379,34 @@ PkgBR:
                 self.extra['content'].update({'files': {'main': self.extras_filelist}})
         """
 
-        try:
-            # TODO, cleanup docs handling when all pkgs need not, include spec.tmpl
-            docs = {}
-            if 'Documents' in self.metadata:
-                docs['main'] = self.metadata['Documents']
-            if "SubPackages" in self.metadata:
-                for sp in self.metadata["SubPackages"]:
-                    if 'Documents' in sp:
-                        docs[sp['Name']] = sp['Documents']
+        # TODO, cleanup docs handling when all pkgs need not, include spec.tmpl
+        docs = {}
+        if 'Documents' in self.metadata:
+            docs['main'] = self.metadata['Documents']
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                if 'Documents' in sp:
+                    docs[sp['Name']] = sp['Documents']
 
-            if 'files' in self.extra['content']:
-                files = copy.deepcopy(self.extra['content']['files'])
+        if 'files' in self.extra['content']:
+            files = copy.deepcopy(self.extra['content']['files'])
+        else:
+            files = {}
+
+        if 'Files' in self.metadata:
+            if 'main' in files:
+                files['main'] += self.metadata['Files']
             else:
-                files = {}
+                files['main'] = self.metadata['Files']
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                if 'Files' in sp:
+                    if sp['Name'] in files:
+                        files[sp['Name']] += sp['Files']
+                    else:
+                        files[sp['Name']] = sp['Files']
 
-            if 'Files' in self.metadata:
-                if 'main' in files:
-                    files['main'] += self.metadata['Files']
-                else:
-                    files['main'] = self.metadata['Files']
-            if "SubPackages" in self.metadata:
-                for sp in self.metadata["SubPackages"]:
-                    if 'Files' in sp:
-                        if sp['Name'] in files:
-                            files[sp['Name']] += sp['Files']
-                        else:
-                            files[sp['Name']] = sp['Files']
-
-            self.parse_files(files, docs)
-        except KeyError:
-            pass
+        self.parse_files(files, docs)
 
         # adding automatic requires according %files
         self._gen_auto_requires(self.metadata, self.extra)
