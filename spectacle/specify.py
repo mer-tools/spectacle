@@ -1110,6 +1110,9 @@ PkgBR:
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 self.extra['subpkgs'][sp['Name']] = copy.deepcopy(self.extra_per_pkg)
+        if "AutoSubPackages" in self.metadata:
+            for asp in self.metadata["AutoSubPackages"]:
+                self.extra['subpkgs'][asp] = copy.deepcopy(self.extra_per_pkg)
 
 
         """ NOTE
