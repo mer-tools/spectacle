@@ -1247,6 +1247,10 @@ PkgBR:
                 record = False
                 if not recording: continue # empty
 
+                if matchout.group(2) and matchout.group(1) in ["files", "post","postun", "pre", "preun"]:
+                    if not matchout.group(2) in self.extra['subpkgs']:
+                        logger.error('In spec %s section for %s package. Package does not excist in YAML.' % (matchout.group(1), matchout.group(2)))
+
                 if matchout.group(1) == "files":
                     if matchout.group(2):
                         files[matchout.group(2)] = recording
