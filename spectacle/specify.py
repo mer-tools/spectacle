@@ -502,17 +502,28 @@ class RPMWriter():
         def _check_arched_keys(metadata):
             """ sub-routine for ARCH namespace available keys """
             def _check_arch(key, item):
+                if isinstance(item, dict):
+                    logger.warning('For arch prefixed %s value "%s", please do NOT leave extra spaces after ":", skipped!' % \
+                                    (key, ':'.join(map(str, item.popitem()))))
+                    return False
+
                 arch = arch_split(item)[0]
                 if arch and arch not in ARCHS:
                     logger.warning('unsupport arch namespace: %s in key %s' % (arch, key))
 
+                return True
+
             for key in ARCHED_KEYS:
                 if key in metadata:
                     if key in STR_KEYS:
-                        _check_arch(key, metadata[key])
+                        if not _check_arch(key, metadata[key]):
+                            del metadata[key]
                     elif key in LIST_KEYS:
                         for item in metadata[key]:
-                            _check_arch(key, item)
+                            if not _check_arch(key, item):
+                                metadata[key].remove(item)
+                                if not metadata[key]:
+                                    del metadata[key]
 
         def _check_key_localename(metadata):
             """ sub-routine for 'LocaleName' checking """
