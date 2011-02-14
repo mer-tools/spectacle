@@ -166,7 +166,7 @@ ARCHED_KEYS = ('Requires',
 ARCHS = {'ix86': '%{ix86}',
          'arm': '%{arm}',
          'armv5': 'armv5el armv5tel armv5tejl',
-         'armv7': 'armv7el armv7tel armv7l',
+         'armv7': 'armv7el armv7tel armv7l armv7hl armv7nhl',
         }
 
 CONFIGURES = ('configure', 'reconfigure', 'autogen', 'cmake', 'none')
