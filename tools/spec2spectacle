@@ -410,11 +410,12 @@ class SpecParser(object):
     def _do_files(self, items, pkg, h, v):
         files = map(str.strip, v.strip().splitlines())
 
-        # skip option line
-        if files[0].startswith('-'):
-            files.pop(0)
+        if files:
+            # skip option line
+            if files[0].startswith('-'):
+                files.pop(0)
 
-        self._remove_attrs(files)
+            self._remove_attrs(files)
 
         if self.include_files:
             items['Files'] = files
