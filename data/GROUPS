@@ -23,22 +23,66 @@ System/Boot
 System/Console
 System/I18n/Chinese
 System/I18n/Japanese
-System/I18n/Korean 
+System/I18n/Korean
 System/Packages
 System/Base
 System/Daemons
 System/Kernel
 System/Libraries
-System/Libraries/Python
-System/Libraries/Perl
-System/Networking
 System/Shells
 System/X11
-System/X11/Applications
 System/X11/Fonts
 System/X11/Icons
-System/X Hardware Support
 System/GUI/XFCE
 System/GUI/Other
 System/GUI/GNOME
-System/Desktop
+Communications/Cellular Adaptation
+Communications/Cellular Framework
+Communications/Telephony and IM
+Communications/Bluetooth
+Communications/Connectivity Adaptation
+Communications/ConnMan
+Data Management/Content Framework
+Development Platform/Platform SDK
+Essentials/Base Essentials
+Graphics/Font Management
+Graphics/Display and Graphics Adaptation
+Graphics/Input Adaptation
+Graphics/Open GL ES
+Graphics/X11
+Kernel/Linux Kernel
+Location/Location Framework
+Location/Location Adaptation
+Multimedia/Audio Adaptation
+Multimedia/Camera Adaptation
+Multimedia/Gstreamer
+Multimedia/Imaging and Video Adaptation
+Multimedia/Imaging Codecs
+Multimedia/PulseAudio
+Multimedia/Sharing
+Multimedia/UPnP
+Personal Information Management/Backup Framework
+Personal Information Management/Calendar Engine
+Personal Information Management/Contacts Engine
+Personal Information Management/Email Engine
+Personal Information Management/Synchronization Framework
+Qt/Qt
+Qt/Qt Mobility
+Qt/Qt WebKit
+Security/Accounts
+Security/Certificate Manager
+Security/Integrity Protection Framework
+Security/Access Control Framework
+Security/Single Sign-On
+Security/SW Distribution Security
+Security/Security Adaptation
+oftware Management/Package Manager
+System/Context Framework
+System/NGF
+System/Resource Policy
+System/Sensor Adaptation
+System/Sensor Framework
+System/Startup Services
+System/System Control
+System/Device Mode Adaptation
+System/Vibra and Haptics Adaptation
