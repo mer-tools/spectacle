@@ -38,6 +38,7 @@ SERIES_PATH = 'series.conf'
 
 MAND_KEYS = ('Name',
              'Summary',
+             'Description',
              'Version',
              'Group',
              'License',
@@ -45,6 +46,7 @@ MAND_KEYS = ('Name',
 
 SUB_MAND_KEYS = ('Name',
                  'Summary',
+                 'Description',
                  'Group',
                 )
 
@@ -476,8 +478,8 @@ class RPMWriter():
 
         def _check_key_desc(metadata):
             """ sub-routine for 'description' checking """
-            if 'Description' not in metadata or \
-                metadata['Description'] == '%{summary}':
+            if metadata['Description'] == '%{summary}' or \
+               metadata['Description'] == metadata['Summary']:
                 return False
             return True
 
@@ -725,11 +727,11 @@ PkgBR:
 
         # checking for validation of 'Description'
         if not _check_key_desc(self.metadata):
-            logger.warning('main package has no qualified "Description" tag')
+            logger.error('main package has no qualified "Description" tag')
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 if not _check_key_desc(sp):
-                    logger.warning('sub-pkg: %s has no qualified "Description" tag' % sp['Name'])
+                    logger.error('sub-pkg: "%s" has no qualified "Description" tag' % sp['Name'])
 
         # checking for validation of 'LocaleName' and 'LocaleOptions'
         if not _check_key_localename(self.metadata):
