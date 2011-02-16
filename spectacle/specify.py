@@ -1169,7 +1169,11 @@ PkgBR:
                 elif re.match('.*(usr/share|%{_datadir})/applications/.*\.desktop$', l):
                     if 'NoDesktop' not in self.metadata:
                         pkg_extra['Desktop'] = True
-                elif re.match('.*etc/rc.d/init.d.*', l) or re.match('.*etc/init.d.*', l):
+                elif re.match('.*(/etc|%{_sysconfdir})/rc.d/init.d/.*', l) or \
+                     re.match('.*(/etc|%{_sysconfdir})/init.d/.*', l) or \
+                     re.match('.*%{_initddir}/.*', l) or \
+                     re.match('.*%{_initrddir}/.*', l):
+
                     pkg_extra['Service'] = True
                 elif re.match('.*(%{_libdir}|%{_lib}|/lib|/usr/lib)/[^/]*[.*?]+so([.*?]+.*$|$)', l) or \
                    re.match('.*(/ld.so.conf.d/).*', l):
