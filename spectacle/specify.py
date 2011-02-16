@@ -388,7 +388,7 @@ class RPMWriter():
 
             return keys
 
-        def _check_mandatory_keys(metadata, subpkg = None):
+        def _check_mandatory_keys(metadata, subpkg = False):
             """ return [] if all mandatory keys found, otherwise return the lost keys """
             if subpkg:
                 mkeys = list(SUB_MAND_KEYS)
@@ -598,9 +598,12 @@ class RPMWriter():
             logger.error('Missing mandatory keys for main package: %s' % ', '.join(keys))
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
-                keys = _check_mandatory_keys(sp, sp['Name'])
+                keys = _check_mandatory_keys(sp, True)
                 if keys:
-                    logger.error('Missing mandatory keys for sub-pkg %s: %s' % (sp['Name'], ', '.join(keys)))
+                    if 'Name' in keys:
+                        logger.error('Missing mandatory keys for sub-pkg: Name')
+                    else:
+                        logger.error('Missing mandatory keys for sub-pkg "%s": %s' % (sp['Name'], ', '.join(keys)))
 
         # checking for unexpected keys
         keys = _check_invalid_keys(self.metadata)
