@@ -253,6 +253,7 @@ class RPMWriter():
         self.clean_old = clean_old
         self.download_new = download_new
         self.skip_scm = skip_scm
+        self.uiwidget = None # default as gtk2 if Qt not detected
 
         # initialize extra info for spec
         self.extra = { 'subpkgs': {}, 'content': {} }
@@ -1134,6 +1135,15 @@ PkgBR:
             for asp in self.metadata["AutoSubPackages"]:
                 self.extra['subpkgs'][asp] = copy.deepcopy(self.extra_per_pkg)
 
+        # detect the using UI widget, QT or Gtk2
+        all_pkgbr = []
+        if 'PkgBR' in self.metadata:
+            all_pkgbr += self.metadata['PkgBR']
+        if 'PkgConfigBR' in self.metadata:
+            all_pkgbr += self.metadata['PkgConfigBR']
+        for br in all_pkgbr:
+            if br.startswith('Qt'):
+                self.uiwidget = 'Qt'
 
         """ NOTE
         we need NOT to do the following checking:
@@ -1190,6 +1200,10 @@ PkgBR:
                     pkg_extra['Schema'] = True
                     pkg_extra['Schemas'].append(l)
                 elif re.match('.*\/icons\/.*', l):
+                    if self.uiwidget and self.uiwidget == 'Qt':
+                        # disable icon files handling for Qt based app
+                        continue
+
                     pkg_extra['Icon'] = True
 
                 # special checking for python packages
