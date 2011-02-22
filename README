@@ -191,6 +191,8 @@ All available directives for spectacle are listed as the following:
 
 * UpdateDesktopDB: **boolean**, whether to run 'update-desktop-database' to flush cache when package (un)installation
 
+* NoIconCache: **boolean**, whether to run 'gtk-update-icon-cache' if icon files found in package
+
 * AutoDepend: **boolean**, for subpackages only, whether to add Require to main package automatically
 
 * AsWholeName: **boolean**, for subpackages only, whether to use **Name** as the whole package name

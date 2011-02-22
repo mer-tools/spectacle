@@ -62,6 +62,7 @@ BOOLNO_KEYS = ('Check',
                'NoFiles',
                'NoDesktop',
                'UpdateDesktopDB',
+               'NoIconCache',
               )
 # boolean keys with the default 'True' value
 BOOLYES_KEYS = ('UseAsNeeded',
@@ -142,6 +143,7 @@ SUBAVAIL_KEYS = ('Name',
                  'NoAutoReq',
                  'NoAutoProv',
                  'NoAutoReqProv',
+                 'NoIconCache',
                  'FilesInput',
                  'Version', 'Release', 'Epoch', 'URL', 'BuildArch' # very rare
                 )
@@ -1152,6 +1154,17 @@ PkgBR:
         They should be checked by users manually.
         """
 
+    def _lookup_pkgmeta(self, pkgname):
+        if pkgname == 'main':
+            return self.metadata
+
+        for sp in self.metadata['SubPackages']:
+            if sp['Name'] == pkgname:
+                return sp
+
+        # not found
+        return {}
+
     def parse_files(self, files = {}, docs = {}):
 
         py_path_check = False
@@ -1163,6 +1176,8 @@ PkgBR:
                 py_path = '%{python_sitearch}'
 
         for pkg_name,v in files.iteritems():
+            pkg_meta = self._lookup_pkgmeta(pkg_name)
+
             if pkg_name == 'main':
                 pkg_extra = self.extra
             else:
@@ -1200,6 +1215,10 @@ PkgBR:
                     pkg_extra['Schema'] = True
                     pkg_extra['Schemas'].append(l)
                 elif re.match('.*\/icons\/.*', l):
+                    if 'NoIconCache' in pkg_meta and pkg_meta['NoIconCache'] == True:
+                        # using "NoIconCache" to avoid cache explicitly
+                        continue
+
                     if self.uiwidget and self.uiwidget == 'Qt':
                         # disable icon files handling for Qt based app
                         continue
