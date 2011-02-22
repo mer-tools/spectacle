@@ -484,6 +484,7 @@ class RPMWriter():
             if metadata['Description'] == '%{summary}' or \
                metadata['Description'] == metadata['Summary']:
                 return False
+
             return True
 
         def _check_listkey(metadata, key):
@@ -730,11 +731,14 @@ PkgBR:
 
         # checking for validation of 'Description'
         if not _check_key_desc(self.metadata):
-            logger.error('main package has no qualified "Description" tag')
+            logger.error('main package has no qualified "Description" tag\n\
+\t"Description" cannot be "%{summary}" or equal to the value of "Summary"')
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 if not _check_key_desc(sp):
-                    logger.error('sub-pkg: "%s" has no qualified "Description" tag' % sp['Name'])
+                    logger.error('sub-pkg: "%s" has no qualified "Description" tag\n\
+\t"Description" cannot be "%%{summary}" or equal to the value of "Summary"'
+                    % sp['Name'])
 
         # checking for validation of 'LocaleName' and 'LocaleOptions'
         if not _check_key_localename(self.metadata):
