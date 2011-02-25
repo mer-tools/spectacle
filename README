@@ -221,6 +221,59 @@ directives for sub packages:
 (double-quote), and the choice of quote char should not conflict with the value
 string self.**
 
+## Mandatory and valid keywords for all packages
+### Mandatory keywords
+The following keywords are mandatory for main package:
+
+* Name
+* Summary
+* Description
+* Version
+* Group
+* License
+
+The following keywords are mandatory for sub-package:
+
+* Name
+* Summary
+* Description
+* Group
+
+### Valid keywords for sub-packages
+For sub-packages, only a subset of keywords can be specified:
+
+* Name
+* Summary
+* Description
+* Group
+* License
+* Version
+* Release
+* Epoch
+* URL
+* BuildArch
+* Files
+* Prefix
+* Requires
+* RequiresPre
+* RequiresPreUn
+* RequiresPost
+* RequiresPostUn
+* Provides
+* Conflicts
+* Obsoletes
+* NoAutoReq
+* NoAutoProv
+* NoAutoReqProv
+* NoIconCache
+* FilesInput
+
+### Keywords only for sub-packages
+The following keywords are only valid for sub-packages:
+
+* AsWholeName
+* AutoDepend
+
 ## Namespace support for multi-architecture in several keywords
 For the following spectacle YAML keywords:
 
@@ -237,7 +290,7 @@ it. The supported prefix and the corresponding architectures as the followings:
 * ``ix86:`` -   x86 platform
 * ``arm:``  -   generic arm platform
 * ``armv5:``  -   armv5 platform, will expand to "armv5el armv5tel armv5tejl"
-* ``armv7:``  -   armv7 platform, will expand to "armv7el armv7tel armv7l"
+* ``armv7:``  -   armv7 platform, will expand to "armv7el armv7tel armv7l armv7hl armv7nhl"
 
 Here's some samples:
 
