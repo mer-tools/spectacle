@@ -33,7 +33,7 @@ test:
 	cd tests/; $(PYTHON) alltest.py
 
 install: all install-data
-	$(PYTHON) setup.py install
+	$(PYTHON) setup.py install --root=${DESTDIR}
 
 develop: all install-data
 	$(PYTHON) setup.py develop
