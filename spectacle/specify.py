@@ -1197,7 +1197,8 @@ PkgBR:
                     pkg_extra['Info'] = True
                 elif re.match('.*(usr/share|%{_datadir})/applications/.*\.desktop$', l):
                     if 'NoDesktop' not in self.metadata:
-                        pkg_extra['Desktop'] = True
+                        # any pkg (main and every sub-pkg) will affect global settings
+                        self.extra['Desktop'] = True
                 elif re.match('.*(/etc|%{_sysconfdir})/rc.d/init.d/.*', l) or \
                      re.match('.*(/etc|%{_sysconfdir})/init.d/.*', l) or \
                      re.match('.*%{_initddir}/.*', l) or \
