@@ -166,6 +166,7 @@ ARCHED_KEYS = ('Requires',
                'Patches',
                'ConfigOptions',
                'QMakeOptions',
+               'Files',
               )
 ARCHS = {'ix86': '%{ix86}',
          'arm': '%{arm}',

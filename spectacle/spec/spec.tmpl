@@ -882,7 +882,7 @@ $str_newline.join($extra.content.postun[$sp.Name])
 #end if
 #if "Files" in $metadata:
 #for $f in $metadata.Files
-$f
+$arch_line($f)
 #end for
 #end if
 # >> files
@@ -927,7 +927,7 @@ $str_newline.join($extra.content.files[$sp])
 #end if
 #if "Files" in $sp:
 #for $f in $sp.Files
-$f
+$arch_line($f)
 #end for
 #end if
 # >> files $sp.Name
