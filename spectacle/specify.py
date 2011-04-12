@@ -488,10 +488,26 @@ class RPMWriter():
             return True
 
         def _check_listkey(metadata, key):
-            """ sub-routine for LIST typed keys checking """
+            """ sub-routine for LIST typed keys checking
+                and will remove all empty and None values
+            """
             if key in metadata and not isinstance(metadata[key], list):
                 return False
-            return True
+
+            if key not in metadata:
+                return True
+
+            try:
+                while True:
+                    metadata[key].remove(None)
+            except ValueError:
+                pass
+
+            try:
+                while True:
+                    metadata[key].remove('')
+            except ValueError:
+                return True
 
         def _check_strkey(metadata, key):
             """ sub-routine for STR typed keys checking """
