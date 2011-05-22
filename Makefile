@@ -1,3 +1,4 @@
+PYTHON ?= python
 VERSION = $(shell cat VERSION)
 TAGVER = $(shell cat VERSION | sed -e "s/\([0-9\.]*\).*/\1/")
 
@@ -8,7 +9,7 @@ else
 endif
 
 all: tmpls
-	python setup.py build
+	$(PYTHON) setup.py build
 
 tmpls:
 	cd spectacle/spec; $(MAKE)
@@ -29,13 +30,13 @@ doc:
 	markdown README > README.html
 
 test:
-	cd tests/; python alltest.py
+	cd tests/; $(PYTHON) alltest.py
 
 install: all install-data
-	python setup.py install
+	$(PYTHON) setup.py install --root=${DESTDIR}
 
 develop: all install-data
-	python setup.py develop
+	$(PYTHON) setup.py develop
 
 install-data:
 	install -d ${DESTDIR}/usr/share/spectacle/
