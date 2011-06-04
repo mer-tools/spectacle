@@ -1,0 +1,362 @@
+#!/usr/bin/python -tt
+# vim: ai ts=4 sts=4 et sw=4
+
+#    Copyright (c) 2009 Intel Corporation
+#
+#    This program is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by the Free
+#    Software Foundation; version 2 of the License
+#
+#    This program is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#    for more details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with this program; if not, write to the Free Software Foundation, Inc., 59
+#    Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+""" 
+Overview of deb2spectacle:
+    Tool to convert debian file to spectacle compatibile YAML/spec
+    The input files can be:
+"""
+INPUT_SRC="""
+    1. "control" file for only package metainfo
+    2. "debian/" directory that contains all the deb files
+    3. tarball "debian.tar.gz" which contain all the deb files
+"""
+#TODO: 4. gzipped diff file with names *.diff.gz which include all the content of deb files
+#TODO: 5. binary .deb support using pure python parser
+
+import os, sys
+import re
+
+# spectacle modules
+from spectacle.convertor import *
+from spectacle.dumper import *
+from spectacle import logger
+from spectacle import deb822
+from spectacle.__version__ import VERSION
+
+# global constants
+DEBTARBALL = 'debian.tar.gz'
+
+class DebConvertor(Convertor):
+    """ Convertor for deb keys to yaml ones """
+
+    def __init__(self):
+        deb_cv_table = {
+                'Section': 'Group',
+                'Build-Depends': 'PkgBR',
+                'Build-Depends-Indep': 'PkgBR',
+                'Build-Conflicts': 'BuildConflicts',
+                'Build-Conflicts-Indep': 'BuildConflicts',
+                'Depends': 'Requires',
+                'Pre-Depends': 'RequiresPre',
+                'Pre-Depends': 'RequiresPre',
+                'Suggests': 'Requires',  # FIXME
+                'Recommends': 'Requires',  # FIXME
+                'Replaces': 'Obsoletes',
+                'Breaks': 'Conflicts',
+                'Homepage': 'URL',
+                'Architecture': 'BuildArch',
+                'Vcs-Git': 'SCM',
+                'Vcs-Svn': 'SCM',
+                'Vcs-Cvs': 'SCM',
+                'Vcs-Hg': 'SCM',
+                }
+
+        self.re_debvar = re.compile('\$\{([^}]+)\}', re.M)
+        self.debvars = {
+                'shlibs:Depends': '', # spec autodep/autopro can handle it
+                'misc:Depends': '',
+                'python:Depends': 'python',
+                'perl:Depends': 'perl',
+                # TODO more
+                }
+
+        self.depkeys = (
+                'PkgBR',
+                'Requires',
+                'RequiresPre',
+                'Provides',
+                'Obsoletes',
+                'Conflicts',
+                'BuildConflicts',
+                )
+
+        self.dropkeys = (
+                'Maintainer',
+                'Uploaders',
+                'Priority',
+                'Standards-Version',
+                'Vcs-Browser',
+                )
+
+        Convertor.__init__(self, deb_cv_table)
+
+    def _replace_var(self, val):
+        if isinstance(val, list):
+            return val
+
+        while self.re_debvar.search(val):
+            nval = val
+            print val
+            for m in self.re_debvar.finditer(val):
+                var = m.group(1)
+                print var
+                if var in self.debvars:
+                    rep = self.debvars[var]
+                    nval = nval.replace('${%s}' % var, rep)
+
+            if val == nval:
+                break
+            val = nval
+            print val
+
+        return val
+
+    def _split_dep(self, single):
+        return filter(lambda x:x, map(str.strip, str(single).split(',')))
+
+    def _translate_keys(self, items):
+        """ override parent class method for pre-processing
+        """
+
+        #! at this point, all keys name have been translated
+
+        # update deb vars table
+        if 'Version' in items:
+            self.debvars['binary:Version'] = items['Version']
+            self.debvars['Source-Version'] = items['Version'] # legacy one
+
+        # drop debian only keys
+        for key in self.dropkeys:
+            if key in items:
+                del items[key]
+
+        # split 'Description' to 'Summary' + 'Description'
+        lines = items['Description'].splitlines()
+        items['Summary'] = lines[0]
+        items['Description'] = '\n'.join(lines[1:])
+
+        # expand all debian variables
+        for key, val in items.iteritems():
+            items[key] = self._replace_var(val)
+
+        # depends keys handling
+        for key, val in items.iteritems():
+            if key in self.depkeys:
+                items[key] = self._split_dep(val)
+
+        # architecture translate
+        if 'BuildArch' in items:
+            if items['BuildArch'] == 'any':
+                items['BuildArch'] = 'noarch'
+
+            # otherwise, no BuildArch needed
+            del items['BuildArch']
+
+        Convertor._translate_keys(self, items)
+
+class DebInfo:
+    """ Container of package information from debian files """
+
+    def __init__(self, binver, license):
+        self.fields = {'Version': binver,
+                       'License': license,
+                       'Release': '1',
+                      }
+        self.pkgname = None
+        self.sec_section = None
+
+    def _get_subpkgname(self, raw):
+        if raw.startswith(self.pkgname):
+            left = raw.lstrip(self.pkgname)
+            try:
+                int(left)
+                # should be main pkg
+                return self.pkgname
+
+            except ValueError:
+                # not pure number string
+                if left.startswith('-'):
+                    # sub packages with main-name prefix
+                    subname = left.lstrip('-')
+                    if subname == 'dev':
+                        # the rpm tradition
+                        return 'devel'
+                    else:
+                        return subname
+
+        # return orignal value without special recog
+        return raw
+
+
+    def feed(self, ctl, rules=None):
+        """ feed in the file content of:
+                ctl:    "control"
+                rules:  "rules", optional
+        """
+
+        for para in deb822.Deb822.iter_paragraphs(ctl.splitlines()):
+            items = dict(para.items())
+
+            if 'Source' in items:
+                # Source paragraph, and must be the 1st para
+                items['Name'] = items['Source']
+                del items['Source']
+                self.fields.update(items)
+
+                self.pkgname = items['Name']
+
+                self.src_section = items['Section']
+
+            else:
+                # confirm the format of input
+                if 'Package' not in items or not self.pkgname:
+                    logger.error('input debian control is in wrong format')
+
+                bpkg = items['Package']
+                del items['Package']
+                subpkg = self._get_subpkgname(bpkg)
+
+                if subpkg == self.pkgname:
+                    # main package
+                    self.fields.update(items)
+
+                else:
+                    # sub-packages
+                    if 'SubPackages' not in self.fields:
+                        self.fields['SubPackages'] = []
+
+                    items['Name'] = subpkg
+                    if subpkg == bpkg:
+                        items['AsWholeName'] = True
+
+                    if 'Section' not in items:
+                        items['Section'] = self.src_section
+
+                    self.fields['SubPackages'].append(items)
+
+    def all_info(self):
+        return self.fields
+
+def convert_deb(ctl, binver, license, outdir):
+    """ Generate spectacle files based on content of debain/control
+        argument :ctl contain the content of debian/control
+    """
+
+    convertor = DebConvertor()
+
+    # feed in the debian/control file to parser
+    debi = DebInfo(binver, license)
+    debi.feed(ctl)
+
+    # Dump data to yaml
+    dumper = SpectacleDumper(opath = '%s/%s.yaml' % (outdir, debi.pkgname))
+    spec_fpath = dumper.dump(convertor.convert(debi.all_info()))
+
+    logger.info('YAML and SPEC file are created with pkg name %s in dir: %s' % (debi.pkgname, outdir))
+
+def parse_options(args):
+    import optparse
+
+    usage = """Usage: %prog [options] [debian-path]
+    The "debian-path" can be:""" + INPUT_SRC
+
+    parser = optparse.OptionParser(usage, version=VERSION)
+
+    parser.add_option("-o", "--outdir", type="string",
+                      dest="outdir", default=None,
+                      help="Path of output yaml/spec files")
+    parser.add_option("-V", "--binver", type="string",
+                      help="The version string of binary packages")
+    parser.add_option("", "--dsc", type="string",
+                      help='The path of "dsc" file for version information')
+    parser.add_option("-L", "--license", type="string",
+                      help="The License string of this package")
+
+    return parser.parse_args()
+
+if __name__ == '__main__':
+    """ Main Function """
+
+    (opts, args) = parse_options(sys.argv[1:])
+
+    if not opts.binver and not opts.dsc:
+        logger.error('Must provide one of the two options "-V|--binver" and "--dsc"')
+
+    if not opts.license:
+        logger.error('Must provide the License string using "-L|--license" options')
+
+    ctl_path = None
+    if not args:
+        if os.path.isfile('control'):
+            ctl_path = os.path.abspath('./control')
+            logger.info('using "control" under current directory')
+
+        elif os.path.isdir('debian') and os.path.isfile('debian/control'):
+            ctl_path = os.path.abspath('./debian/control')
+            logger.info('using "control" under "debian/" directory')
+
+        elif os.path.isfile(DEBTARBALL):
+            logger.info('using "%s" under current directory' % DEBTARBALL)
+
+        else:
+            # no debian packaging file found in cwd
+            logger.error('found no debian files in current dir, please specify one')
+
+    else:
+        if not args[0].endswith(DEBTARBALL):
+            ctl_path = os.path.abspath(os.path.expanduser(args[0]))
+
+    if ctl_path:
+        if not os.path.exists(ctl_path):
+            # input file does not exist
+            logger.error("%s: File does not exist" % ctl_path)
+
+        ctl_cont = open(ctl_path).read()
+
+    else: # means the input is debian.tar.gz
+        # extract "control" from it
+        import tarfile
+        if tarfile.is_tarfile(DEBTARBALL):
+            tar = tarfile.open(DEBTARBALL)
+
+            found = False
+            for member in tar.getmembers():
+                if member.name == 'debian/control' and \
+                   member.isfile():
+                    found = True
+                    break
+
+            if found:
+                ctl_cont = tar.extractfile('debian/control').read()
+                tar.close()
+
+                logger.info('using "debian/control" in debian.tar.gz archive')
+            else:
+                logger.error('debian.tar.gz contains no "debian/control" file')
+        else:
+            logger.error('debian.tar.gz is not a valid tarball')
+    
+    # prepare the output folder
+    if opts.outdir:
+        outdir = os.path.abspath(os.path.expanduser(opts.outdir))
+    else:
+        outdir = os.path.abspath('./spectacle')
+
+    if opts.binver:
+        binver = opts.binver
+    else:
+        # opts.dsc must be valid
+        binver = get_binver_from_dsc(opts.dsc) # TODO
+
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+    os.chdir(outdir) 
+
+    convert_deb(ctl_cont, binver, opts.license, outdir)
+
