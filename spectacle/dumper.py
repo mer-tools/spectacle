@@ -141,7 +141,11 @@ class SpectacleDumper(object):
                 lines_to_write = value.splitlines()
 
                 if len(lines_to_write) == 1:
-                    fp.write(cur_indent + "%s: %s\n" % (key, self._esc_value(value)))
+                    try:
+                        fp.write(cur_indent + "%s: %s\n" % (key, self._esc_value(value)))
+                    except UnicodeEncodeError:
+                        fp.write(cur_indent + "%s: %s\n" % (key, self._esc_value(value).encode('utf8')))
+
                 elif len(lines_to_write) == 0:
                     # not exist until now
                     fp.write(cur_indent + "%s:\n" % (key))
