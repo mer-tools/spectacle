@@ -73,6 +73,9 @@ class DebConvertor(Convertor):
                 'misc:Depends': '',
                 'python:Depends': 'python',
                 'perl:Depends': 'perl',
+                'binary:Version': '%{version}-%{release}',
+                'source:Version': '%{version}-%{release}',
+                'Source-Version': '%{version}-%{release}', #legacy one
                 # TODO more
                 }
 
@@ -94,6 +97,9 @@ class DebConvertor(Convertor):
                 'Vcs-Browser',
                 )
 
+        # regex of depends compare
+        self.re_depcomp = re.compile('\(([<>=]+)\s*([^)]*)\)')
+
         Convertor.__init__(self, deb_cv_table)
 
     def _replace_var(self, val):
@@ -102,10 +108,8 @@ class DebConvertor(Convertor):
 
         while self.re_debvar.search(val):
             nval = val
-            print val
             for m in self.re_debvar.finditer(val):
                 var = m.group(1)
-                print var
                 if var in self.debvars:
                     rep = self.debvars[var]
                     nval = nval.replace('${%s}' % var, rep)
@@ -113,23 +117,33 @@ class DebConvertor(Convertor):
             if val == nval:
                 break
             val = nval
-            print val
 
         return val
 
-    def _split_dep(self, single):
-        return filter(lambda x:x, map(str.strip, str(single).split(',')))
+    def _conv_dep(self, single):
+        def comp_replace(dep):
+            if not dep:
+                return None
+
+            dep = dep.strip()
+            m = self.re_depcomp.search(dep)
+            if m:
+                (old, op, ver) = m.group(0, 1, 2)
+                if op == '>>':
+                    op = '>'
+                elif op == '<<':
+                    op = '<'
+
+                dep = dep.replace(old, '%s %s' %(op, ver))
+            return dep
+
+        return filter(lambda x:x, map(comp_replace, str(single).split(',')))
 
     def _translate_keys(self, items):
         """ override parent class method for pre-processing
         """
 
         #! at this point, all keys name have been translated
-
-        # update deb vars table
-        if 'Version' in items:
-            self.debvars['binary:Version'] = items['Version']
-            self.debvars['Source-Version'] = items['Version'] # legacy one
 
         # drop debian only keys
         for key in self.dropkeys:
@@ -148,7 +162,7 @@ class DebConvertor(Convertor):
         # depends keys handling
         for key, val in items.iteritems():
             if key in self.depkeys:
-                items[key] = self._split_dep(val)
+                items[key] = self._conv_dep(val)
 
         # architecture translate
         if 'BuildArch' in items:
