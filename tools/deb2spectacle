@@ -89,10 +89,13 @@ class DebConvertor(Convertor):
                 'BuildConflicts',
                 )
 
+        self.re_userfield = re.compile('^X[BCS]+-.*')
         self.dropkeys = (
                 'Maintainer',
                 'Uploaders',
+                'Changed-By',
                 'Priority',
+                'Essential',
                 'Standards-Version',
                 'Vcs-Browser',
                 )
@@ -146,8 +149,8 @@ class DebConvertor(Convertor):
         #! at this point, all keys name have been translated
 
         # drop debian only keys
-        for key in self.dropkeys:
-            if key in items:
+        for key in items.keys():
+            if key in self.dropkeys or self.re_userfield.match(key):
                 del items[key]
 
         # split 'Description' to 'Summary' + 'Description'
