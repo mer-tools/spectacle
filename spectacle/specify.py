@@ -183,13 +183,15 @@ PATHMACROS = (('/usr/bin',     '%{_bindir}'),
               ('/usr/lib',     '%{_libdir}'),
               ('/usr/libexec', '%{_libexecdir}'),
               ('/usr/include', '%{_includedir}'),
-              ('/usr/com',     '%{_sharedstatedir}'),
-              ('/usr/var',     '%{_localstatedir}'),
               ('/usr/share/info',  '%{_infodir}'),
               ('/usr/share/man',   '%{_mandir}'),
               ('/usr/share',   '%{_datadir}'),
               ('/usr',         '%{_prefix}'),
+              ('/etc/rc.d/init.d',  '%{_initddir}'),
+              ('/etc/init.d',  '%{_initddir}'),
               ('/etc',         '%{_sysconfdir}'),
+              ('/var/lib',     '%{_sharedstatedir}'),
+              ('/var',         '%{_localstatedir}'),
              )
 
 # global helper functions
