@@ -256,6 +256,7 @@ class RPMWriter():
                         'HasStatic': False,
                         'Icon': False,
                         'Service': False,
+                        'NewService': False,
                         'Info': False,
                         'Infos': [],
                     }
@@ -1003,6 +1004,11 @@ PkgBR:
                 'Service': {'RequiresPost': ['/sbin/service', '/sbin/chkconfig'],
                             'RequiresPostUn': ['/sbin/service', '/sbin/chkconfig'],
                            },
+                'NewService': {'RequiresPost': ['systemd'],
+                               'RequiresPreUn': ['systemd'],
+                               'RequiresPostUn': ['systemd'],
+                               'Requires': ['systemd'],
+                              },
                 'Schema': {'RequiresPost': ['GConf2'],
                            'RequiresPreUn': ['GConf2'],
                            'RequiresPre': ['GConf2'],
@@ -1236,30 +1242,40 @@ PkgBR:
                     l1 = p1.sub(r'\1', l)
                     pkg_extra['Infos'].append(l1)
                     pkg_extra['Info'] = True
+
                 elif re.match('.*(usr/share|%{_datadir})/applications/.*\.desktop$', l):
                     if 'NoDesktop' not in self.metadata:
                         # any pkg (main and every sub-pkg) will affect global settings
                         self.extra['Desktop'] = True
+
                 elif re.match('.*(/etc|%{_sysconfdir})/rc.d/init.d/.*', l) or \
                      re.match('.*(/etc|%{_sysconfdir})/init.d/.*', l) or \
                      re.match('.*%{_initddir}/.*', l) or \
                      re.match('.*%{_initrddir}/.*', l):
-
+                    # legacy init scripts
                     pkg_extra['Service'] = True
+
+                elif re.match('/(lib|%{_lib})/systemd/system/.+\.service', l):
+                    # new service for systemd
+                    pkg_extra['NewService'] = True
+
                 elif re.match('.*(%{_libdir}|%{_lib}|/lib|/usr/lib)/[^/]*[.*?]+so([.*?]+.*$|$)', l) or \
                    re.match('.*(/ld.so.conf.d/).*', l):
                     if pkg_name != 'devel' and not pkg_name.endswith('-devel'):
                         # 'devel' sub pkgs should not set Lib flags
                         pkg_extra['Lib'] = True
+
                 elif re.match('.*(%{_libdir}|%{_lib}).*', l) and re.match('.*\.a$', l):
                     # if *.a found, set 'HasStatic' flag for MAIN pkg
                     self.extra['HasStatic'] = True
+
                 elif re.match('.*\.schema.*', l):
                     comp = l.split()
                     if len(comp) > 1:
                         l = comp[1]
                     pkg_extra['Schema'] = True
                     pkg_extra['Schemas'].append(l)
+
                 elif re.match('.*\/icons\/.*', l):
                     if 'NoIconCache' in pkg_meta and pkg_meta['NoIconCache'] == True:
                         # using "NoIconCache" to avoid cache explicitly
