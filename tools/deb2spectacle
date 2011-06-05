@@ -276,6 +276,22 @@ def convert_deb(ctl, binver, license, outdir):
     spec_fpath = dumper.dump(convertor.convert(debi.all_info()))
 
     logger.info('YAML and SPEC file are created with pkg name %s in dir: %s' % (debi.pkgname, outdir))
+def get_binver_from_dsc(dsc_fp):
+    re_ver = re.compile('^Version:\s*(.*)')
+    try:
+        with open(dsc_fp) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                m = re_ver.match(line)
+                if m:
+                    return m.group(1)
+
+            logger.error('cannot found version information in dsc file %s, please specify version using -V|--version' % dsc_fp)
+
+    except OSError:
+        logger.error('cannot read dsc file %s' % dsc_fp)
 
 def parse_options(args):
     import optparse
