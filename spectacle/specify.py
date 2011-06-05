@@ -1186,7 +1186,7 @@ PkgBR:
         # not found
         return {}
 
-    def parse_files(self, files = {}, docs = {}):
+    def parse_files(self, files):
 
         py_path_check = False
         if 'Builder' in self.metadata and self.metadata['Builder'] == 'python':
@@ -1258,21 +1258,6 @@ PkgBR:
             self.extra['DesktopDB'] = True
             if self.extra['Desktop'] != True:
                 logger.warning('"UpdateDesktopDB" specified but found no desktop files')
-
-        # files listed in '%doc' need handling
-        # TODO to be cleanup
-        for pkg_name,v in docs.iteritems():
-            if pkg_name == 'main':
-                pkg_extra = self.extra
-            else:
-                pkg_extra = self.extra['subpkgs'][pkg_name]
-
-            for l in v:
-                for item in l.split():
-                    if re.match('.*\.info.*', item) or \
-                       re.match('.*(usr/share/info|%{_infodir}).*', item):
-                        pkg_extra['Info'] = True
-                        pkg_extra['Infos'].append(item)
 
     def parse_existing(self, spec_fpath):
         sin = re.compile("^# >> ([^\s]+)\s*(.*)")
@@ -1451,24 +1436,6 @@ PkgBR:
         if extra_content:
             self.extra['content'].update(extra_content)
 
-        """
-        TODO: should not regard them as the content of MAIN pkg
-        if self.extras_filelist:
-            try:
-                self.extra['content']['files']['main'].extend(self.extras_filelist)
-            except KeyError:
-                self.extra['content'].update({'files': {'main': self.extras_filelist}})
-        """
-
-        # TODO, cleanup docs handling when all pkgs need not, include spec.tmpl
-        docs = {}
-        if 'Documents' in self.metadata:
-            docs['main'] = self.metadata['Documents']
-        if "SubPackages" in self.metadata:
-            for sp in self.metadata["SubPackages"]:
-                if 'Documents' in sp:
-                    docs[sp['Name']] = sp['Documents']
-
         if 'files' in self.extra['content']:
             files = copy.deepcopy(self.extra['content']['files'])
         else:
@@ -1487,7 +1454,7 @@ PkgBR:
                     else:
                         files[sp['Name']] = sp['Files']
 
-        self.parse_files(files, docs)
+        self.parse_files(files)
 
         # adding automatic requires according %files
         self._gen_auto_requires(self.metadata, self.extra)
