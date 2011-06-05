@@ -177,6 +177,21 @@ ARCHS = {'ix86': '%{ix86}',
 CONFIGURES = ('configure', 'reconfigure', 'autogen', 'cmake', 'none')
 BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'cmake', 'none')
 
+# order care
+PATHMACROS = (('/usr/bin',     '%{_bindir}'),
+              ('/usr/sbin',    '%{_sbindir}'),
+              ('/usr/lib',     '%{_libdir}'),
+              ('/usr/libexec', '%{_libexecdir}'),
+              ('/usr/include', '%{_includedir}'),
+              ('/usr/com',     '%{_sharedstatedir}'),
+              ('/usr/var',     '%{_localstatedir}'),
+              ('/usr/share/info',  '%{_infodir}'),
+              ('/usr/share/man',   '%{_mandir}'),
+              ('/usr/share',   '%{_datadir}'),
+              ('/usr',         '%{_prefix}'),
+              ('/etc',         '%{_sysconfdir}'),
+             )
+
 # global helper functions
 def arch_split(value):
     m = re.match('^(\w+):([^:]+)', value)
@@ -1205,6 +1220,13 @@ PkgBR:
                 pkg_extra = self.extra['subpkgs'][pkg_name]
 
             for l in v:
+                # check and warn improper file path
+                for prefix, macro in PATHMACROS:
+                    if l.startswith(prefix):
+                        logger.warning('for %%files line: "%s"\n' % (l,) +\
+                                '\tplease use %s to replace the leading path %s' % (macro, prefix))
+                        break
+
                 if re.match('\s*%exclude\s.*', l):
                     pass # not match anyting excluded files
                 elif re.match('.*\.info\..*', l) or re.match('.*(usr/share/info|%{_infodir}).*info\..*$', l):
