@@ -615,7 +615,7 @@ $str_newline.join($extra.content.pre.main)
 
 ############################ PreUn
 #set $has_extra_preun = $extra.content.has_key("preun") and $extra.content.preun.has_key("main")
-#if $extra.Schema or $has_extra_preun
+#if $extra.Schema or $extra.NewService or $has_extra_preun
 %preun
 ## -Schema
 #if $extra.Schema
@@ -628,6 +628,12 @@ if [ "$1" -eq 0 ]; then
 #end for
 fi
 #end if
+## -NewService (systemd)
+#if $extra.NewService
+#for $srv in $extra.NewServices
+systemctl stop $srv
+#end for
+#end if
 ## -Extra preun
 #if $has_extra_preun
 # >> preun
@@ -638,8 +644,8 @@ $str_newline.join($extra.content.preun.main)
 
 ############################ Post
 #set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key("main") and $extra.content.post.main
-#if $extra.Lib or $extra.Info or $extra.Schema or $extra.Icon or $extra.DesktopDB or $has_extra_post
-#set $only_Lib = not ($extra.Info or $extra.Schema or $extra.Icon or $extra.DesktopDB or $has_extra_post)
+#if $extra.Lib or $extra.Info or $extra.Schema or $extra.Icon or $extra.DesktopDB or $extra.NewService or $has_extra_post
+#set $only_Lib = not ($extra.Info or $extra.Schema or $extra.Icon or $extra.DesktopDB or $extra.NewService or $has_extra_post)
 #if $only_Lib
 %post -p /sbin/ldconfig
 #else
@@ -673,6 +679,13 @@ gconftool-2 --makefile-install-rule \
 #if $extra.DesktopDB
 update-desktop-database %{_datadir}/applications &> /dev/null || :
 #end if
+## -NewService (systemd)
+#if $extra.NewService
+systemctl daemon-reload
+#for $srv in $extra.NewServices
+systemctl reload-or-try-restart $srv
+#end for
+#end if
 ## -Extra Post Script
 #if $has_extra_post
 # >> post
@@ -683,8 +696,8 @@ $str_newline.join($extra.content.post.main)
 
 ############################ PostUn
 #set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key("main") and $extra.content.postun.main
-#if $extra.Lib or $extra.Info or $extra.Icon or $extra.DesktopDB or $has_extra_postun
-#set $only_Lib = not ($extra.Info or $extra.Icon or $extra.DesktopDB or $has_extra_postun)
+#if $extra.Lib or $extra.Info or $extra.Icon or $extra.DesktopDB or $extra.NewService or $has_extra_postun
+#set $only_Lib = not ($extra.Info or $extra.Icon or $extra.DesktopDB or $extra.NewService or $has_extra_postun)
 #if $only_Lib
 %postun -p /sbin/ldconfig
 #else
@@ -710,6 +723,10 @@ fi
 ## -DesktopDB
 #if $extra.DesktopDB
 update-desktop-database %{_datadir}/applications &> /dev/null || :
+#end if
+## -NewService (systemd)
+#if $extra.NewService
+systemctl daemon-reload
 #end if
 ## -Extra Postun Script
 #if $has_extra_postun
@@ -756,7 +773,7 @@ $str_newline.join($extra.content.pre[$sp.Name])
 #######################
 ## Preun for SubPackages
 #set $has_extra_preun = $extra.content.has_key("preun") and $extra.content.preun.has_key($sp.Name)
-#if $sub_extra.Schema or $has_extra_preun
+#if $sub_extra.Schema or $sub_extra.NewService or $has_extra_preun
 %preun $pkg_name
 ## -Schema
 #if $sub_extra.Schema
@@ -769,6 +786,12 @@ if [ "$1" -eq 0 ]; then
 #end for
 fi
 #end if
+## -NewService (systemd)
+#if $sub_extra.NewService
+#for $srv in $sub_extra.NewServices
+systemctl stop $srv
+#end for
+#end if
 ## -Extra preun
 #if $has_extra_preun
 # >> preun $sp.Name
@@ -780,8 +803,8 @@ $str_newline.join($extra.content.preun[$sp.Name])
 #######################
 ## Post for SubPackages
 #set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key($sp.Name) and $extra.content.post[$sp.Name]
-#if $sub_extra.Lib or $sub_extra.Info or $sub_extra.Icon or $sub_extra.Schema or $sub_extra.DesktopDB or $has_extra_post
-#set $only_Lib = not ($sub_extra.Info or $sub_extra.Icon or $sub_extra.Schema or $sub_extra.DesktopDB or $has_extra_post)
+#if $sub_extra.Lib or $sub_extra.Info or $sub_extra.Icon or $sub_extra.Schema or $sub_extra.DesktopDB or $sub_extra.NewService or $has_extra_post
+#set $only_Lib = not ($sub_extra.Info or $sub_extra.Icon or $sub_extra.Schema or $sub_extra.DesktopDB or $sub_extra.NewService or $has_extra_post)
 #if $only_Lib
 %post $pkg_name -p /sbin/ldconfig
 #else
@@ -815,6 +838,13 @@ gconftool-2 --makefile-install-rule \
 #if $sub_extra.DesktopDB
 update-desktop-database %{_datadir}/applications &> /dev/null || :
 #end if
+## -NewService (systemd)
+#if $sub_extra.NewService
+systemctl daemon-reload
+#for $srv in $sub_extra.NewServices
+systemctl reload-or-try-restart $srv
+#end for
+#end if
 ## -Extra Post Script
 #if $has_extra_post
 # >> post $sp.Name
@@ -826,8 +856,8 @@ $str_newline.join($extra.content.post[$sp.Name])
 #######################
 ## PostUn for SubPackages
 #set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key($sp.Name) and $extra.content.postun[$sp.Name]
-#if  $sub_extra.Lib or $sub_extra.Info or $sub_extra.Icon or $sub_extra.DesktopDB or $has_extra_postun
-#set $only_Lib = not ($sub_extra.Info or $sub_extra.Icon or $sub_extra.DesktopDB or $has_extra_postun)
+#if  $sub_extra.Lib or $sub_extra.Info or $sub_extra.Icon or $sub_extra.DesktopDB or $sub_extra.NewService or $has_extra_postun
+#set $only_Lib = not ($sub_extra.Info or $sub_extra.Icon or $sub_extra.DesktopDB or $sub_extra.NewService or $has_extra_postun)
 #if $only_Lib
 %postun $pkg_name -p /sbin/ldconfig
 #else
@@ -852,6 +882,10 @@ fi
 ## -DesktopDB
 #if $sub_extra.DesktopDB
 update-desktop-database %{_datadir}/applications &> /dev/null || :
+#end if
+## -NewService (systemd)
+#if $sub_extra.NewService
+systemctl daemon-reload
 #end if
 ## -Extra Postun Script
 #if $has_extra_postun

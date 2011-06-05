@@ -257,6 +257,7 @@ class RPMWriter():
                         'Icon': False,
                         'Service': False,
                         'NewService': False,
+                        'NewServices': [],
                         'Info': False,
                         'Infos': [],
                     }
@@ -1255,9 +1256,12 @@ PkgBR:
                     # legacy init scripts
                     pkg_extra['Service'] = True
 
-                elif re.match('/(lib|%{_lib})/systemd/system/.+\.service', l):
+                elif re.match('^/(lib|%{_lib})/systemd/system/[^/*]*.service$', l):
                     # new service for systemd
                     pkg_extra['NewService'] = True
+                    service = l.split('systemd/system/')[-1]
+                    if service not in pkg_extra['NewServices']:
+                        pkg_extra['NewServices'].append(service)
 
                 elif re.match('.*(%{_libdir}|%{_lib}|/lib|/usr/lib)/[^/]*[.*?]+so([.*?]+.*$|$)', l) or \
                    re.match('.*(/ld.so.conf.d/).*', l):
