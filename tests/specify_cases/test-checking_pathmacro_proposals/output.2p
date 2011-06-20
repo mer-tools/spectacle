@@ -1,0 +1,11 @@
+--- output.2.o	2011-06-20 17:05:38.468485134 +0800
++++ output.2	2011-06-20 17:06:35.907678856 +0800
+@@ -1,2 +1,8 @@
+ [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
++[33mWarning:[0m for %files line: "/usr/bin/abc"
++	please use %{_bindir} to replace the leading path /usr/bin
++[33mWarning:[0m for %files line: "/usr/share/info/info.gz"
++	please use %{_infodir} to replace the leading path /usr/share/info
++[33mWarning:[0m for %files line: "/usr/share/testpkg/api"
++	please use %{_datadir} to replace the leading path /usr/share
+ [33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!
