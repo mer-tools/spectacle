@@ -1203,9 +1203,13 @@ PkgBR:
         if pkgname == 'main':
             return self.metadata
 
-        for sp in self.metadata['SubPackages']:
-            if sp['Name'] == pkgname:
-                return sp
+        try:
+            for sp in self.metadata['SubPackages']:
+                if sp['Name'] == pkgname:
+                    return sp
+        except KeyError:
+            # Not a available subpackage for 'pkgname'
+            return {}
 
         # not found
         return {}
