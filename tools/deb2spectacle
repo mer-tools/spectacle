@@ -98,6 +98,7 @@ class DebConvertor(Convertor):
                 'Essential',
                 'Standards-Version',
                 'Vcs-Browser',
+                'Vcs-Bzr'
                 )
 
         # regex of depends compare
@@ -250,7 +251,7 @@ class DebInfo:
 
                     items['Name'] = subpkg
                     if subpkg == bpkg:
-                        items['AsWholeName'] = True
+                        items['AsWholeName'] = 'True'
 
                     if 'Section' not in items:
                         items['Section'] = self.src_section
