@@ -72,6 +72,7 @@ class DebConvertor(Convertor):
                 'shlibs:Depends': '', # spec autodep/autopro can handle it
                 'misc:Depends': '',
                 'python:Depends': 'python',
+                'python:Provides': '',
                 'perl:Depends': 'perl',
                 'binary:Version': '%{version}-%{release}',
                 'source:Version': '%{version}-%{release}',
@@ -225,6 +226,7 @@ class DebInfo:
                 # Source paragraph, and must be the 1st para
                 items['Name'] = items['Source']
                 del items['Source']
+                items['Sources'] = '%s-%s.tar.gz' % (items['Name'], self.fields['Version'])
                 self.fields.update(items)
 
                 self.pkgname = items['Name']
@@ -387,6 +389,7 @@ if __name__ == '__main__':
     else:
         # opts.dsc must be valid
         binver = get_binver_from_dsc(opts.dsc) # TODO
+        binver = binver.split('-',)[0]
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)
