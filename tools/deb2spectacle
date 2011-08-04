@@ -31,6 +31,7 @@ INPUT_SRC="""
 
 import os, sys
 import re
+import string
 
 # spectacle modules
 from spectacle.convertor import *
@@ -222,6 +223,21 @@ class DebInfo:
         return raw
 
 
+    def format_filelist(self, filelist):
+        """ format the debian filelist format
+        """
+
+        ret = []
+        for file in filelist:
+            file = string.replace (file, 'debian/tmp', '')
+            file = file.strip()
+            if file.find (' ') != -1:
+                base = file.split (' ')[0].split ('/')[-1]
+                dir  = file.split (' ')[1]
+                file = '%s/%s' % (dir, base)
+            ret.append (file)
+        return ret
+
     def feed(self, ctl, rules=None):
         """ feed in the file content of:
                 ctl:    "control"
@@ -253,12 +269,16 @@ class DebInfo:
 
                 if subpkg == self.pkgname:
                     # main package
+                    if os.path.isdir('debian') and os.path.isfile('debian/%s.install' % (subpkg)):
+                        items['Files'] = self.format_filelist (open('debian/%s.install' % (subpkg)).readlines())
                     self.fields.update(items)
 
                 else:
                     # sub-packages
                     if 'SubPackages' not in self.fields:
                         self.fields['SubPackages'] = []
+                    if os.path.isdir('debian') and os.path.isfile('debian/%s.install' % (subpkg)):
+                       items['Files'] = self.format_filelist (open('debian/%s.install' % (subpkg)).readlines())
 
                     items['Name'] = subpkg
                     if subpkg == bpkg:
@@ -402,7 +422,6 @@ if __name__ == '__main__':
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)
-    os.chdir(outdir) 
 
     convert_deb(ctl_cont, binver, opts.license, outdir)
 
