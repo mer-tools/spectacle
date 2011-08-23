@@ -443,9 +443,7 @@ fi
 %autogen $cfgstatic
 %configure $cfgstatic#slurp
 #else if $Configure == 'cmake'
-mkdir meego-build
-cd meego-build
-cmake .. #slurp
+%cmake . #slurp
 #else if $Configure == 'configure'
 %configure $cfgstatic#slurp
 #else if $Configure == 'reconfigure'
@@ -534,9 +532,6 @@ find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %makeinstall
 %endif
 #else
-#if $Builder == 'cmake'
-cd meego-build
-#end if
 %make_install
 #end if
 #end if ## of Builder==???
