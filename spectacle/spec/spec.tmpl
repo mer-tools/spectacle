@@ -451,8 +451,6 @@ fi
 %configure $cfgstatic#slurp
 #else if $Configure == 'reconfigure'
 %reconfigure $cfgstatic#slurp
-#else if $Configure == 'cmake'
-%reconfigure $cfgstatic#slurp
 #end if
 ## any other values fall thru to 'noconfigure'
 #if ( $Configure != 'noconfigure' or $Configure != 'none' ) and $metadata.has_key("ConfigOptions")
