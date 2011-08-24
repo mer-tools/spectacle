@@ -151,6 +151,9 @@ BuildConflicts: $bcfl
 #if $metadata.has_key("RunFdupes")
 BuildRequires:  fdupes
 #end if
+#if $Builder == 'cmake'
+BuildRequires:  cmake
+#end if
 #if 'NoAutoProv' in $metadata
 AutoProv: 0
 #end if
