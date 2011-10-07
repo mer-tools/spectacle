@@ -992,7 +992,7 @@ PkgBR:
                 'Lib': {'RequiresPost': ['/sbin/ldconfig'],
                         'RequiresPostUn': ['/sbin/ldconfig'],
                        },
-                'Icon': {'RequiresPost': ['/bin/touch', 'gtk2'],
+                'Icon': {'RequiresPost': ['/bin/touch', '%{_bindir}/gtk-update-icon-cache'],
                         },
                 'Desktop': {'PkgBR': ['desktop-file-utils'],
                            },
