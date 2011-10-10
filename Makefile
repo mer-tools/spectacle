@@ -8,6 +8,10 @@ else
 	TAG = "HEAD"
 endif
 
+ifndef PREFIX
+    PREFIX = "/usr"
+endif
+
 all: tmpls
 	$(PYTHON) setup.py build
 
@@ -33,7 +37,7 @@ test:
 	cd tests/; $(PYTHON) alltest.py
 
 install: all install-data
-	$(PYTHON) setup.py install --root=${DESTDIR}
+	$(PYTHON) setup.py install --root=${DESTDIR} --prefix=${PREFIX}
 
 develop: all install-data
 	$(PYTHON) setup.py develop
