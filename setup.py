@@ -28,17 +28,14 @@ try:
     ver_file.close()
 except IOError:
     print 'WARNING: Cannot write version number file'
-    pass
 
 setup(name='spectacle',
       version = version,
       description='Spectacle',
       author='Anas Nashif, Jian-feng Ding',
       author_email='anas.nashif@intel.com, jian-feng.ding@intel.com',
-      url='http://moblin.org/',
+      url='https://meego.gitorious.org/meego-developer-tools/spectacle',
       scripts=['tools/specify', 'tools/ini2spectacle', 'tools/spec2spectacle', 'tools/deb2spectacle'],
       packages=['spectacle', 'spectacle.spec', 'spectacle.dsc'],
-      package_data={'sepctacle': ['data/*.csv']},
-
+      package_data={'sepctacle': ['data/*.csv', 'data/GROUPS']},
      )
-
