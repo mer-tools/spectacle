@@ -151,6 +151,9 @@ BuildConflicts: $bcfl
 #if $metadata.has_key("RunFdupes")
 BuildRequires:  fdupes
 #end if
+#if $Builder == 'cmake'
+BuildRequires:  cmake
+#end if
 #if 'NoAutoProv' in $metadata
 AutoProv: 0
 #end if
@@ -443,14 +446,10 @@ fi
 %autogen $cfgstatic
 %configure $cfgstatic#slurp
 #else if $Configure == 'cmake'
-mkdir meego-build
-cd meego-build
-cmake .. #slurp
+%cmake . #slurp
 #else if $Configure == 'configure'
 %configure $cfgstatic#slurp
 #else if $Configure == 'reconfigure'
-%reconfigure $cfgstatic#slurp
-#else if $Configure == 'cmake'
 %reconfigure $cfgstatic#slurp
 #end if
 ## any other values fall thru to 'noconfigure'
@@ -534,9 +533,6 @@ find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %makeinstall
 %endif
 #else
-#if $Builder == 'cmake'
-cd meego-build
-#end if
 %make_install
 #end if
 #end if ## of Builder==???
