@@ -27,7 +27,7 @@ dist-gz:
 		gzip  > spectacle-$(VERSION).tar.gz
 
 doc:
-	markdown README > README.html
+	markdown README.md > README.html
 
 test:
 	cd tests/; $(PYTHON) alltest.py

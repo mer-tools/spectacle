@@ -1,20 +1,3 @@
 Topic
-- [ ] Maintain a list of Licenses (to be provided ) and check if the
-      rpm license in the yaml/spec is valid and if it is one of those
-      supported in MeeGo
-- [ ] Speculate:
-    - [ ] This is a tool that basically helps generate yaml files
-    - [ ] Point it to a tar ball and maybe some other hints and it will
-          create a basic yaml file from the data it can extract from
-          the tar and other web services like freshmeat
-    - [ ] From the tar:
-        - [ ] Examine configure scripts and look for pkgconfig
-              dependencies and add them for BuildRequire
-        - [ ] Extract name of package version from tar file
-        - [ ] Examine other files in the tar that can provide
-              additional data, for example from doc/
-        - [ ] Guess file list
-    - [ ] Web services (Freshmeat, sourceforge , etc.)
-        - [ ] Check web service for the package and its descriptions,
-              category, license etc.
-        - [ ] Other data can be extracted from the web...
+- Integrate Arjan's autospectacle:
+    https://meego.gitorious.org/meego-developer-tools/autospectacle
