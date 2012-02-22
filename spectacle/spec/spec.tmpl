@@ -584,8 +584,8 @@ make check
 #end if
 #end if
 # << check
-#end if
 
+#end if
 ############################ Pre
 #set $has_extra_pre = $extra.content.has_key("pre") and $extra.content.pre.has_key("main")
 #if $extra.Schema or $has_extra_pre
@@ -607,8 +607,8 @@ fi
 $str_newline.join($extra.content.pre.main)
 # << pre
 #end if
-#end if
 
+#end if
 ############################ PreUn
 #set $has_extra_preun = $extra.content.has_key("preun") and $extra.content.preun.has_key("main")
 #if $extra.Schema or $extra.NewService or $has_extra_preun
@@ -764,8 +764,8 @@ fi
 $str_newline.join($extra.content.pre[$sp.Name])
 # << pre $sp.Name
 #end if
-#end if
 
+#end if
 #######################
 ## Preun for SubPackages
 #set $has_extra_preun = $extra.content.has_key("preun") and $extra.content.preun.has_key($sp.Name)
@@ -794,8 +794,8 @@ systemctl stop $srv
 $str_newline.join($extra.content.preun[$sp.Name])
 # << preun $sp.Name
 #end if
-#end if
 
+#end if
 #######################
 ## Post for SubPackages
 #set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key($sp.Name) and $extra.content.post[$sp.Name]
@@ -847,8 +847,8 @@ systemctl reload-or-try-restart $srv
 $str_newline.join($extra.content.post[$sp.Name])
 # << post $sp.Name
 #end if
-#end if ## need post
 
+#end if ## need post
 #######################
 ## PostUn for SubPackages
 #set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key($sp.Name) and $extra.content.postun[$sp.Name]
