@@ -29,6 +29,11 @@ $str_newline.join($extra.content.macros.main)
 #else
 #set $cfgstatic = "--disable-static"
 #end if
+#if $metadata.has_key("Macros")
+#for $macro_key,$macro_value in $metadata.Macros.items()
+%define $macro_key $macro_value
+#end for
+#end if
 #if $metadata.has_key('Builder')
 #set $Builder = $metadata.Builder
 #else

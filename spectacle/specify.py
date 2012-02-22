@@ -91,7 +91,8 @@ LIST_KEYS = ('Sources',
              'Files',
              'Documents',
              'RunFdupes',
-             'RpmLintIgnore'
+             'RpmLintIgnore',
+             'Macros',
              )
 
 STR_KEYS =  ('Name',
@@ -1119,6 +1120,16 @@ PkgBR:
             # if no srcpkg with yaml.version exists in cwd, trying to download
             if 'Sources' in self.metadata:
                 self._download_sources()
+
+        if "Macros" in self.metadata:
+            macros_parsed = {}
+            for macro in self.metadata['Macros']:
+                try:
+                    macro_name, macro_value = map(str.strip, macro.split(';'))
+                except:
+                    logger.error('Invalid macro entry "%s", should be "name;value"' % macro)
+                macros_parsed[macro_name] = macro_value
+            self.metadata['Macros'] = macros_parsed
 
         # handle patches with extra options
         if "Patches" in self.metadata:
