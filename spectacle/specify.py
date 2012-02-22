@@ -63,6 +63,7 @@ BOOLNO_KEYS = ('Check',
                'NoDesktop',
                'UpdateDesktopDB',
                'NoIconCache',
+               'NoSystemdService',
               )
 # boolean keys with the default 'True' value
 BOOLYES_KEYS = ('UseAsNeeded',
@@ -1262,10 +1263,11 @@ PkgBR:
 
                 elif re.match('^/(lib|%{_lib})/systemd/system/[^/*]*.service$', l):
                     # new service for systemd
-                    pkg_extra['SystemdService'] = True
-                    service = l.split('systemd/system/')[-1]
-                    if service not in pkg_extra['SystemdServices']:
-                        pkg_extra['SystemdServices'].append(service)
+                    if 'NoSystemdService' not in self.metadata:
+                        pkg_extra['SystemdService'] = True
+                        service = l.split('systemd/system/')[-1]
+                        if service not in pkg_extra['SystemdServices']:
+                            pkg_extra['SystemdServices'].append(service)
 
                 elif re.match('.*(%{_libdir}|%{_lib}|/lib|/usr/lib)/[^/]*[.*?]+so([.*?]+.*$|$)', l) or \
                    re.match('.*(/ld.so.conf.d/).*', l):
