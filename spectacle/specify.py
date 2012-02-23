@@ -93,6 +93,7 @@ LIST_KEYS = ('Sources',
              'RunFdupes',
              'RpmLintIgnore',
              'Macros',
+             'Macros2',
              )
 
 STR_KEYS =  ('Name',
@@ -1127,9 +1128,19 @@ PkgBR:
                 try:
                     macro_name, macro_value = map(str.strip, macro.split(';'))
                 except:
-                    logger.error('Invalid macro entry "%s", should be "name;value"' % macro)
+                    logger.error('Invalid Macros entry "%s", should be "name;value"' % macro)
                 macros_parsed[macro_name] = macro_value
             self.metadata['Macros'] = macros_parsed
+
+        if "Macros2" in self.metadata:
+            macros_parsed = {}
+            for macro in self.metadata['Macros2']:
+                try:
+                    macro_name, macro_value = map(str.strip, macro.split(';'))
+                except:
+                    logger.error('Invalid Macros2 entry "%s", should be "name;value"' % macro)
+                macros_parsed[macro_name] = macro_value
+            self.metadata['Macros2'] = macros_parsed
 
         # handle patches with extra options
         if "Patches" in self.metadata:
@@ -1333,13 +1344,14 @@ PkgBR:
         files = {}
         install = {}
         build = {}
-        macros = {}         # global macros
+        macros = {}         # macros added after Name: field in .spec
+        macros2 = {}        # macros added before %prep section in .spec
         setup = {}
         pre = {}
         preun = {}
         post = {}
         postun = {}
-        check = {} # extra headers
+        check = {}          # extra headers
 
         line_num = 0
         for i in file(spec_fpath):
@@ -1446,6 +1458,10 @@ PkgBR:
                     if 'main' in macros:
                         logger.error('%s:%d two macros section.' % (spec_fpath, line_num))
                     macros['main'] = recording
+                elif matchout.group(1) == "macros2":
+                    if 'main' in macros2:
+                        logger.error('%s:%d two macros2 section.' % (spec_fpath, line_num))
+                    macros2['main'] = recording
                 elif matchout.group(1) == "setup":
                     if 'main' in setup:
                         logger.error('%s:%d two setup section.' % (spec_fpath, line_num))
@@ -1471,6 +1487,8 @@ PkgBR:
 
         if macros:
             content["macros"] = macros
+        if macros2:
+            content["macros2"] = macros2
         if setup:
             content["setup"] = setup
         if post:

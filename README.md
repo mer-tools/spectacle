@@ -150,6 +150,10 @@ All available directives for spectacle are listed as the following:
 
 * BuildConflicts: **list** of **string**
 
+* Macros: **list* of **string**
+
+* Macros2: **list* of **string**
+
 * Configure: **string**, *optional*, valid values: **autogen**, **configure**,
   **reconfigure**, **none**<br>
   **If not specified, the default value "configure" will be used**

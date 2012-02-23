@@ -333,7 +333,19 @@ Description: %{summary}
 
 #end for
 #end if
+###################
+## Macros2
+#if $extra.content.has_key("macros2") and $extra.content.macros2.has_key("main") and $extra.content.macros2.main
+# >> macros2
+$str_newline.join($extra.content.macros2.main)
+# << macros2
+#end if
+#if $metadata.has_key("Macros2")
+#for $macro_key,$macro_value in $metadata.Macros2.items()
+%define $macro_key $macro_value
+#end for
 
+#end if
 ############################ prep scripts
 %prep
 #if $metadata.has_key("Sources")
