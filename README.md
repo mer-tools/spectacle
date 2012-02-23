@@ -39,8 +39,8 @@ Several methods available for spectacle installation:
 ### Requirements
 * python 2.x, above 2.5
 * PyYAML, the python module for YAML parsing
-* cheetah, one popular templating system for python<br>
-    In many linux distributions, the package may be named as python-cheetah.
+* cheetah, one popular templating system for python
+  * In many linux distributions, the package may be named as python-cheetah.
 
 ## Usage
 ### specify
@@ -98,33 +98,33 @@ All available directives for spectacle are listed as the following:
 
 * Release: **string**
 
-* Epoch: **string**, *optional*
+* Epoch: **string**
 
 * Group: **string**
 
 * License: **string**
 
-* URL: **string**, *optional*
+* URL: **string**
 
-* BuildArch: **string**, *optional*
+* BuildArch: **string**
 
-* ExclusiveArch: **string**, *optional*
+* ExclusiveArch: **string**
 
-* Prefix: **string**, *optional*
+* Prefix: **string**
 
-* LocaleName: **string**, *optional*
+* LocaleName: **string**
 
-* LocaleOptions: **string**, *optional*
+* LocaleOptions: **string**
 
-* Description: **text**, *optional*
+* Description: **text**
 
 * Sources: **list** of **string**
 
-* SourcePrefix: **string**, *optional*, specify the prefix path in source package
+* SourcePrefix: **string**, specify the prefix path in source package
 
-* ExtraSources: **list** of **string**, *optional*
+* ExtraSources: **list** of **string**
 
-* SetupOptions: **string**, *optional*, the options string for %setup
+* SetupOptions: **string**, the options string for %setup
 
 * Patches: **list** of **string**, all patches need to be in 'p1' level
 
@@ -154,28 +154,28 @@ All available directives for spectacle are listed as the following:
 
 * Macros2: **list* of **string**
 
-* Configure: **string**, *optional*, valid values: **autogen**, **configure**,
-  **reconfigure**, **none**<br>
+* Configure: **string**, valid values: **autogen**, **configure**,
+  **reconfigure**, **none**
   **If not specified, the default value "configure" will be used**
 
-* ConfigOptions: **list**, *optional*, extra options for ``Configure``
+* ConfigOptions: **list**, extra options for ``Configure``
 
-* Builder: **string**, *optional*, valid values: **make**, **single-make**,
-  **python**, **perl**, **qmake**, **none**<br>
+* Builder: **string**, valid values: **make**, **single-make**,
+  **python**, **perl**, **qmake**, **none**
   **If not specified, the deault value "make" will be used. If do not want a
   automatic builder, please use "none".**
 
-* QMakeOptions: **list**, *optional*, extra options for **qmake** ``Builder``
+* QMakeOptions: **list**, extra options for **qmake** ``Builder``
 
-* Files: **list** of **string**, *optional*, content of ``%files`` for small packages
+* Files: **list** of **string**, content of ``%files`` for small packages
 
-* FilesInput: **string**, *optional*, extra input source for %files
+* FilesInput: **string**, extra input source for %files
 
-* NoFiles: **boolean**, *optional*, if to be set as True, means no %files section for this package and it cause no rpm generated
+* NoFiles: **boolean**, if to be set as True, means no %files section for this package and it cause no rpm generated
 
 * RunFdupes: **string**, path under %buildroot to run ``%fdupes`` macro in %install
 
-* RpmLintIgnore: **list**, *optional*, list of skip items for ``rpmlint``
+* RpmLintIgnore: **list**, list of skip items for ``rpmlint``
 
 * Check: **boolean**, whether need ``%check`` section in spec
 
@@ -208,10 +208,8 @@ directives for sub packages:
 
     * Name
     * Summary
-    * Description, *optional*
-    * Group, *optional*
-    * License, *optional*
-    * Requires, *optional*
+    * Description
+    * Group
     * etc.
 
 **CAUTION**: The following cases of value string have special meaning in YAML syntax:
@@ -327,6 +325,15 @@ The following placeholders in spec can be customized:
 
         # >> macros
         # << macros
+
+* Private Macros2, used in this package's spec
+
+        # >> macros2
+        # << macros2
+
+**NOTE**: The placeholder lines will NOT generated in spec by default. If
+you need customized macros2, it need be added manually before %pre section
+of the .spec file, and only once.
 
 * Extra setup scripts in the last of ``%prep``
 
