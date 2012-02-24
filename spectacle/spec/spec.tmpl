@@ -564,6 +564,7 @@ $metadata.ExtraInstall
 $str_newline.join($extra.content.install.post)
 #end if
 # << install post
+
 #if $extra.Desktop
 desktop-file-install --delete-original       \
   --dir %{buildroot}%{_datadir}/applications             \
