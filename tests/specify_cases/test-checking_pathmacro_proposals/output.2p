@@ -1,5 +1,5 @@
---- output.2.o	2011-06-20 17:05:38.468485134 +0800
-+++ output.2	2011-06-20 17:06:35.907678856 +0800
+--- output.2.o	2012-02-24 13:45:31.914903204 +0200
++++ output.2	2012-02-24 13:45:32.101907413 +0200
 @@ -1,2 +1,8 @@
  [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
 +[33mWarning:[0m for %files line: "/usr/bin/abc"
