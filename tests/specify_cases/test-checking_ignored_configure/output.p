@@ -1,14 +1,14 @@
---- output.orig.spec	2010-07-23 11:18:42.942304765 +0800
-+++ output.spec	2010-07-23 11:18:54.444732273 +0800
-@@ -5,6 +5,7 @@
+--- output.orig.spec	2012-02-24 13:18:43.134607497 +0200
++++ output.spec	2012-02-24 13:18:43.304611352 +0200
+@@ -8,6 +8,7 @@ Name:       testpkg
  # >> macros
  # << macros
  
 +%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
- Name:       testpkg
  Summary:    Sample package for spectacle testings
  Version:    1.0
-@@ -42,7 +43,7 @@ This package contains development files 
+ Release:    1
+@@ -43,7 +44,7 @@ This package contains development files 
  # >> build pre
  # << build pre
  
@@ -17,7 +17,7 @@
  
  # >> build post
  # << build post
-@@ -50,6 +51,7 @@ This package contains development files 
+@@ -51,6 +52,7 @@ This package contains development files 
  rm -rf %{buildroot}
  # >> install pre
  # << install pre
