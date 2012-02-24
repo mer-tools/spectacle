@@ -7,3 +7,6 @@ spectacle/__version__.py
 spectacle/spec/*.py
 spectacle/dsc/*.py
 build/
+tests/specify_cases/*/tmp-files/
+spectacle.egg-info/
+*-swp
