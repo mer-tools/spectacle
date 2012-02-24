@@ -1,13 +1,10 @@
---- output.orig.spec	2012-02-24 12:36:18.176950753 +0200
-+++ output.spec	2012-02-24 12:36:18.345954559 +0200
-@@ -55,11 +55,12 @@ rm -rf %{buildroot}
+--- output.orig.spec	2012-02-24 13:54:39.837238459 +0200
++++ output.spec	2012-02-24 13:54:40.010242353 +0200
+@@ -57,8 +57,9 @@ rm -rf %{buildroot}
  # >> install post
  # << install post
  
 +%find_lang %{name} -gnome
- 
- 
- 
  
 -%files
 +%files -f %{name}.lang
