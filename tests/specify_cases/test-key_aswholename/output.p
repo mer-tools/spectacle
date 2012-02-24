@@ -1,6 +1,6 @@
---- output.orig.spec	2010-03-17 21:15:08.000000000 +0800
-+++ output.spec	2010-03-17 21:15:09.000000000 +0800
-@@ -22,12 +22,12 @@ specified, plus with one sub package "de
+--- output.orig.spec	2012-02-24 13:53:30.253671931 +0200
++++ output.spec	2012-02-24 13:53:30.430675915 +0200
+@@ -25,12 +25,12 @@ specified, plus with one sub package "de
  
  
  
@@ -15,9 +15,9 @@
  This package contains development files for %{name}.
  
  
-@@ -65,8 +65,8 @@ rm -rf %{buildroot}
+@@ -63,7 +63,7 @@ rm -rf %{buildroot}
+ # >> files
  # << files
- 
  
 -%files devel
 +%files -n haha-devel
@@ -26,4 +26,3 @@
 -# << files devel
 +# >> files haha-devel
 +# << files haha-devel
- 
