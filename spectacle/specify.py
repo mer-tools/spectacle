@@ -838,13 +838,15 @@ PkgBR:
 
         if "Archive" in self.metadata:
             archive = self.metadata['Archive']
-            if archive not in ('bzip2', 'gzip'):
+            if archive not in ('bzip2', 'gzip', 'xz'):
                 archive = 'bzip2'
         else:
             archive = 'bzip2'
 
         if archive == 'bzip2':
             appendix = 'bz2'
+        elif archive == 'xz':
+            appendix = 'xz'
         else:
             appendix = 'gz'
 
