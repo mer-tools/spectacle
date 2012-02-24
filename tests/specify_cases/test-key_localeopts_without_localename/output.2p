@@ -1,6 +1,6 @@
---- output.2.o	2010-03-17 21:15:14.000000000 +0800
-+++ output.2	2010-03-17 21:15:14.000000000 +0800
+--- output.2.o	2012-02-24 12:36:18.176950753 +0200
++++ output.2	2012-02-24 12:36:18.345954559 +0200
 @@ -1,2 +1,3 @@
  [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
 +[33mWarning:[0m lost "LocaleName" keyword, use "%{name}" as default
- [32mInfo:[0m Creating new spec file: output.spec
+ [33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!
