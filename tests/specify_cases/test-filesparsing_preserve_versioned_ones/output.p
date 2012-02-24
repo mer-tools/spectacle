@@ -1,21 +1,20 @@
---- output.orig.spec	2010-03-30 19:59:59.000000000 +0800
-+++ output.spec	2010-03-30 20:01:23.000000000 +0800
-@@ -14,6 +14,9 @@ License:    BSD
+--- output.orig.spec	2012-02-24 13:49:53.522792704 +0200
++++ output.spec	2012-02-24 13:49:53.697796645 +0200
+@@ -16,6 +16,10 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
  Source100:  testpkg.yaml
-+Requires(pre): GConf2
-+Requires(preun): GConf2
++Requires(pre): %{_bindir}/gconftool-2
++Requires(preun): %{_bindir}/gconftool-2
 +Requires(post): GConf2 >= 0.14
++Requires(post): %{_bindir}/gconftool-2
+ 
  
  %description
- Sample package for spectacle testings, which will be used as
-@@ -53,8 +56,26 @@ rm -rf %{buildroot}
- # >> install post
+@@ -58,8 +62,30 @@ rm -rf %{buildroot}
  # << install post
  
--
--
+ 
 +%pre
 +if [ "$1" -gt 1 ]; then
 +  export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
@@ -36,11 +35,7 @@
 +export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
 +gconftool-2 --makefile-install-rule \
 +    %{_libdir}/*.schema  > /dev/null || :
- 
- 
- 
-@@ -63,6 +84,7 @@ rm -rf %{buildroot}
- 
++
  %files
  %defattr(-,root,root,-)
 +%{_libdir}/*.schema
