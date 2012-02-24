@@ -1,14 +1,14 @@
---- output.orig.spec	2010-05-16 19:03:04.000000000 +0800
-+++ output.spec	2010-05-16 19:03:04.000000000 +0800
-@@ -5,6 +5,7 @@
+--- output.orig.spec	2012-02-24 13:57:10.149622436 +0200
++++ output.spec	2012-02-24 13:57:10.318626241 +0200
+@@ -8,6 +8,7 @@ Name:       testpkg
  # >> macros
  # << macros
  
 +%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
- Name:       testpkg
  Summary:    Sample package for spectacle testings
  Version:    1.0
-@@ -14,6 +15,7 @@ License:    BSD
+ Release:    1
+@@ -16,6 +17,7 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
  Source100:  testpkg.yaml
@@ -16,7 +16,7 @@
  
  
  %description
-@@ -42,14 +44,19 @@ This package contains development files 
+@@ -44,15 +46,20 @@ This package contains development files 
  # >> build pre
  # << build pre
  
@@ -25,6 +25,7 @@
  
  # >> build post
  # << build post
+ 
  %install
 -rm -rf %{buildroot}
 +rm -rf $RPM_BUILD_ROOT
