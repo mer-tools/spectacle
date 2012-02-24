@@ -1,6 +1,6 @@
---- output.orig.spec	2010-09-18 20:49:44.463208617 +0800
-+++ output.spec	2010-09-18 20:49:44.564208474 +0800
-@@ -14,6 +14,7 @@ License:    BSD
+--- output.orig.spec	2012-02-24 13:55:41.010615651 +0200
++++ output.spec	2012-02-24 13:55:41.182619524 +0200
+@@ -16,6 +16,7 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
  Source100:  testpkg.yaml
@@ -8,7 +8,7 @@
  
  
  %description
-@@ -42,14 +43,33 @@ This package contains development files
+@@ -44,15 +45,34 @@ This package contains development files 
  # >> build pre
  # << build pre
  
@@ -30,6 +30,7 @@
  
  # >> build post
  # << build post
+ 
  %install
 -rm -rf %{buildroot}
 +rm -rf $RPM_BUILD_ROOT
