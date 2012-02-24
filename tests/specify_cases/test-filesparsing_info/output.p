@@ -1,30 +1,26 @@
---- output.orig.spec	2010-03-30 19:56:39.000000000 +0800
-+++ output.spec	2010-03-30 19:56:39.000000000 +0800
-@@ -14,6 +14,8 @@ License:    BSD
+--- output.orig.spec	2012-02-24 13:48:35.999047431 +0200
++++ output.spec	2012-02-24 13:48:36.171051303 +0200
+@@ -16,6 +16,8 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
  Source100:  testpkg.yaml
 +Requires(post): /sbin/install-info
 +Requires(postun): /sbin/install-info
  
- %description
- Sample package for spectacle testings, which will be used as
-@@ -55,7 +57,13 @@ rm -rf %{buildroot}
  
+ %description
+@@ -58,8 +60,17 @@ rm -rf %{buildroot}
+ # << install post
  
  
 +%post
 +%install_info --info-dir=%_infodir %{_infodir}/*.info.gz
- 
++
 +%postun
 +if [ $1 = 0 ] ;then
 +%install_info_delete --info-dir=%{_infodir} %{_infodir}/*.info.gz
 +fi
- 
- 
- 
-@@ -63,6 +71,7 @@ rm -rf %{buildroot}
- 
++
  %files
  %defattr(-,root,root,-)
 +%{_infodir}/*.info.gz
