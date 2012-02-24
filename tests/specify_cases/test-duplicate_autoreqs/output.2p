@@ -1,9 +1,9 @@
---- output.2.o	2010-03-30 19:58:04.000000000 +0800
-+++ output.2	2010-03-30 19:58:43.000000000 +0800
+--- output.2.o	2012-02-24 13:47:09.139091977 +0200
++++ output.2	2012-02-24 13:47:09.318096008 +0200
 @@ -1,2 +1,6 @@
  [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
 +[33mWarning:[0m the value of "RequiresPost" in main package is expected as list typed
 +[33mWarning:[0m the value of "RequiresPostUn" in main package is expected as list typed
 +[33mWarning:[0m duplicate item: /sbin/ldconfig for RequiresPostUn in package main
 +[33mWarning:[0m duplicate item: /sbin/ldconfig for RequiresPost in package main
- [32mInfo:[0m Creating new spec file: output.spec
+ [33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!
