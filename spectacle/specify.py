@@ -266,9 +266,12 @@ class GitAccess():
 
     def get_toptag(self):
         vers = [_V(tag) for tag in self._gettags()]
-        if vers:
-            vers.sort()
-            return str(vers[-1])
+        # Need to filter ^{} entries out
+        # http://stackoverflow.com/questions/5346060/git-tag-why-this-duplicate-tag-in-remotes
+        filtered_vers = [item for item in vers if not str(item).endswith("^{}")]
+        if filtered_vers:
+            filtered_vers.sort()
+            return str(filtered_vers[-1])
 
         return None
 
