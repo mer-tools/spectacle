@@ -1,24 +1,22 @@
---- output.orig.spec	2010-05-16 19:01:30.000000000 +0800
-+++ output.spec	2010-05-16 19:01:30.000000000 +0800
-@@ -14,6 +14,9 @@ License:    BSD
+--- output.orig.spec	2012-02-24 12:29:46.270120571 +0200
++++ output.spec	2012-02-24 12:29:46.441124425 +0200
+@@ -16,6 +16,9 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
  Source100:  testpkg.yaml
-+Requires(post): desktop-file-utils
-+Requires(postun): desktop-file-utils
-+BuildRequires:  desktop-file-utils
++Requires(post): %{_bindir}/update-desktop-database
++Requires(postun): %{_bindir}/update-desktop-database
++BuildRequires:  %{_bindir}/desktop-file-install
  
  
  %description
-@@ -53,10 +56,17 @@ rm -rf %{buildroot}
- 
+@@ -55,12 +58,20 @@ rm -rf %{buildroot}
  # >> install post
  # << install post
+ 
 +desktop-file-install --delete-original       \
 +  --dir %{buildroot}%{_datadir}/applications             \
 +   %{buildroot}%{_datadir}/applications/*.desktop
- 
- 
  
 +%post
 +update-desktop-database %{_datadir}/applications &> /dev/null || :
@@ -26,9 +24,6 @@
 +%postun
 +update-desktop-database %{_datadir}/applications &> /dev/null || :
  
- 
- 
-@@ -64,6 +74,7 @@ rm -rf %{buildroot}
  
  %files
  %defattr(-,root,root,-)
