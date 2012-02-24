@@ -34,8 +34,10 @@ import spec
 import logger
 from vercmp import FairVersion as _V
 
+# Path for series file that contains patches (and comment lines #)
 SERIES_PATH = 'series.conf'
 
+# Mandatory keys for main package
 MAND_KEYS = ('Name',
              'Summary',
              'Description',
@@ -44,6 +46,7 @@ MAND_KEYS = ('Name',
              'License',
             )
 
+# Mandatory keys for subpackage
 SUB_MAND_KEYS = ('Name',
                  'Summary',
                  'Description',
@@ -65,12 +68,16 @@ BOOLNO_KEYS = ('Check',
                'NoIconCache',
                'NoSystemdService',
               )
+
 # boolean keys with the default 'True' value
 BOOLYES_KEYS = ('UseAsNeeded',
                 'AutoDepend',
                )
+               
+# All boolean keys
 BOOL_KEYS = BOOLNO_KEYS + BOOLYES_KEYS
 
+# Keys expected to have list type value.
 LIST_KEYS = ('Sources',
              'ExtraSources',
              'Patches',
@@ -96,6 +103,7 @@ LIST_KEYS = ('Sources',
              'Macros2',
              )
 
+# Keys expected to have string value.
 STR_KEYS =  ('Name',
              'Summary',
              'Description',
@@ -120,14 +128,19 @@ STR_KEYS =  ('Name',
              'Prefix',
             )
 
+# Keys that are only available for subpackages
 SUBONLY_KEYS = ('AsWholeName',
                 'AutoDepend',
                 )
 
+# Key that are warned about moving to main package
+# if found from subpackages.
 SUBWARN_KEYS = ('PkgBR',
                 'PkgConfigBR',
                 'BuildConflicts',
                )
+
+# Keys available for subpackages.
 SUBAVAIL_KEYS = ('Name',
                  'Summary',
                  'Description',
@@ -148,21 +161,31 @@ SUBAVAIL_KEYS = ('Name',
                  'NoAutoReqProv',
                  'NoIconCache',
                  'FilesInput',
-                 'Version', 'Release', 'Epoch', 'URL', 'BuildArch' # very rare
+                 # Very rare keys in sub packages
+                 'Version', 
+                 'Release', 
+                 'Epoch', 
+                 'URL', 
+                 'BuildArch',
                 )
 
+# Deprecated keys that are not used anymore and 
+# should be removed from .yaml
 DROP_KEYS = ('PostScripts',
              'Documents',
             )
 
+# Renamed keys.
 RENAMED_KEYS = {'NeedCheckSection': 'Check',
                 'NoLocale': 'NoAutoLocale',
                }
 
+# Common typos in keys
 TYPO_KEYS = {'BuildRequires': 'PkgBR or PkgConfigBR',
              'Url': 'URL',
             }
 
+# Keys that may have archictecture qualifier in front of them.
 ARCHED_KEYS = ('Requires',
                'PkgBR',
                'PkgConfigBR',
@@ -171,16 +194,22 @@ ARCHED_KEYS = ('Requires',
                'QMakeOptions',
                'Files',
               )
+
+# Available architecture qualifiers
 ARCHS = {'ix86': '%{ix86}',
          'arm': '%{arm}',
          'armv5': 'armv5el armv5tel armv5tejl',
          'armv7': 'armv7el armv7tel armv7l armv7hl armv7nhl',
         }
 
+# Different options for "Configure" yaml key.
 CONFIGURES = ('configure', 'reconfigure', 'autogen', 'cmake', 'none')
+
+# Different options for "Builder" yaml key.
 BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'cmake', 'none')
 
-# order care
+# Paths that should be replaced with macros when seen in %files.
+# NOTE: Order of this list matters!
 PATHMACROS = (('/usr/bin',     '%{_bindir}'),
               ('/usr/sbin',    '%{_sbindir}'),
               ('/usr/lib',     '%{_libdir}'),
