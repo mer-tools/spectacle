@@ -113,7 +113,9 @@ STR_KEYS =  ('Name',
              'Group',
              'License',
              'URL',
+             # "Source Code Management". In this context URL to git repository.
              'SCM',
+             # Type of archive that is done when SCM is used.
              'Archive',
              'BuildArch',
              'ExclusiveArch',

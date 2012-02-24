@@ -106,6 +106,10 @@ All available directives for spectacle are listed as the following:
 
 * URL: **string**
 
+* SCM: **string**, URL to git tree
+
+* Archive: **string**, format for output of SCM tarball, e.g., gzip, bzip2, xz
+
 * BuildArch: **string**
 
 * ExclusiveArch: **string**
