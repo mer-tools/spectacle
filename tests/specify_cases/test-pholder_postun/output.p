@@ -1,7 +1,7 @@
---- output.orig.spec	2010-07-23 11:02:42.067225740 +0800
-+++ output.spec	2010-07-23 11:02:42.215377186 +0800
-@@ -57,6 +57,11 @@ rm -rf %{buildroot}
- 
+--- output.orig.spec	2012-02-24 13:58:48.329832769 +0200
++++ output.spec	2012-02-24 13:58:48.498836573 +0200
+@@ -58,6 +58,12 @@ rm -rf %{buildroot}
+ # << install post
  
  
 +%postun
@@ -9,6 +9,7 @@
 +# customized postun scripts here
 +# for testing
 +# << postun
- 
- 
- 
++
+ %files
+ %defattr(-,root,root,-)
+ # >> files
