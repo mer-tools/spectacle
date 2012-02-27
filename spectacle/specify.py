@@ -299,6 +299,30 @@ class RPMWriter():
                         'Infos': [],
                     }
 
+    asp_templates = {
+                        'devel': { 'Name': "devel",
+                                   'Description': "Development files for %{name}",
+                                   'Summary': "Development files for %{name}.",
+                                   'Group': "Development/Libraries",
+                                   'Requires': "%{name} = $auto_depend"},
+                        'docs': { 'Name': "docs",
+                                   'Description': "Documentation files for %{name}",
+                                   'Summary': "Documentation files for %{name}.",
+                                   'Group': "Development/Libraries",
+                                   'Requires:': "%{name} = $auto_depend"},
+                        'lang': { 'Name': "lang",
+                                   'Description': "Translation files for %{name}",
+                                   'Summary': "Translation files for %{name}.",
+                                   'Group': "Development/Libraries",
+                                   'Requires:': "%{name} = $auto_depend"},
+                        # Used when package doesn't match any of the above.
+                        'unknown': { 'Name': "unknown",
+                                   'Description': "Files for %{name}",
+                                   'Summary': "Files for %{name}.",
+                                   'Group': "Development/Libraries",
+                                   'Requires:': "%{name} = $auto_depend"},
+                    }
+
     def __init__(self, yaml_fpath, spec_fpath=None, clean_old=False, download_new=True, skip_scm=False):
         self.yaml_fpath = yaml_fpath
         now = datetime.datetime.now()
@@ -1238,8 +1262,16 @@ PkgBR:
             for sp in self.metadata["SubPackages"]:
                 self.extra['subpkgs'][sp['Name']] = copy.deepcopy(self.extra_per_pkg)
         if "AutoSubPackages" in self.metadata:
+            if not self.metadata.has_key('SubPackages'):
+                self.metadata['SubPackages'] = []
             for asp in self.metadata["AutoSubPackages"]:
                 self.extra['subpkgs'][asp] = copy.deepcopy(self.extra_per_pkg)
+                if self.asp_templates.has_key(asp):
+                    self.metadata['SubPackages'].append(self.asp_templates[asp])
+                else:
+                    unknown_asp_tmp = self.asp_templates['unknown']
+                    unknown_asp_tmp['Name'] = asp
+                    self.metadata['SubPackages'].append(unknown_asp_tmp)
 
         # detect the using UI widget, QT or Gtk2
         all_pkgbr = []

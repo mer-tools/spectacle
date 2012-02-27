@@ -186,24 +186,11 @@ Obsoletes:   $obs
 BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 #end if
 
-
 %description
 #if $metadata.has_key("Description")
 ${metadata.Description}
 #else
 Description: %{summary}
-#end if
-
-#if $metadata.has_key("AutoSubPackages")
-#for $sp in $metadata.AutoSubPackages
-%package $sp
-Summary:    Development files for %{name}
-Group:      Development/Libraries
-Requires:   %{name} = $auto_depend
-%description $sp
-Development files for %{name}
-
-#end for
 #end if
 
 #if $metadata.has_key("SubPackages")
@@ -946,18 +933,6 @@ $str_newline.join($extra.content.files.main)
 #end if
 # << files
 #end if ## not NoFiles
-#if $metadata.has_key("AutoSubPackages")
-#for $sp in $metadata.AutoSubPackages
-
-%files $sp
-%defattr(-,root,root,-)
-# >> files $sp
-#if $extra.content.has_key("files") and $extra.content.files.has_key($sp)
-$str_newline.join($extra.content.files[$sp])
-#end if
-# << files $sp
-#end for
-#end if
 ## files for subpkgs
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
