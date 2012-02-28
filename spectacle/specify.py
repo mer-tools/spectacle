@@ -299,28 +299,33 @@ class RPMWriter():
                         'Infos': [],
                     }
 
+    # Templates for AutoSubPackages key
     asp_templates = {
                         'devel': { 'Name': "devel",
                                    'Description': "Development files for %{name}",
                                    'Summary': "Development files for %{name}.",
                                    'Group': "Development/Libraries",
-                                   'Requires': "%{name} = $auto_depend"},
+                                   'AutoDepend': "True",
+                                  },
                         'docs': { 'Name': "docs",
                                    'Description': "Documentation files for %{name}",
                                    'Summary': "Documentation files for %{name}.",
                                    'Group': "Development/Libraries",
-                                   'Requires:': "%{name} = $auto_depend"},
+                                   'AutoDepend': "True",
+                                },
                         'lang': { 'Name': "lang",
                                    'Description': "Translation files for %{name}",
                                    'Summary': "Translation files for %{name}.",
                                    'Group': "Development/Libraries",
-                                   'Requires:': "%{name} = $auto_depend"},
+                                   'AutoDepend': "True",
+                                 },
                         # Used when package doesn't match any of the above.
                         'unknown': { 'Name': "unknown",
                                    'Description': "Files for %{name}",
                                    'Summary': "Files for %{name}.",
                                    'Group': "Development/Libraries",
-                                   'Requires:': "%{name} = $auto_depend"},
+                                   'AutoDepend': "True",
+                                   },
                     }
 
     def __init__(self, yaml_fpath, spec_fpath=None, clean_old=False, download_new=True, skip_scm=False):
