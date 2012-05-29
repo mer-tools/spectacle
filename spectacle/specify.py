@@ -1062,7 +1062,8 @@ PkgBR:
                        },
                 'Icon': {'RequiresPost': ['/bin/touch', '%{_bindir}/gtk-update-icon-cache'],
                         },
-                'Desktop': {'PkgBR': ['%{_bindir}/desktop-file-install'],
+                 # BuildRequires doesn't support paths, thus this is mentioned as package.
+                'Desktop': {'PkgBR': ['desktop-file-utils'],
                            },
                 'DesktopDB': {'RequiresPost': ['%{_bindir}/update-desktop-database'],
                               'RequiresPostUn': ['%{_bindir}/update-desktop-database'],

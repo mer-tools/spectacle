@@ -1,14 +1,14 @@
---- output.orig.spec	2012-02-24 13:47:54.207106581 +0200
-+++ output.spec	2012-02-24 13:47:54.388110654 +0200
+--- output.orig.spec	2012-05-29 18:30:04.547967561 +0300
++++ output.spec	2012-05-29 18:30:05.175970683 +0300
 @@ -16,6 +16,7 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
  Source100:  testpkg.yaml
-+BuildRequires:  %{_bindir}/desktop-file-install
- 
++BuildRequires:  desktop-file-utils
  
  %description
-@@ -57,9 +58,13 @@ rm -rf %{buildroot}
+ Sample package for spectacle testings, which will be used as
+@@ -55,9 +56,13 @@ rm -rf %{buildroot}
  # >> install post
  # << install post
  
