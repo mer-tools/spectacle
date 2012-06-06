@@ -1,5 +1,5 @@
---- output.orig.spec	2012-02-24 13:51:43.460267705 +0200
-+++ output.spec	2012-02-24 13:51:43.634271622 +0200
+--- output.orig.spec	2012-06-06 13:07:56.834228873 +0300
++++ output.spec	2012-06-06 13:07:57.466232002 +0300
 @@ -16,6 +16,10 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
@@ -9,9 +9,9 @@
 +Requires(post): systemd
 +Requires(postun): systemd
  
- 
  %description
-@@ -29,6 +33,10 @@ specified, plus with one sub package "de
+ Sample package for spectacle testings, which will be used as
+@@ -27,6 +31,10 @@ specified, plus with one sub package "de
  Summary:    Development files for %{name}
  Group:      Development/Libraries
  Requires:   %{name} = %{version}-%{release}
@@ -22,12 +22,14 @@
  
  %description devel
  This package contains development files for %{name}.
-@@ -58,12 +66,34 @@ rm -rf %{buildroot}
+@@ -56,12 +64,38 @@ rm -rf %{buildroot}
  # << install post
  
  
 +%preun
++if [ "$1" -eq 0 ]; then
 +systemctl stop abc.service
++fi
 +
 +%post
 +systemctl daemon-reload
@@ -37,7 +39,9 @@
 +systemctl daemon-reload
 +
 +%preun devel
++if [ "$1" -eq 0 ]; then
 +systemctl stop xyz.service
++fi
 +
 +%post devel
 +systemctl daemon-reload

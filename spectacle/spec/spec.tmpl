@@ -638,9 +638,11 @@ fi
 #end if
 ## -SystemdService (systemd)
 #if $extra.SystemdService
+if [ "$1" -eq 0 ]; then
 #for $srv in $extra.SystemdServices
 systemctl stop $srv
 #end for
+fi
 #end if
 ## -Extra preun
 #if $has_extra_preun
@@ -796,9 +798,11 @@ fi
 #end if
 ## -SystemdService (systemd)
 #if $sub_extra.SystemdService
+if [ "$1" -eq 0 ]; then
 #for $srv in $sub_extra.SystemdServices
 systemctl stop $srv
 #end for
+fi
 #end if
 ## -Extra preun
 #if $has_extra_preun
