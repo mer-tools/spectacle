@@ -942,6 +942,9 @@ PkgBR:
                     except urlgrabber.grabber.URLGrabError, e:
                         if e.errno == 14: # HTTPError
                             logger.warning('Invalid source URL')
+                            # In error case the file most probably would not be valid,
+                            # thus we remove the invalid file.
+                            os.remove(f_name)
                         else:
                             raise e
                     except KeyboardInterrupt:
