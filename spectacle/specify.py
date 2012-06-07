@@ -943,7 +943,7 @@ PkgBR:
                         urlgrabber.urlgrab(target, f_name, progress_obj = text_progress_meter())
                     except urlgrabber.grabber.URLGrabError, e:
                         if e.errno == 14: # HTTPError
-                            logger.warning('Invalid source URL')
+                            logger.warning('Invalid source URL \'%s\'' % (target))
                             # In error case the file most probably would not be valid,
                             # thus we remove the invalid file.
                             os.remove(f_name)
