@@ -929,7 +929,9 @@ PkgBR:
                 target = s.replace('%{name}', pkg)
                 target = target.replace('%{version}', rev)
                 f_name = os.path.basename(target)
-                if not os.path.isfile(f_name):
+                if os.path.isdir(f_name):
+                    logger.warning('Source file \'%s\' can not be downloaded, because directory with same name already exists.' % (f_name))
+                elif not os.path.isfile(f_name):
                     answer = logger.ask('Need to download source package: %s ?' % f_name)
                     if not answer: break
 
