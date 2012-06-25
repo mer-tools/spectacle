@@ -37,5 +37,5 @@ setup(name='spectacle',
       url='https://meego.gitorious.org/meego-developer-tools/spectacle',
       scripts=['tools/specify', 'tools/ini2spectacle', 'tools/spec2spectacle', 'tools/deb2spectacle'],
       packages=['spectacle', 'spectacle.spec', 'spectacle.dsc'],
-      package_data={'sepctacle': ['data/*.csv', 'data/GROUPS']},
+      package_data={'spectacle': ['data/*.csv', 'data/GROUPS']},
      )
