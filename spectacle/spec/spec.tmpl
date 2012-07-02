@@ -904,7 +904,7 @@ $str_newline.join($extra.content.postun[$sp.Name])
 #end if ## has subpackages
 #if not $metadata.has_key("NoFiles")
 
-#if $metadata.has_key("LocaleName")
+#if (not $metadata.has_key('LocaleFilesPkgName') or $metadata.LocaleFilesPkgName == $metadata.Name) and $metadata.has_key("LocaleName")
 %files -f ${metadata.LocaleName}.lang
 #else if $metadata.has_key('FilesInput')
 %files -f $metadata.FilesInput
@@ -938,7 +938,9 @@ $str_newline.join($extra.content.files.main)
 #set $pkg_name = $sp.Name
 #end if
 
-#if $sp.has_key('FilesInput')
+#if $metadata.has_key("LocaleName") and $metadata.has_key('LocaleFilesPkgName') and $metadata.LocaleFilesPkgName == $pkg_name
+%files $pkg_name -f ${metadata.LocaleName}.lang
+#else if $sp.has_key('FilesInput')
 %files $pkg_name -f $sp.FilesInput
 #else
 %files $pkg_name

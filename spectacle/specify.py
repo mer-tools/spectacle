@@ -127,6 +127,8 @@ STR_KEYS =  ('Name',
              'SetupOptions',
              'LocaleName',
              'LocaleOptions',
+             # Defines the package name where the *.lang file is added.
+             'LocaleFilesPkgName',
              'FilesInput',
              'PostScripts',
              'Prefix',
@@ -1311,6 +1313,10 @@ PkgBR:
                 self.extra['subpkgs'][asp] = copy.deepcopy(self.extra_per_pkg)
                 if self.asp_templates.has_key(asp):
                     self.metadata['SubPackages'].append(self.asp_templates[asp])
+                    # By default if the LocaleFilesPkgName isn't defined and we have
+                    # lang subpackage the .lang file is assigned to lang package.
+                    if asp == "lang" and not self.metadata.has_key('LocaleFilesPkgName'):
+                        self.metadata['LocaleFilesPkgName'] = asp
                 else:
                     unknown_asp_tmp = self.asp_templates['unknown']
                     unknown_asp_tmp['Name'] = asp
