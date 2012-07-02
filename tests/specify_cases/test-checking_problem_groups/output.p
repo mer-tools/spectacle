@@ -1,6 +1,6 @@
---- output.orig.spec	2010-03-17 21:15:16.000000000 +0800
-+++ output.spec	2010-03-17 21:15:17.000000000 +0800
-@@ -9,7 +9,7 @@ Name:       testpkg
+--- output.orig.spec	2012-07-02 15:35:05.123573696 +0300
++++ output.spec	2012-07-02 15:35:05.233573699 +0300
+@@ -11,7 +11,7 @@ Name:       testpkg
  Summary:    Sample package for spectacle testings
  Version:    1.0
  Release:    1

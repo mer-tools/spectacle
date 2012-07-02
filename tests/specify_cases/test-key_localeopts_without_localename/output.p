@@ -1,6 +1,6 @@
---- output.orig.spec	2012-02-24 13:54:39.837238459 +0200
-+++ output.spec	2012-02-24 13:54:40.010242353 +0200
-@@ -57,8 +57,9 @@ rm -rf %{buildroot}
+--- output.orig.spec	2012-07-02 15:35:08.199573778 +0300
++++ output.spec	2012-07-02 15:35:08.308573781 +0300
+@@ -55,8 +55,9 @@ rm -rf %{buildroot}
  # >> install post
  # << install post
  

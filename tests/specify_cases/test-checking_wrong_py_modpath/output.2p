@@ -1,6 +1,5 @@
---- output.2.o	2010-07-23 11:05:50.835751410 +0800
-+++ output.2	2010-07-23 11:05:50.997754756 +0800
-@@ -1,2 +1,2 @@
- [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
+--- output.2.o	2012-07-02 15:35:06.279573727 +0300
++++ output.2	2012-07-02 15:35:06.391573730 +0300
+@@ -1 +1 @@
 -[33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!
 +[31mError:[0m please use %{python_sitelib} in %files to specify module installation path

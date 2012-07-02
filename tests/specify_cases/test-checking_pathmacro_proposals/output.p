@@ -1,5 +1,5 @@
---- output.orig.spec	2012-02-24 13:45:31.914903204 +0200
-+++ output.spec	2012-02-24 13:45:32.101907413 +0200
+--- output.orig.spec	2012-07-02 15:35:04.642573683 +0300
++++ output.spec	2012-07-02 15:35:04.758573686 +0300
 @@ -16,6 +16,8 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
@@ -7,9 +7,9 @@
 +Requires(post): /sbin/install-info
 +Requires(postun): /sbin/install-info
  
- 
  %description
-@@ -58,8 +60,19 @@ rm -rf %{buildroot}
+ Sample package for spectacle testings, which will be used as
+@@ -56,8 +58,19 @@ rm -rf %{buildroot}
  # << install post
  
  

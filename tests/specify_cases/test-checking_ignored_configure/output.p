@@ -1,5 +1,5 @@
---- output.orig.spec	2012-02-24 13:18:43.134607497 +0200
-+++ output.spec	2012-02-24 13:18:43.304611352 +0200
+--- output.orig.spec	2012-07-02 15:35:02.996573639 +0300
++++ output.spec	2012-07-02 15:35:03.108573642 +0300
 @@ -8,6 +8,7 @@ Name:       testpkg
  # >> macros
  # << macros
@@ -8,7 +8,7 @@
  Summary:    Sample package for spectacle testings
  Version:    1.0
  Release:    1
-@@ -43,7 +44,7 @@ This package contains development files 
+@@ -42,7 +43,7 @@ This package contains development files
  # >> build pre
  # << build pre
  
@@ -17,7 +17,7 @@
  
  # >> build post
  # << build post
-@@ -51,6 +52,7 @@ This package contains development files 
+@@ -51,6 +52,7 @@ This package contains development files
  rm -rf %{buildroot}
  # >> install pre
  # << install pre

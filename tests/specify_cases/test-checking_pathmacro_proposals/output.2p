@@ -1,7 +1,6 @@
---- output.2.o	2012-02-24 13:45:31.914903204 +0200
-+++ output.2	2012-02-24 13:45:32.101907413 +0200
-@@ -1,2 +1,8 @@
- [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
+--- output.2.o	2012-07-02 15:35:04.642573683 +0300
++++ output.2	2012-07-02 15:35:04.758573686 +0300
+@@ -1 +1,7 @@
 +[33mWarning:[0m for %files line: "/usr/bin/abc"
 +	please use %{_bindir} to replace the leading path /usr/bin
 +[33mWarning:[0m for %files line: "/usr/share/info/info.gz"

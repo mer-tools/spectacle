@@ -25,14 +25,6 @@ import glob
 from spectacle import specify
 from spectacle import logger
 
-MF_TEMPLATE = """PKG_NAME := %s
-SPECFILE = $(addsuffix .spec, $(PKG_NAME))
-YAMLFILE = $(addsuffix .yaml, $(PKG_NAME))
-
-
-include /usr/share/packaging-tools/Makefile.common
-"""
-
 def new_yaml(fpath):
     from spectacle import dumper
     if not fpath.endswith('.yaml'):
@@ -169,14 +161,6 @@ if __name__ == '__main__':
         os.chdir(wdir)
 
     yaml_fname = os.path.basename(yaml_fpath)
-
-    # check Makefile from packaging-tools
-    if not os.path.exists('Makefile'):
-        logger.warning('There is no "Makefile" for this package, please update it using packaging-tools')
-        if logger.ask('Need to create Makefile from default template?', False):
-            mf = open('Makefile', 'w')
-            mf.write(MF_TEMPLATE % os.path.basename(yaml_fname).rstrip('.yaml'))
-            mf.close()
 
     spec_fpath, newspec = specify.generate_rpm(yaml_fname, spec_fpath=out_fpath, download_new=not options.not_download, skip_scm=options.skip_scm)
     if newspec:

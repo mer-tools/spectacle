@@ -1,7 +1,6 @@
---- output.2.o	2010-07-07 09:41:40.916096869 +0800
-+++ output.2	2010-07-07 09:41:50.749043384 +0800
-@@ -1,2 +1,4 @@
- [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
+--- output.2.o	2012-07-02 15:35:03.467573651 +0300
++++ output.2	2012-07-02 15:35:03.577573654 +0300
+@@ -1 +1,3 @@
 +[33mWarning:[0m "abc" is not a valid choice of Configure(configure/reconfigure/autogen/cmake/none)
 +[33mWarning:[0m "xyz" is not a valid choice of Builder(make/single-make/python/perl/qmake/cmake/none)
- [32mInfo:[0m Creating new spec file: output.spec
+ [33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!

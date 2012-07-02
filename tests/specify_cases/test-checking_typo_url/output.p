@@ -1,6 +1,6 @@
---- output.orig.spec	2011-06-20 16:44:59.822595669 +0800
-+++ output.spec	2011-06-20 16:44:59.939595547 +0800
-@@ -11,7 +11,6 @@ Version:    1.0
+--- output.orig.spec	2012-07-02 15:35:06.049573721 +0300
++++ output.spec	2012-07-02 15:35:06.160573724 +0300
+@@ -13,7 +13,6 @@ Version:    1.0
  Release:    1
  Group:      System/Base
  License:    BSD

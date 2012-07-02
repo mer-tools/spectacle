@@ -1,6 +1,5 @@
---- output.2.o	2012-02-24 13:58:48.329832769 +0200
-+++ output.2	2012-02-24 13:58:48.498836573 +0200
-@@ -1,2 +1,2 @@
- [33mWarning:[0m There is no "Makefile" for this package, please update it using packaging-tools
+--- output.2.o	2012-07-02 15:35:08.430573784 +0300
++++ output.2	2012-07-02 15:35:08.546573787 +0300
+@@ -1 +1 @@
 -[33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!
 +[32mInfo:[0m Old spec file exists, patching output.spec ...

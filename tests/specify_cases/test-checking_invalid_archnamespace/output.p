@@ -1,6 +1,6 @@
---- output.orig.spec	2010-12-09 11:34:14.525023916 +0800
-+++ output.spec	2010-12-09 11:34:14.645023854 +0800
-@@ -14,6 +14,12 @@ License:    BSD
+--- output.orig.spec	2012-07-02 15:35:03.231573645 +0300
++++ output.spec	2012-07-02 15:35:03.346573648 +0300
+@@ -16,6 +16,12 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
  Source100:  testpkg.yaml
@@ -11,5 +11,5 @@
 +BuildRequires:  sparc-pkg-devel
 +%endif
  
- 
  %description
+ Sample package for spectacle testings, which will be used as

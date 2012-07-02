@@ -1,6 +1,6 @@
---- output.orig.spec	2010-03-17 21:15:04.000000000 +0800
-+++ output.spec	2010-03-17 21:15:05.000000000 +0800
-@@ -61,6 +61,8 @@ rm -rf %{buildroot}
+--- output.orig.spec	2012-07-02 15:35:02.519573626 +0300
++++ output.spec	2012-07-02 15:35:02.629573629 +0300
+@@ -58,6 +58,8 @@ rm -rf %{buildroot}
  
  %files
  %defattr(-,root,root,-)
