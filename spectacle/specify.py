@@ -1326,6 +1326,15 @@ PkgBR:
             if br.startswith('Qt'):
                 self.uiwidget = 'Qt'
 
+        if 'LocaleName' not in self.metadata and 'NoAutoLocale' not in self.metadata:
+            # If LocaleName or NoAutoLocale isn't set lets search if there is 'intltool' build requirement 
+            # and set LocaleName to Name.
+            if self.metadata.has_key("PkgBR"):
+                for br in self.metadata['PkgBR']:
+                    if br == 'intltool':
+                        self.metadata['LocaleName'] = self.metadata['Name']
+                        break
+                
         """ NOTE
         we need NOT to do the following checking:
          * whether auto-added Requires(include pre/post/preun/postun) duplicated

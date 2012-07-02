@@ -140,12 +140,8 @@ $arch_line($br, "BuildRequires:  pkgconfig(", ")")
 #end if
 #end for ## each br
 #end if
-#set $br_locale = ""
 #if $metadata.has_key("PkgBR")
 #for $br in $metadata.PkgBR
-#if $br == 'intltool' and not $metadata.has_key("LocaleName") and not $metadata.has_key("NoAutoLocale")
-#set $br_locale = $metadata.Name
-#end if
 $arch_line($br, "BuildRequires:  ")
 #end for ## each br
 #end if
@@ -568,8 +564,6 @@ desktop-file-install --delete-original       \
 #else
 %find_lang ${metadata.LocaleName}
 #end if
-#else if $br_locale != ""
-%find_lang $br_locale
 #end if
 ############################ run fdupes
 #if $metadata.has_key("RunFdupes")
@@ -912,8 +906,6 @@ $str_newline.join($extra.content.postun[$sp.Name])
 
 #if $metadata.has_key("LocaleName")
 %files -f ${metadata.LocaleName}.lang
-#else if $br_locale != ""
-%files -f ${br_locale}.lang
 #else if $metadata.has_key('FilesInput')
 %files -f $metadata.FilesInput
 #else
