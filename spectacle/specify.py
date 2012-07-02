@@ -34,6 +34,8 @@ import spec
 import logger
 from vercmp import FairVersion as _V
 
+USER_CONFIG = '~/.spectacle/spectacle.conf'
+
 # Path for series file that contains patches (and comment lines #)
 SERIES_PATH = 'series.conf'
 
@@ -228,6 +230,34 @@ PATHMACROS = (('/usr/bin',     '%{_bindir}'),
               ('/var',         '%{_localstatedir}'),
              )
 
+# Function to read config file to parser
+def read_config_file(configfile,config_parser = None):
+    from ConfigParser import SafeConfigParser
+    configfile = os.path.expanduser(configfile)
+
+    if not os.path.exists(configfile):
+        return None
+    
+    if not config_parser:
+        config_parser = SafeConfigParser()
+    
+    config_parser.read(configfile)
+    
+    return config_parser
+
+# Function to get values from config
+def get_config(configs, gettype, key, section = 'Main'):
+    if not configs:
+        return None
+    if not configs.has_section(section):
+        return None
+    if not configs.has_option(section, key):
+        return None
+    if gettype == "boolean":
+        return configs.getboolean(section,key)
+    else:
+        return configs.get(section,key)
+
 # global helper functions
 def arch_split(value):
     m = re.match('^(\w+):([^:]+)', value)
@@ -356,6 +386,8 @@ class RPMWriter():
             self.stream = file(yaml_fpath, 'r')
         except IOError:
             logger.error('Cannot read file: %s' % yaml_fpath)
+        
+        self.configs = read_config_file(USER_CONFIG)
 
     def dump(self):
         # debugging
@@ -1445,7 +1477,12 @@ PkgBR:
                         cur_ver = _V(__version__.VERSION)
                         if cur_ver < spec_ver:
                             logger.warning('!!! Current spectacle version is lower than the one used for this package previously')
-                            answer = logger.ask('Please upgrade your spectacle, continue?', False)
+                            default_answer = False
+                            if self.configs:
+                                old_spectacle_ok = get_config(self.configs,'boolean','old_spectacle_ok')
+                                if old_spectacle_ok is not None:
+                                    default_answer = old_spectacle_ok
+                            answer = logger.ask('Please upgrade your spectacle, continue?', default_answer)
                             if not answer:
                                 sys.exit(1)
                     else:
