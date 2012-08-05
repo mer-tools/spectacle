@@ -21,3 +21,4 @@ PkgBR:
     - python-devel
     - python-cheetah
 Builder: python
+SetupOptions: -q -n src

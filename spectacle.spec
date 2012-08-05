@@ -32,7 +32,7 @@ A tool for managing and creating RPM spec files
 
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n src
 
 # >> setup
 # << setup
