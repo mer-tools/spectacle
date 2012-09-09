@@ -1318,7 +1318,7 @@ PkgBR:
                     if asp == "lang" and not self.metadata.has_key('LocaleFilesPkgName'):
                         self.metadata['LocaleFilesPkgName'] = asp
                 else:
-                    unknown_asp_tmp = self.asp_templates['unknown']
+                    unknown_asp_tmp = copy.deepcopy(self.asp_templates['unknown'])
                     unknown_asp_tmp['Name'] = asp
                     self.metadata['SubPackages'].append(unknown_asp_tmp)
 
