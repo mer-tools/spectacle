@@ -183,11 +183,7 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 #end if
 
 %description
-#if $metadata.has_key("Description")
 ${metadata.Description}
-#else
-Description: %{summary}
-#end if
 
 #if $metadata.has_key("SubPackages")
 #for $sp in $metadata.SubPackages
@@ -308,11 +304,7 @@ BuildConflicts: $bcfl
 #else
 %description $sp.Name
 #end if
-#if $sp.has_key('Description')
 $sp.Description
-#else
-Description: %{summary}
-#end if
 
 #end for
 #end if

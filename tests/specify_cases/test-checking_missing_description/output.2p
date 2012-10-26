@@ -1,5 +1,0 @@
---- output.2.o	2012-07-02 15:35:04.170573670 +0300
-+++ output.2	2012-07-02 15:35:04.280573673 +0300
-@@ -1 +1 @@
--[33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!
-+[31mError:[0m Missing mandatory keys for main package: Description

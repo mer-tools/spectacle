@@ -42,7 +42,6 @@ SERIES_PATH = 'series.conf'
 # Mandatory keys for main package
 MAND_KEYS = ('Name',
              'Summary',
-             'Description',
              'Version',
              'Group',
              'License',
@@ -51,7 +50,6 @@ MAND_KEYS = ('Name',
 # Mandatory keys for subpackage
 SUB_MAND_KEYS = ('Name',
                  'Summary',
-                 'Description',
                  'Group',
                 )
 
@@ -864,6 +862,14 @@ PkgBR:
         if "SubPackages" in self.metadata:
             for sp in self.metadata["SubPackages"]:
                 _check_key_license(sp)
+
+        # By default make Description equal to %{summary}.
+        if "Description" not in self.metadata and 'Summary' in self.metadata:
+            self.metadata["Description"] = "%{summary}."
+        if "SubPackages" in self.metadata:
+            for sp in self.metadata["SubPackages"]:
+                if 'Description' not in sp and 'Summary' in sp:
+                    sp['Description'] = "%{summary}."
 
         # checking for validation of 'Description'
         if not _check_key_desc(self.metadata):
