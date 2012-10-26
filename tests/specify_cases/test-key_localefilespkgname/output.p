@@ -1,5 +1,5 @@
---- output.orig.spec	2012-07-02 15:11:19.251535512 +0300
-+++ output.spec	2012-07-02 15:12:13.125536955 +0300
+--- output.orig.spec	2012-10-26 06:14:07.480343474 +0000
++++ output.spec	2012-10-26 06:14:07.583343694 +0000
 @@ -16,6 +16,7 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
@@ -24,14 +24,14 @@
 +%description mylocale
 +This package contains locale files for %{name}.
  
- 
  %prep
-@@ -55,13 +56,14 @@ rm -rf %{buildroot}
+ %setup -q -n %{name}-%{version}
+@@ -54,12 +55,14 @@ rm -rf %{buildroot}
  # >> install post
  # << install post
  
 +%find_lang testpkg
- 
++
  %files
  %defattr(-,root,root,-)
  # >> files

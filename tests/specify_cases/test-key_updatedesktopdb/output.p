@@ -1,5 +1,5 @@
---- output.orig.spec	2012-05-29 18:29:53.547913017 +0300
-+++ output.spec	2012-05-29 18:29:54.183916168 +0300
+--- output.orig.spec	2012-10-26 06:12:58.920246810 +0000
++++ output.spec	2012-10-26 06:12:59.021247026 +0000
 @@ -16,6 +16,9 @@ License:    BSD
  URL:        http://www.testpkg.org/
  Source0:    http://www.testpkg.org/testpkg-%{version}.tar.gz
@@ -10,7 +10,7 @@
  
  %description
  Sample package for spectacle testings, which will be used as
-@@ -55,9 +58,19 @@ rm -rf %{buildroot}
+@@ -54,8 +57,19 @@ rm -rf %{buildroot}
  # >> install post
  # << install post
  
@@ -23,7 +23,7 @@
 +
 +%postun
 +update-desktop-database %{_datadir}/applications &> /dev/null || :
- 
++
  %files
  %defattr(-,root,root,-)
 +%{_datadir}/applications/*.desktop

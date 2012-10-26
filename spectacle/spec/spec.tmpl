@@ -319,7 +319,6 @@ Description: %{summary}
 ###################
 ## Macros2
 #if $metadata.has_key("Macros2") or $extra.content.has_key("macros2")
-
 #if $extra.content.has_key("macros2") and $extra.content.macros2.has_key("main") and $extra.content.macros2.main
 # >> macros2
 $str_newline.join($extra.content.macros2.main)
@@ -330,8 +329,8 @@ $str_newline.join($extra.content.macros2.main)
 %define $macro_key $macro_value
 #end for
 #end if
-#end if
 
+#end if
 ############################ prep scripts
 %prep
 #if $metadata.has_key("Sources")
@@ -556,6 +555,7 @@ $str_newline.join($extra.content.install.post)
 desktop-file-install --delete-original       \
   --dir %{buildroot}%{_datadir}/applications             \
    %{buildroot}%{_datadir}/applications/*.desktop
+
 #end if
 #if $metadata.has_key("LocaleName")
 #if $metadata.has_key("LocaleOptions")
@@ -564,16 +564,17 @@ desktop-file-install --delete-original       \
 #else
 %find_lang ${metadata.LocaleName}
 #end if
+
 #end if
 ############################ run fdupes
 #if $metadata.has_key("RunFdupes")
 #for $fditem in $metadata.RunFdupes
 %fdupes  %{buildroot}/$fditem
 #end for
+
 #end if
 ############################ optional check scripts
 #if $metadata.has_key("Check")
-
 %check
 # >> check
 #if $extra.content.has_key("check")
@@ -590,11 +591,11 @@ make check
 #end if
 #end if
 # << check
+
 #end if
 ############################ Pre
 #set $has_extra_pre = $extra.content.has_key("pre") and $extra.content.pre.has_key("main")
 #if $extra.Schema or $has_extra_pre
-
 %pre
 ## -Schema
 #if $extra.Schema
@@ -613,11 +614,11 @@ fi
 $str_newline.join($extra.content.pre.main)
 # << pre
 #end if
+
 #end if
 ############################ PreUn
 #set $has_extra_preun = $extra.content.has_key("preun") and $extra.content.preun.has_key("main")
 #if $extra.Schema or $extra.SystemdService or $has_extra_preun
-
 %preun
 ## -Schema
 #if $extra.Schema
@@ -644,11 +645,11 @@ fi
 $str_newline.join($extra.content.preun.main)
 # << preun
 #end if
+
 #end if
 ############################ Post
 #set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key("main") and $extra.content.post.main
 #if $extra.Lib or $extra.Info or $extra.Schema or $extra.Icon or $extra.DesktopDB or $extra.SystemdService or $has_extra_post
-
 #set $only_Lib = not ($extra.Info or $extra.Schema or $extra.Icon or $extra.DesktopDB or $extra.SystemdService or $has_extra_post)
 #if $only_Lib
 %post -p /sbin/ldconfig
@@ -696,11 +697,11 @@ systemctl reload-or-try-restart $srv
 $str_newline.join($extra.content.post.main)
 # << post
 #end if
+
 #end if ## need post
 ############################ PostUn
 #set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key("main") and $extra.content.postun.main
 #if $extra.Lib or $extra.Info or $extra.Icon or $extra.DesktopDB or $extra.SystemdService or $has_extra_postun
-
 #set $only_Lib = not ($extra.Info or $extra.Icon or $extra.DesktopDB or $extra.SystemdService or $has_extra_postun)
 #if $only_Lib
 %postun -p /sbin/ldconfig
@@ -738,6 +739,7 @@ systemctl daemon-reload
 $str_newline.join($extra.content.postun.main)
 # << postun
 #end if
+
 #end if ## need postun
 ########################################
 ## Pre/Preun/Post/Postun for SubPackages
@@ -753,7 +755,6 @@ $str_newline.join($extra.content.postun.main)
 ## Pre for SubPackages
 #set $has_extra_pre = $extra.content.has_key("pre") and $extra.content.pre.has_key($sp.Name)
 #if $sub_extra.Schema or $has_extra_pre
-
 %pre $pkg_name
 ## -Schema
 #if $sub_extra.Schema
@@ -772,12 +773,12 @@ fi
 $str_newline.join($extra.content.pre[$sp.Name])
 # << pre $sp.Name
 #end if
+
 #end if
 #######################
 ## Preun for SubPackages
 #set $has_extra_preun = $extra.content.has_key("preun") and $extra.content.preun.has_key($sp.Name)
 #if $sub_extra.Schema or $sub_extra.SystemdService or $has_extra_preun
-
 %preun $pkg_name
 ## -Schema
 #if $sub_extra.Schema
@@ -804,12 +805,12 @@ fi
 $str_newline.join($extra.content.preun[$sp.Name])
 # << preun $sp.Name
 #end if
+
 #end if
 #######################
 ## Post for SubPackages
 #set $has_extra_post = $extra.content.has_key("post") and $extra.content.post.has_key($sp.Name) and $extra.content.post[$sp.Name]
 #if $sub_extra.Lib or $sub_extra.Info or $sub_extra.Icon or $sub_extra.Schema or $sub_extra.DesktopDB or $sub_extra.SystemdService or $has_extra_post
-
 #set $only_Lib = not ($sub_extra.Info or $sub_extra.Icon or $sub_extra.Schema or $sub_extra.DesktopDB or $sub_extra.SystemdService or $has_extra_post)
 #if $only_Lib
 %post $pkg_name -p /sbin/ldconfig
@@ -857,12 +858,12 @@ systemctl reload-or-try-restart $srv
 $str_newline.join($extra.content.post[$sp.Name])
 # << post $sp.Name
 #end if
+
 #end if ## need post
 #######################
 ## PostUn for SubPackages
 #set $has_extra_postun = $extra.content.has_key("postun") and $extra.content.postun.has_key($sp.Name) and $extra.content.postun[$sp.Name]
 #if  $sub_extra.Lib or $sub_extra.Info or $sub_extra.Icon or $sub_extra.DesktopDB or $sub_extra.SystemdService or $has_extra_postun
-
 #set $only_Lib = not ($sub_extra.Info or $sub_extra.Icon or $sub_extra.DesktopDB or $sub_extra.SystemdService or $has_extra_postun)
 #if $only_Lib
 %postun $pkg_name -p /sbin/ldconfig
@@ -899,11 +900,11 @@ systemctl daemon-reload
 $str_newline.join($extra.content.postun[$sp.Name])
 # << postun $sp.Name
 #end if
+
 #end if ## need postun
 #end for ## per subpackage
 #end if ## has subpackages
 #if not $metadata.has_key("NoFiles")
-
 #if (not $metadata.has_key('LocaleFilesPkgName') or $metadata.LocaleFilesPkgName == $metadata.Name) and $metadata.has_key("LocaleName")
 %files -f ${metadata.LocaleName}.lang
 #else if $metadata.has_key('FilesInput')
