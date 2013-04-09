@@ -154,9 +154,9 @@ All available directives for spectacle are listed as the following:
 
 * BuildConflicts: **list** of **string**
 
-* Macros: **list* of **string**
+* Macros: **list** of **string**
 
-* Macros2: **list* of **string**
+* Macros2: **list** of **string**
 
 * Configure: **string**, valid values: **autogen**, **configure**,
   **reconfigure**, **none**
