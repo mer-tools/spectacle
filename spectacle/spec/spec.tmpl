@@ -95,7 +95,7 @@ $arch_line($patch, "Patch%d:     "%$idx)
 #end for ## each patch
 #end if
 #if 'NoAutoReq' in $metadata
-AutoReq: 0
+AutoReq:    0
 #end if
 #if 'NoAutoReqProv' in $metadata
 AutoReqProv:    0
@@ -158,7 +158,7 @@ BuildRequires:  fdupes
 BuildRequires:  cmake
 #end if
 #if 'NoAutoProv' in $metadata
-AutoProv: 0
+AutoProv:   0
 #end if
 ## Provides
 #if $metadata.has_key("Provides")
@@ -224,7 +224,7 @@ Prefix:    $sp.Prefix
 AutoReq:    0
 #end if
 #if 'NoAutoProv' in $sp
-AutoProv:    0
+AutoProv:   0
 #end if
 #if 'NoAutoReqProv' in $sp
 AutoReqProv:    0
