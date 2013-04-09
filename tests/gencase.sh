@@ -7,8 +7,8 @@ fi
 
 CaseName=$1
 
-mkdir test-${CaseName}
-cd test-${CaseName}
+mkdir -p specify_cases/test-${CaseName}
+cd specify_cases/test-${CaseName}
 
 cp ../base/testpkg.yaml .
 specify -N -n -o output.spec testpkg.yaml 1>output.1.o 2>output.2.o
@@ -48,5 +48,5 @@ else
   rm -f output.2p
 fi
 
-mkdir tmp-files
+mkdir -p tmp-files
 mv -f *.yaml *.spec *.[12o] tmp-files
