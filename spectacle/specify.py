@@ -95,7 +95,6 @@ LIST_KEYS = ('Sources',
              'Obsoletes',
              'AutoSubPackages',
              'Files',
-             'Documents',
              'RunFdupes',
              'RpmLintIgnore',
              'Macros',
@@ -127,7 +126,6 @@ STR_KEYS =  ('Name',
              # Defines the package name where the *.lang file is added.
              'LocaleFilesPkgName',
              'FilesInput',
-             'PostScripts',
              'Prefix',
             )
 

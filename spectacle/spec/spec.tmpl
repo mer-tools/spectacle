@@ -200,16 +200,16 @@ Version:    $sp.Version
 Release:    $sp.Release
 #end if
 #if $sp.has_key("Epoch")
-Epoch:    $sp.Epoch
+Epoch:      $sp.Epoch
 #end if
 #if $sp.has_key("URL")
-URL:    $sp.URL
+URL:        $sp.URL
 #end if
 #if $sp.has_key("BuildArch")
-BuildArch:    $sp.BuildArch
+BuildArch:  $sp.BuildArch
 #end if
 #if $sp.has_key("Prefix")
-Prefix:    $sp.Prefix
+Prefix:     $sp.Prefix
 #end if
 #if 'NoAutoReq' in $sp
 AutoReq:    0
@@ -257,13 +257,13 @@ Provides:   $prd
 ## Conflicts
 #if $sp.has_key("Conflicts")
 #for $cfl in $sp.Conflicts
-Conflicts:   $cfl
+Conflicts:  $cfl
 #end for
 #end if
 ## Obsoletes
 #if $sp.has_key("Obsoletes")
 #for $obs in $sp.Obsoletes
-Obsoletes:   $obs
+Obsoletes:  $obs
 #end for
 #end if
 ## BR
@@ -446,7 +446,7 @@ $metadata.Builder
 ############################
 
 # >> build post
-#if $extra.content.has_key("build") and  $extra.content.build.has_key("post")
+#if $extra.content.has_key("build") and $extra.content.build.has_key("post")
 $str_newline.join($extra.content.build.post)
 #end if
 # << build post
@@ -455,7 +455,7 @@ $str_newline.join($extra.content.build.post)
 %install
 rm -rf %{buildroot}
 # >> install pre
-#if $extra.content.has_key("install") and  $extra.content.install.has_key("pre")
+#if $extra.content.has_key("install") and $extra.content.install.has_key("pre")
 $str_newline.join($extra.content.install.pre)
 #end if
 # << install pre
@@ -848,12 +848,6 @@ $str_newline.join($extra.content.postun[$sp.Name])
 %files
 #end if
 %defattr(-,root,root,-)
-## TODO to be cleanup
-#if $metadata.has_key("Documents")
-#for $doc in $metadata.Documents
-%doc $doc
-#end for
-#end if
 #if "Files" in $metadata:
 #for $f in $metadata.Files
 $arch_line($f)
@@ -882,12 +876,6 @@ $str_newline.join($extra.content.files.main)
 %files $pkg_name
 #end if
 %defattr(-,root,root,-)
-## TODO to be cleanup
-#if $sp.has_key("Documents")
-#for $doc in $sp.Documents
-%doc $doc
-#end for
-#end if
 #if "Files" in $sp:
 #for $f in $sp.Files
 $arch_line($f)
