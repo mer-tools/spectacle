@@ -183,8 +183,6 @@ All available directives for spectacle are listed as the following:
 
 * Check: **boolean**, whether need ``%check`` section in spec
 
-* SupportOtherDistros: **boolean**, whether need to check for other distros (besides MeeGo)
-
 * UseAsNeeded: **boolean**, whether export LD\_AS\_NEEDED=1 environ variable before building
 
 * NoAutoReq: **boolean**, whether add 'AutoReq: 0' to spec

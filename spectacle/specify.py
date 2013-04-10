@@ -55,7 +55,6 @@ SUB_MAND_KEYS = ('Name',
 
 # boolean keys with the default 'False' value
 BOOLNO_KEYS = ('Check',
-               'SupportOtherDistros',
                'NoAutoReq',
                'NoAutoProv',
                'NoAutoReqProv',
@@ -177,6 +176,7 @@ SUBAVAIL_KEYS = ('Name',
 # should be removed from .yaml
 DROP_KEYS = ('PostScripts',
              'Documents',
+             'SupportOtherDistros',
             )
 
 # Renamed keys.
