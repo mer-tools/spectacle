@@ -890,6 +890,10 @@ PkgBR:
         # checking for validation of 'NoSetup', 'SetupOptions' and 'SourcePrefix'
         _check_key_setups(self.metadata)
 
+        # We recommend adding URL for each package
+        if not 'URL' in self.metadata:
+            logger.warning("You should consider adding URL to the main package that points to website or git tree of the package.")
+
         # checking for validation of 'NoFiles'
         if 'NoFiles' in self.metadata:
             _check_key_nofiles(self.metadata)
