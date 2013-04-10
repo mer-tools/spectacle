@@ -37,14 +37,8 @@ $str_newline.join($extra.content.macros.main)
 %define $macro_key $macro_value
 #end for
 #end if
-#if $metadata.has_key('Builder')
-#set $Builder = $metadata.Builder
-#else
-## default
-#set $Builder = 'make'
-#end if
 
-#if $Builder == 'python'
+#if $metadata.Builder == 'python'
 #if $metadata.has_key("BuildArch") and $metadata.BuildArch == 'noarch'
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 #else
@@ -101,7 +95,7 @@ AutoReq:    0
 AutoReqProv:    0
 #end if
 ## Requires
-#if $Builder == 'perl'
+#if $metadata.Builder == 'perl'
 Requires:   perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo \$version))
 #end if
 #if $metadata.has_key("Requires")
@@ -154,7 +148,7 @@ BuildConflicts: $bcfl
 #if $metadata.has_key("RunFdupes")
 BuildRequires:  fdupes
 #end if
-#if $Builder == 'cmake'
+#if $metadata.Builder == 'cmake'
 BuildRequires:  cmake
 #end if
 #if 'NoAutoProv' in $metadata
@@ -365,11 +359,11 @@ $str_newline.join($extra.content.build.pre)
 # << build pre
 
 ############################
-#if $Builder == 'python'
+#if $metadata.Builder == 'python'
 CFLAGS="\$RPM_OPT_FLAGS" %{__python} setup.py build
-#else if $Builder == 'qmake' or $Builder == 'qmake5'
+#else if $metadata.Builder == 'qmake' or $metadata.Builder == 'qmake5'
 #set $Configure = 'none'
-#if $Builder == 'qmake'
+#if $metadata.Builder == 'qmake'
 %qmake #slurp
 #else
 %qmake5 #slurp
@@ -393,7 +387,7 @@ $arch_line($opt, "    ", " \\")
 #end if  ## QMakeOptions
 
 make %{?jobs:-j%jobs}
-#else if $Builder == 'perl'
+#else if $metadata.Builder == 'perl'
 if test -f Makefile.PL; then
 %{__perl} Makefile.PL INSTALLDIRS=vendor
 make %{?jobs:-j%jobs}
@@ -408,7 +402,7 @@ fi
 #######
 #else
 ## default
-#if $Builder == 'cmake'
+#if $metadata.Builder == 'cmake'
 #set $Configure = 'cmake'
 #else
 #set $Configure = 'configure'
@@ -441,12 +435,12 @@ $arch_line($opt, "    ", " \\")
 #end for
 #end if ## ConfigOptions
 
-#if $Builder == 'make' or $Builder == 'cmake'
+#if $metadata.Builder == 'make' or $metadata.Builder == 'cmake'
 make %{?jobs:-j%jobs}
-#else if $Builder == 'single-make'
+#else if $metadata.Builder == 'single-make'
 make
-#else if $Builder != 'no-make' and $Builder != 'none' and $Builder != 'no-builder'
-$Builder
+#else if $metadata.Builder != 'no-make' and $metadata.Builder != 'none' and $metadata.Builder != 'no-builder'
+$metadata.Builder
 #end if
 #end if ## Builder == python
 ############################
@@ -465,9 +459,9 @@ rm -rf %{buildroot}
 $str_newline.join($extra.content.install.pre)
 #end if
 # << install pre
-#if $Builder == 'python'
+#if $metadata.Builder == 'python'
 %{__python} setup.py install --root=%{buildroot} -O1
-#else if $Builder == 'perl'
+#else if $metadata.Builder == 'perl'
 if test -f Makefile.PL; then
 make pure_install PERL_INSTALL_ROOT=%{buildroot}
 else
@@ -477,9 +471,9 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
 find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null ';'
 find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %{_fixperms} %{buildroot}/*
-#else if $Builder == 'qmake' or $Builder == 'qmake5'
+#else if $metadata.Builder == 'qmake' or $metadata.Builder == 'qmake5'
 %qmake_install
-#else if $Builder == 'make' or $Builder == 'single-make' or $Builder == 'cmake'
+#else if $metadata.Builder == 'make' or $metadata.Builder == 'single-make' or $metadata.Builder == 'cmake'
 %make_install
 #end if ## of Builder == 'make' ...
 #if $metadata.has_key("ExtraInstall")
@@ -521,7 +515,7 @@ desktop-file-install --delete-original       \
 #if $extra.content.has_key("check")
 $str_newline.join($extra.content.check.main)
 #else
-#if  $Builder == 'perl'
+#if  $metadata.Builder == 'perl'
 if test -f Makefile.PL; then
 make test
 else

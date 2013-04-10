@@ -362,7 +362,8 @@ class RPMWriter():
     def __init__(self, yaml_fpath, spec_fpath=None, clean_old=False, download_new=True, skip_scm=False):
         self.yaml_fpath = yaml_fpath
         now = datetime.datetime.now()
-        self.metadata = {'MyVersion': __version__.VERSION, 'Date': now.strftime("%Y-%m-%d")}
+        self.metadata = {'MyVersion': __version__.VERSION, 'Date': now.strftime("%Y-%m-%d"),
+                         'Builder': "make"}
         self.pkg = None
         self.version = None
         self.release = None
