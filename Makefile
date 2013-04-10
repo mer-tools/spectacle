@@ -49,6 +49,6 @@ install-data:
 
 clean:
 	rm -rf build/
-	rm -f README.html
+	rm -f README.html */*~ */*/*~
 	cd spectacle/spec; $(MAKE) clean
 	cd spectacle/dsc; $(MAKE) clean
