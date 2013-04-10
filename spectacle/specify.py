@@ -1516,7 +1516,9 @@ PkgBR:
 
             if matchin:
                 if record:
-                    logger.error('%s:%d "%s %s" placeholder starting without ending previous %s:%d "%s %s"' % (spec_fpath, line_num, matchin.group(1), matchin.group(2), spec_fpath, start_line_num, ingroup1, ingroup2) )
+                    logger.error('%s:%d "%s %s" placeholder starting without ending previous %s:%d "%s %s"' % 
+                                 (spec_fpath, line_num, matchin.group(1), matchin.group(2), spec_fpath, 
+                                  start_line_num, ingroup1, ingroup2))
                 record = True
                 recording = []
                 ingroup1 = matchin.group(1)
@@ -1527,17 +1529,22 @@ PkgBR:
 
             if matchout:
                 if not record:
-                    logger.error('%s:%d "%s %s" placeholder ending whithout starting' % (spec_fpath, line_num, matchout.group(1), matchout.group(2)))
+                    logger.error('%s:%d "%s %s" placeholder ending whithout starting' % 
+                                 (spec_fpath, line_num, matchout.group(1), matchout.group(2)))
                 record = False
 
                 if matchout.group(1) != ingroup1 or matchout.group(2) != ingroup2 :
-                    logger.error('%s:%d "%s %s" placeholder ending not match starting %s:%d "%s %s"' % (spec_fpath, line_num, matchout.group(1), matchout.group(2),spec_fpath, start_line_num, ingroup1, ingroup2))
+                    logger.error('%s:%d "%s %s" placeholder ending not match starting %s:%d "%s %s"' % 
+                                 (spec_fpath, line_num, matchout.group(1), matchout.group(2), 
+                                  spec_fpath, start_line_num, ingroup1, ingroup2))
 
                 if not recording: continue # empty
 
                 if matchout.group(2) and matchout.group(1) in ["files", "post","postun", "pre", "preun"]:
                     if not matchout.group(2) in self.extra['subpkgs']:
-                        logger.error('In %s:%d %s section for lost sub-package: %s. Please fix it and try again.' % (spec_fpath, line_num, matchout.group(1), matchout.group(2)))
+                        logger.error('In %s:%d %s section for lost sub-package: %s. Please fix it and try again.' % 
+                                     (spec_fpath, line_num, matchout.group(1), matchout.group(2)))
+
                 if matchout.group(1) == "files":
                     if matchout.group(2):
                         if matchout.group(2) in files:
@@ -1615,7 +1622,8 @@ PkgBR:
                 recording.append(i)
 
         if record:
-            logger.error('%s:%d "%s %s" placeholder starting without ending' % (spec_fpath, start_line_num, ingroup1, ingroup2))
+            logger.error('%s:%d "%s %s" placeholder starting without ending' % 
+                         (spec_fpath, start_line_num, ingroup1, ingroup2))
 
         content= { "files" : files,
                    "install": install,
