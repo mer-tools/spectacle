@@ -367,9 +367,13 @@ $str_newline.join($extra.content.build.pre)
 ############################
 #if $Builder == 'python'
 CFLAGS="\$RPM_OPT_FLAGS" %{__python} setup.py build
-#else if $Builder == 'qmake'
+#else if $Builder == 'qmake' or $Builder == 'qmake5'
 #set $Configure = 'none'
+#if $Builder == 'qmake'
 %qmake #slurp
+#else
+%qmake5 #slurp
+#end if
 #if 'QMakeOptions' in $metadata
  \
 #else
@@ -473,7 +477,7 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
 find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null ';'
 find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %{_fixperms} %{buildroot}/*
-#else if $Builder == 'qmake'
+#else if $Builder == 'qmake' or $Builder == 'qmake5'
 %qmake_install
 #else if $Builder == 'make' or $Builder == 'single-make' or $Builder == 'cmake'
 %make_install
