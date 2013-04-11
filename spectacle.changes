@@ -1,3 +1,12 @@
+* Thu Apr 2013 Marko Saukko <marko.saukko@jollamobile.com> - 0.26-1
+- Add support for qmake5 Builder (by sage)
+- Add armv6 to architecture list (by kulve)
+- Make "%{summary}." the default description (by sage)
+- Drop SupportOtherDistros, Documents and PostScript support from yaml (by sage)
+- Update pkgconfig-provides.csv (by sage)
+- Warn if URL is not set in .yaml (by sage)
+- Improve test case coverage (by sage)
+
 * Mon Jul 30 2012 David Greaves <david@dgreaves.com> - 0.25
  - Update to 0.25
  - Remove the check for Makefile for packaging-tools : MER#388
