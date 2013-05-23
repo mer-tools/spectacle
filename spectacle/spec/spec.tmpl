@@ -471,8 +471,10 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
 find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null ';'
 find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %{_fixperms} %{buildroot}/*
-#else if $metadata.Builder == 'qmake' or $metadata.Builder == 'qmake5'
+#else if $metadata.Builder == 'qmake'
 %qmake_install
+#else if $metadata.Builder == 'qmake5'
+%qmake5_install
 #else if $metadata.Builder == 'make' or $metadata.Builder == 'single-make' or $metadata.Builder == 'cmake'
 %make_install
 #end if ## of Builder == 'make' ...

@@ -14,7 +14,7 @@
  rm -rf %{buildroot}
  # >> install pre
  # << install pre
-+%qmake_install
++%qmake5_install
  
  # >> install post
  # << install post
