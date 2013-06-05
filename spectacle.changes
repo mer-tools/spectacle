@@ -1,3 +1,6 @@
+* Wed Jun 05 2013 David Greaves <david@dgreaves.com> - 0.28-1
+- Qt5 uses %qmake5_install
+
 * Mon May 27 2013 David Greaves <david@dgreaves.com> - 0.27-1
 - Support a QtCreator Builder using qtc and qtc5.
 

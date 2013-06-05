@@ -10,7 +10,7 @@ Name:       spectacle
 
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 Summary:    RPM Spec file generator and management tool
-Version:    0.27
+Version:    0.28
 Release:    1
 Group:      Development/Tools
 License:    GPLv2+
