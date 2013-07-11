@@ -1,6 +1,6 @@
 Name: spectacle
 Summary: RPM Spec file generator and management tool
-Version: 0.28
+Version: 0.29
 Release: 1
 SCM: git://github.com/mer-tools/spectacle.git
 Group: Development/Tools
