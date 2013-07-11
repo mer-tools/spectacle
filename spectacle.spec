@@ -16,7 +16,7 @@ Group:      Development/Tools
 License:    GPLv2+
 BuildArch:  noarch
 URL:        https://meego.gitorious.org/meego-developer-tools/spectacle
-Source0:    spectacle.tar.bz2
+Source0:    spectacle-%{version}.tar.gz
 Source1:    autospectacle.pl
 Source100:  spectacle.yaml
 Requires:   python-yaml

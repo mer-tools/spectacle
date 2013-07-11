@@ -10,7 +10,7 @@ BuildArch: noarch
 Description: |
   A tool for managing and creating RPM spec files
 Sources:
-  - spectacle.tar.bz2
+  - spectacle-%{version}.tar.gz
   - autospectacle.pl
 Requires:
   - python-yaml
