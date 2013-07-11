@@ -44,6 +44,11 @@ $str_newline.join($extra.content.macros.main)
 #else
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 #end if
+#else if $metadata.Builder == 'qtc' or $metadata.Builder == 'qtc5'
+%{!?qtc_qmake:%define qtc_qmake %qmake}
+%{!?qtc_qmake5:%define qtc_qmake5 %qmake5}
+%{!?qtc_make:%define qtc_make make}
+%{?qtc_builddir:%define _builddir %qtc_builddir}
 #end if
 Summary:    ${metadata.Summary}
 Version:    ${metadata.Version}
