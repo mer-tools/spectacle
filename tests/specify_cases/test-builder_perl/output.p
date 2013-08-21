@@ -15,7 +15,7 @@
 -
 +if test -f Makefile.PL; then
 +%{__perl} Makefile.PL INSTALLDIRS=vendor
-+make %{?jobs:-j%jobs}
++make %{?_smp_mflags}
 +else
 +%{__perl} Build.PL  --installdirs vendor
 +./Build

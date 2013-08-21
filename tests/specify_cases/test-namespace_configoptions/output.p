@@ -13,7 +13,7 @@
 +    --x86-opt
 +%endif
  
-+make %{?jobs:-j%jobs}
++make %{?_smp_mflags}
  
  # >> build post
  # << build post
