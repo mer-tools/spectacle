@@ -396,15 +396,15 @@ $arch_line($opt, "    ", " \\")
 #end if  ## QMakeOptions
 #if $metadata.Builder == 'qtc' or $metadata.Builder == 'qtc5'
 
-%qtc_make %{?jobs:-j%jobs}
+%qtc_make %{?_smp_mflags}
 #else
 
-make %{?jobs:-j%jobs}
+make %{?_smp_mflags}
 #end if ## qtc
 #else if $metadata.Builder == 'perl'
 if test -f Makefile.PL; then
 %{__perl} Makefile.PL INSTALLDIRS=vendor
-make %{?jobs:-j%jobs}
+make %{?_smp_mflags}
 else
 %{__perl} Build.PL  --installdirs vendor
 ./Build
@@ -450,7 +450,7 @@ $arch_line($opt, "    ", " \\")
 #end if ## ConfigOptions
 
 #if $metadata.Builder == 'make' or $metadata.Builder == 'cmake'
-make %{?jobs:-j%jobs}
+make %{?_smp_mflags}
 #else if $metadata.Builder == 'single-make'
 make
 #else if $metadata.Builder != 'no-make' and $metadata.Builder != 'none' and $metadata.Builder != 'no-builder'

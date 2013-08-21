@@ -8,7 +8,7 @@
 +    --yes-one \
 +    --no-two
  
-+make %{?jobs:-j%jobs}
++make %{?_smp_mflags}
  
  # >> build post
  # << build post

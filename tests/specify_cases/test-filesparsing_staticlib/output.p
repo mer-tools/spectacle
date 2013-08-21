@@ -14,7 +14,7 @@
  
 -
 +%configure 
-+make %{?jobs:-j%jobs}
++make %{?_smp_mflags}
  
  # >> build post
  # << build post
