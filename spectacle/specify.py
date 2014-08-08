@@ -1427,6 +1427,14 @@ PkgBR:
                         if service not in pkg_extra['SystemdServices']:
                             pkg_extra['SystemdServices'].append(service)
 
+                elif re.match('.*%{_unitdir}/[^/*]*.service$', l):
+                    # service for systemd with macro for unit directory
+                    if 'NoSystemdService' not in self.metadata:
+                        pkg_extra['SystemdService'] = True
+                        service = l.split('/')[-1]
+                        if service not in pkg_extra['SystemdServices']:
+                            pkg_extra['SystemdServices'].append(service)
+
                 elif re.match('.*(%{_libdir}|%{_lib}|/lib|/usr/lib)/[^/]*[.*?]+so([.*?]+.*$|$)', l) or \
                    re.match('.*(/ld.so.conf.d/).*', l):
                     if pkg_name != 'devel' and not pkg_name.endswith('-devel'):
