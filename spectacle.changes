@@ -1,3 +1,6 @@
+* Mon Mar 26 2018 Martin Kampas <martin.kampas@jolla.com> - 0.30-2
+- [packaging] Fix QA issues with changelog. Contributes to JB#36213
+
 * Thu Aug 22 2013 David Greaves <david@dgreaves.com> - 0.30-1
 - [spectacle] Use %{?_smp_mflags} instead of the jobs macro construction.
 
@@ -10,7 +13,7 @@
 * Mon May 27 2013 David Greaves <david@dgreaves.com> - 0.27-1
 - Support a QtCreator Builder using qtc and qtc5.
 
-* Thu Apr 2013 Marko Saukko <marko.saukko@jollamobile.com> - 0.26-1
+* Thu Apr 04 2013 Marko Saukko <marko.saukko@jollamobile.com> - 0.26-1
 - Add support for qmake5 Builder (by sage)
 - Add armv6 to architecture list (by kulve)
 - Make "%{summary}." the default description (by sage)
@@ -20,9 +23,9 @@
 - Improve test case coverage (by sage)
 
 * Mon Jul 30 2012 David Greaves <david@dgreaves.com> - 0.25
- - Update to 0.25
- - Remove the check for Makefile for packaging-tools : MER#388
- - Summary should not end with a dot : MER#383
+- Update to 0.25
+- Remove the check for Makefile for packaging-tools : MER#388
+- Summary should not end with a dot : MER#383
 
 * Tue Jun 05 2012 Marko Saukko <sage@merproject.org> - 0.24.1
 - Update to version 0.24.1
@@ -109,7 +112,7 @@
    - "setup.py develop" supported
    - Update of document
 
-* Wed Jul 07 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.18
+* Wed Jul 07 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.18
 - Release 0.18, with the following changes:
    specify:
      - Support new builder: 'qmake'
@@ -135,7 +138,7 @@
      - Fixed bugs in parsing of Perl packages' spec
      - More old spec directives support: Prereq, BuildConflicts
 
-* Tue May 18 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.17
+* Tue May 18 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.17
 - Release 0.17, with the following changes:
    specify:
      - Add compatible support for older 'OtherDistros'
@@ -151,20 +154,20 @@
 - Fixed rpmlint errors
 - Do not install tests
 
-* Fri Apr 30 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.16
+* Fri Apr 30 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.16
 - Fixed modules installation path in Debian/Ubuntu system
 
-* Thu Apr 22 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.16
+* Thu Apr 22 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.16
 - Update to 0.16, with the following changes:
    specify:
     - New key 'NoDesktop' to skip desktop files in package
     - New key 'RpmLintIgnore' to ignore rpmlintrc
     - README updated with new MeeGo information
 
-* Thu Apr 22 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.15
+* Thu Apr 22 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.15
 - Add lost requires for 'python-cheetah', fixed BMC#779
 
-* Wed Mar 31 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.15
+* Wed Mar 31 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.15
 - Update to 0.15, with the following changes:
    specify:
     - Architecture namespace support
@@ -185,7 +188,7 @@
     - new cases for new features
     - README, as the reference, updated according all changes
 
-* Wed Mar 17 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.14
+* Wed Mar 17 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.14
 - Update to 0.14, with the following changes:
    specify:
     - Proposals for pkgconfig requires to replace buildrequires
@@ -216,7 +219,7 @@
     - Support parsing of "-n" and "-p" options of spec headers
     - More accurate parsing of pkgconfig build requires
 
-* Tue Feb 23 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.13
+* Tue Feb 23 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.13
 - Update to 0.13, with the following changes:
     - Added python-urlgrabber to 'Requires'
     - Added new document to package: TODO and examples/*
@@ -251,7 +254,7 @@
       origin spec file, in converter tools.
     - Other bug fixings and minor changes...
 
-* Tue Feb 09 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.11
+* Tue Feb 09 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.11
 - update to 0.11, with the following changes:
     Changes of features:
     - download newer source package automatically
@@ -264,22 +267,22 @@
     - support %check spec section
     - more convenient cmdln options for all tools
 
-* Fri Jan 22 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.10
+* Fri Jan 22 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.10
 - update to 0.10, many features and fixes were added
 
-* Mon Jan 18 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.9
+* Mon Jan 18 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.9
 - Update to 0.9, new tool spec2spectacle added
 
-* Fri Jan 15 2010 Jian-feng Ding <jian-feng.ding@intel.com> 0.8
+* Fri Jan 15 2010 Jian-feng Ding <jian-feng.ding@intel.com> - 0.8
 - Add python-cheetah to BuildReq
 
 * Sat Jan 02 2010 nashif <anas.nashif@intel.com> - 0.8
 - Update to 0.8
 
-* Wed Dec 30 2009 Jian-feng Ding <jian-feng.ding@intel.com> 0.7
+* Wed Dec 30 2009 Jian-feng Ding <jian-feng.ding@intel.com> - 0.7
 - Update to 0.7
 
-* Tue Dec 29 2009 Jian-feng Ding <jian-feng.ding@intel.com> 0.6
+* Tue Dec 29 2009 Jian-feng Ding <jian-feng.ding@intel.com> - 0.6
 - Update to 0.6
 
 * Sun Dec 13 2009 Anas Nashif <anas.nashif@intel.com> - 0.4
