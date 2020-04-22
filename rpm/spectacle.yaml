@@ -1,0 +1,25 @@
+Name: spectacle
+Summary: RPM Spec file generator and management tool
+Version: 0.30
+Release: 1
+SCM: git://github.com/mer-tools/spectacle.git
+Group: Development/Tools
+License: GPLv2+
+URL: https://meego.gitorious.org/meego-developer-tools/spectacle
+BuildArch: noarch
+Description: |
+  A tool for managing and creating RPM spec files
+Sources:
+  - spectacle-%{version}.tar.gz
+  - autospectacle.pl
+Requires:
+  - python-yaml
+  - python-urlgrabber
+  - python-cheetah
+  - perl
+PkgBR:
+  - python-devel
+  - python-cheetah
+Builder: python
+SetupOptions: -q -n %{name}-%{version}
+Patches: []
