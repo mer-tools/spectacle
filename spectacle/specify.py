@@ -629,7 +629,7 @@ class RPMWriter():
 
         def _check_strkey(metadata, key):
             """ sub-routine for STR typed keys checking """
-            if key in metadata and not isinstance(metadata[key], str) and not isinstance(metadata[key], unicode):
+            if key in metadata and not isinstance(metadata[key], str):
                 return False
             return True
 
