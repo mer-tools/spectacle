@@ -38,13 +38,7 @@ $str_newline.join($extra.content.macros.main)
 #end for
 #end if
 
-#if $metadata.Builder == 'python'
-#if "BuildArch" in $metadata and $metadata.BuildArch == 'noarch'
-%{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
-#else
-%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
-#end if
-#else if $metadata.Builder == 'qtc' or $metadata.Builder == 'qtc5'
+#if $metadata.Builder == 'qtc' or $metadata.Builder == 'qtc5'
 %{!?qtc_qmake:%define qtc_qmake %qmake}
 %{!?qtc_qmake5:%define qtc_qmake5 %qmake5}
 %{!?qtc_make:%define qtc_make make}
@@ -364,8 +358,8 @@ $str_newline.join($extra.content.build.pre)
 # << build pre
 
 ############################
-#if $metadata.Builder == 'python'
-CFLAGS="\$RPM_OPT_FLAGS" %{__python} setup.py build
+#if $metadata.Builder in ('python', 'python3')
+%{py3_build}
 #else if $metadata.Builder == 'qmake' or $metadata.Builder == 'qmake5' or $metadata.Builder == 'qtc' or $metadata.Builder == 'qtc5'
 #set $Configure = 'none'
 #if $metadata.Builder == 'qmake'
@@ -456,7 +450,7 @@ make
 #else if $metadata.Builder != 'no-make' and $metadata.Builder != 'none' and $metadata.Builder != 'no-builder'
 $metadata.Builder
 #end if
-#end if ## Builder == python
+#end if ## Builder == python or python3
 ############################
 
 # >> build post
@@ -473,8 +467,8 @@ rm -rf %{buildroot}
 $str_newline.join($extra.content.install.pre)
 #end if
 # << install pre
-#if $metadata.Builder == 'python'
-%{__python} setup.py install --root=%{buildroot} -O1
+#if $metadata.Builder in ('python', 'python3')
+%{py3_install}
 #else if $metadata.Builder == 'perl'
 if test -f Makefile.PL; then
 make pure_install PERL_INSTALL_ROOT=%{buildroot}
