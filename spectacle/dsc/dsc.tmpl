@@ -11,7 +11,7 @@ Homepage:        ${metadata.URL}
 Standards-Version: 3.8.0
 Maintainer: packagers@moblin.org
 ## BuildRequires
-#if $metadata.has_key("BuildRequires")
+#if "BuildRequires" in $metadata
 #for $brtype in $metadata.BuildRequires
 #if $brtype == "PkgConfig"
 #for $br in $metadata.BuildRequires.PkgConfig
