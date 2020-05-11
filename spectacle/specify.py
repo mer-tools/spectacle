@@ -209,7 +209,7 @@ ARCHS = {'ix86': '%{ix86}',
 CONFIGURES = ('configure', 'reconfigure', 'autogen', 'cmake', 'none')
 
 # Different options for "Builder" yaml key.
-BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'qmake5', 'qtc', 'qtc5', 'cmake', 'none')
+BUILDERS = ('make', 'single-make', 'python', 'python3', 'perl', 'qmake', 'qmake5', 'qtc', 'qtc5', 'cmake', 'none')
 
 # Paths that should be replaced with macros when seen in %files.
 # NOTE: Order of this list matters!
