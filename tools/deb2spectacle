@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/python3
 # vim: ai ts=4 sts=4 et sw=4
 
 #    Copyright (c) 2009 Intel Corporation
@@ -152,7 +152,7 @@ class DebConvertor(Convertor):
                 dep = dep.replace(old, '%s %s' %(op, ver))
             return dep
 
-        return filter(lambda x:x, map(comp_replace, str(single).split(',')))
+        return [x for x in map(comp_replace, str(single).split(',')) if x]
 
     def _translate_keys(self, items):
         """ override parent class method for pre-processing
@@ -161,7 +161,7 @@ class DebConvertor(Convertor):
         #! at this point, all keys name have been translated
 
         # drop debian only keys
-        for key in items.keys():
+        for key in list(items.keys()):
             if key in self.dropkeys or self.re_userfield.match(key):
                 del items[key]
 
@@ -171,11 +171,11 @@ class DebConvertor(Convertor):
         items['Description'] = '\n'.join(lines[1:])
 
         # expand all debian variables
-        for key, val in items.iteritems():
+        for key, val in items.items():
             items[key] = self._replace_var(val)
 
         # depends keys handling
-        for key, val in items.iteritems():
+        for key, val in items.items():
             if key in self.depkeys:
                 items[key] = self._conv_dep(val)
 
@@ -245,7 +245,7 @@ class DebInfo:
         """
 
         for para in deb822.Deb822.iter_paragraphs(ctl.splitlines()):
-            items = dict(para.items())
+            items = dict(list(para.items()))
 
             if 'Source' in items:
                 # Source paragraph, and must be the 1st para
