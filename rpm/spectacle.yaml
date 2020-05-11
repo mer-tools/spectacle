@@ -1,6 +1,6 @@
 Name: spectacle
 Summary: RPM Spec file generator and management tool
-Version: 0.30
+Version: 0.32
 Release: 1
 SCM: git://github.com/mer-tools/spectacle.git
 Group: Development/Tools
@@ -13,13 +13,14 @@ Sources:
   - spectacle-%{version}.tar.gz
   - autospectacle.pl
 Requires:
-  - python-yaml
-  - python-urlgrabber
-  - python-cheetah
+  - python3-yaml
+  - python3-urlgrabber
+  - python3-cheetah
   - perl
 PkgBR:
-  - python-devel
-  - python-cheetah
-Builder: python
+  - python3-devel
+  - python3-setuptools
+  - python3-cheetah
+Builder: python3
 SetupOptions: -q -n %{name}-%{version}
 Patches: []
