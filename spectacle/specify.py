@@ -1759,7 +1759,7 @@ PkgBR:
                                       }]).respond()
 
         file = open(specfile, "w")
-        file.write(spec_content.encode('utf-8'))
+        file.write(spec_content)
         file.close()
 
 def generate_rpm(yaml_fpath, clean_old = False, extra_content = None, spec_fpath=None, download_new=True, skip_scm=False):
