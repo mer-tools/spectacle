@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/python3
 # vim: ai ts=4 sts=4 et sw=4
 
 #    Copyright (c) 2009 Intel Corporation
@@ -70,7 +70,7 @@ def run_and_check(work_dir):
     os.system(SCRIPTS)
     if os.path.exists('output.error'):
         # something wrong with tested tools
-        print >> sys.stderr, file(os.path.join(work_dir, 'output.error')).read()
+        print(open(os.path.join(work_dir, 'output.error')).read(), file=sys.stderr)
         result = False
 
     os.chdir(cwd)
@@ -95,21 +95,21 @@ def compare_outfile(work_dir):
                                os.path.join(work_dir, new[out])):
                 all_equ = False
 
-                exp_output_diff = file(fp).read().strip()
-                output_diff = file(os.path.join(work_dir, 'new'+out)).read().strip()
+                exp_output_diff = open(fp).read().strip()
+                output_diff = open(os.path.join(work_dir, 'new'+out)).read().strip()
 
                 if not output_diff:
                     output_diff = '<EMPTY>'
                 if not exp_output_diff:
                     exp_output_diff = '<EMPTY>'
 
-                print "%sExpected changes of %s:" % (BLUE,desc[out])
-                print '----------------------------------------------------------------------%s' % RESET
-                print exp_output_diff
-                print '%s----------------------------------------------------------------------%s' % (BLUE,RESET)
-                print "%sActual:" % RED
-                print '----------------------------------------------------------------------%s' % RESET
-                print output_diff
-                print '%s----------------------------------------------------------------------%s' % (RED,RESET)
+                print("%sExpected changes of %s:" % (BLUE,desc[out]))
+                print('----------------------------------------------------------------------%s' % RESET)
+                print(exp_output_diff)
+                print('%s----------------------------------------------------------------------%s' % (BLUE,RESET))
+                print("%sActual:" % RED)
+                print('----------------------------------------------------------------------%s' % RESET)
+                print(output_diff)
+                print('%s----------------------------------------------------------------------%s' % (RED,RESET))
 
     return all_equ
