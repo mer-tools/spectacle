@@ -1156,8 +1156,8 @@ PkgBR:
         # to regard all numbers as plain string
         def _no_number(self, node):
             return str(self.construct_scalar(node))
-        yaml.Loader.add_constructor(u'tag:yaml.org,2002:int', _no_number)
-        yaml.Loader.add_constructor(u'tag:yaml.org,2002:float', _no_number)
+        yaml.add_constructor('tag:yaml.org,2002:int', _no_number)
+        yaml.add_constructor('tag:yaml.org,2002:float', _no_number)
 
         # loading data from YAML
         try:
