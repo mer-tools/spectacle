@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/python3
 # vim: ai ts=4 sts=4 et sw=4
 
 #    Copyright (c) 2009 Intel Corporation
@@ -77,7 +77,7 @@ def ask(msg, default=True):
         else:
             msg += '(y/N) '
         if INTERACTIVE:
-            repl = raw_input(msg)
+            repl = input(msg)
             if repl.lower() == 'y':
                 return True
             elif repl.lower() == 'n':

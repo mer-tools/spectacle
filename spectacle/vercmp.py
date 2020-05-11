@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/python3
 # vim: ai ts=4 sts=4 et sw=4
 
 #    Copyright (c) 2009 Intel Corporation
@@ -18,7 +18,6 @@
 
 import re
 import string
-from types import StringType
 import distutils.version
 
 class FairVersion(distutils.version.LooseVersion):
@@ -40,8 +39,7 @@ class FairVersion(distutils.version.LooseVersion):
 
     def parse (self, vstring):
         self.vstring = vstring
-        components = filter(lambda x: x and x != '.',
-                            self.component_re.split(vstring))
+        components = [x for x in self.component_re.split(vstring) if x and x != '.']
 
         numbers = []
         extras = []
@@ -61,7 +59,7 @@ class FairVersion(distutils.version.LooseVersion):
         return "FairVersion ('%s')" % str(self)
 
     def __cmp__ (self, other):
-        if isinstance(other, StringType):
+        if isinstance(other, str):
             other = FairVersion(other)
 
         res = cmp(self.version, other.version)
