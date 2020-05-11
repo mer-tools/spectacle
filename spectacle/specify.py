@@ -392,7 +392,7 @@ class RPMWriter():
     def dump(self):
         # debugging
         import pprint
-        pprint.pprint(yaml.dump(yaml.load(self.stream)))
+        pprint.pprint(yaml.dump(yaml.load(self.stream, Loader=yaml.FullLoader)))
 
     def _check_dup_files(self, files):
         # try to remove duplicate '%defattr' in files list
@@ -1161,7 +1161,7 @@ PkgBR:
 
         # loading data from YAML
         try:
-            self.metadata.update(yaml.load(self.stream))
+            self.metadata.update(yaml.load(self.stream, Loader=yaml.FullLoader))
         except yaml.scanner.ScannerError as e:
             logger.error('syntax error found in yaml: %s' % str(e))
         except yaml.parser.ParserError as e:
