@@ -8,9 +8,8 @@ Name:       spectacle
 # >> macros
 # << macros
 
-%{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 Summary:    RPM Spec file generator and management tool
-Version:    0.30
+Version:    0.32
 Release:    1
 Group:      Development/Tools
 License:    GPLv2+
@@ -19,12 +18,13 @@ URL:        https://meego.gitorious.org/meego-developer-tools/spectacle
 Source0:    spectacle-%{version}.tar.gz
 Source1:    autospectacle.pl
 Source100:  spectacle.yaml
-Requires:   python-yaml
-Requires:   python-urlgrabber
-Requires:   python-cheetah
+Requires:   python3-yaml
+Requires:   python3-urlgrabber
+Requires:   python3-cheetah
 Requires:   perl
-BuildRequires:  python-devel
-BuildRequires:  python-cheetah
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-cheetah
 
 %description
 A tool for managing and creating RPM spec files
@@ -41,7 +41,7 @@ A tool for managing and creating RPM spec files
 make tmpls
 # << build pre
 
-CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
+%{py3_build}
 
 # >> build post
 # << build post
@@ -50,7 +50,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
 rm -rf %{buildroot}
 # >> install pre
 # << install pre
-%{__python} setup.py install --root=%{buildroot} -O1
+%{py3_install}
 
 # >> install post
 make install-data DESTDIR=${RPM_BUILD_ROOT}
@@ -65,5 +65,5 @@ install -m 0755 %{SOURCE1} ${RPM_BUILD_ROOT}%{_bindir}
 %dir %{_datadir}/spectacle
 %{_datadir}/spectacle/*
 %{_bindir}/*
-%{python_sitelib}/*
+%{python3_sitelib}/*
 # << files
