@@ -245,7 +245,10 @@ class SpecParser(object):
             if re.match('^(%\{__)?make', whole_line):
                 found_bldr = True
                 self._Builder = 'make'
-            elif re.search('python\W+setup.py\W+build', whole_line):
+            elif re.search('%{py3_build}', whole_line) or re.search('python3\W+setup.py\W+build', whole_line):
+                found_bldr = True
+                self._Builder = 'python3'
+            elif re.search('%{py_build}', whole_line) or re.search('python\W+setup.py\W+build', whole_line):
                 found_bldr = True
                 self._Builder = 'python'
 
@@ -327,6 +330,8 @@ class SpecParser(object):
             re_installer = re.compile('make[_ \t]*install')
         elif self._Builder == 'python':
             re_installer = re.compile('python\W+setup.py\W+install')
+        elif self._Builder == 'python3':
+            re_installer = re.compile('%{py3_install}')
 
         re_cleanup = re.compile('(rm|\%\{__rm\})\W+-rf\W+(\$RPM_BUILD_ROOT|\%\{buildroot\})')
 
