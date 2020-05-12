@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/python3
 # vim: ai ts=4 sts=4 et sw=4
 
 #    Copyright (c) 2009 Intel Corporation
@@ -28,7 +28,7 @@ import sys
 import re
 import shutil
 import optparse
-from ConfigParser import RawConfigParser
+from configparser import RawConfigParser
 
 # spectacle modules
 from spectacle.convertor import *
@@ -107,7 +107,7 @@ class SBConfigParser(RawConfigParser):
         """ Check whether Makefile in working dir should be moved """
         if os.path.exists('Makefile'):
             try:
-                cont = file('Makefile').read()
+                cont = open('Makefile').read()
                 if re.search('\s+spec-builder\s+', cont):
                     # The Makefile is for spec-builder
                     self.record_used_files.append('Makefile')
@@ -118,7 +118,7 @@ class SBConfigParser(RawConfigParser):
     def read(self, filenames):
         """ override super read to record input files """
 
-        if isinstance(filenames, basestring):
+        if isinstance(filenames, str):
             filenames = [filenames]
         self.record_used_files.extend(filenames)
 
@@ -136,7 +136,7 @@ class SBConfigParser(RawConfigParser):
         """ Helper function to expand *.desc """
         if os.path.exists(filename):
             self.record_used_files.append(filename)
-            return file(filename).read().strip()
+            return open(filename).read().strip()
         else:
             logger.warning("Warning: missing expected file %s" % filename)
             return None
@@ -153,7 +153,7 @@ class SBConfigParser(RawConfigParser):
             # Convert space seperated string to list
             for key in self.multi_keys:
                 if key in items:
-                    self.set(section, key, map(str.strip, items[key].split()))
+                    self.set(section, key, list(map(str.strip, items[key].split())))
 
             # Convert dependent like entry to list
             for key in self.reqs_keys:
@@ -166,8 +166,7 @@ class SBConfigParser(RawConfigParser):
             # special cases for 'ConfigOptions'
             if 'ConfigOptions' in items:
                 self.set(section, 'ConfigOptions',
-                            map(lambda s: '--'+s,
-                                [opt for opt in map(str.strip, items['ConfigOptions'].split('--')) if opt]))
+                            ['--'+s for s in [opt for opt in map(str.strip, items['ConfigOptions'].split('--')) if opt]])
 
             # special cases for 'LocaleOptions'
             if 'LocaleOptions' in items and 'LocaleName' not in items:
@@ -215,7 +214,7 @@ class SBConfigParser(RawConfigParser):
             all_items['extra'] = main_extra
 
         # Checking must-have keys
-        for key, default in self.must_keys.iteritems():
+        for key, default in self.must_keys.items():
             if key not in all_items:
                 all_items[key] = default
 
@@ -228,7 +227,7 @@ class SBConfigParser(RawConfigParser):
                 try:
                     all_items['SubPackages'].append(dict(self.items(subpkg)))
                     all_items['SubPackages'][-1].update({'Name': subpkg})
-                except NoSectionError, e:
+                except NoSectionError as e:
                     logger.warning('Needed section for sub-package %s not found' % subpkg)
                     raise e
 

@@ -1,5 +1,6 @@
 --- output.2.o	2012-07-02 15:35:06.049573721 +0300
 +++ output.2	2012-07-02 15:35:06.160573724 +0300
-@@ -1 +1,2 @@
+@@ -1 +2,3 @@
 +[33mWarning:[0m "Url" might be a typo of URL, please fix it
++[33mWarning:[0m You should consider adding URL to the main package that points to website or git tree of the package.
  [33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!

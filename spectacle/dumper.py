@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/python3
 # vim: ai ts=4 sts=4 et sw=4
 
 #    Copyright (c) 2009 Intel Corporation
@@ -99,7 +99,7 @@ class SpectacleDumper(object):
                 continue
 
             if key == 'extra':
-                for extra_key, extra_val in value.iteritems():
+                for extra_key, extra_val in value.items():
                     if not extra_val:
                         continue
 
@@ -157,7 +157,7 @@ class SpectacleDumper(object):
             first_line = False
 
     def _update_spec(self):
-        import specify
+        from . import specify
         return specify.generate_rpm(self.opath, True, self.spec_extra) [0]
 
     def dump(self, data, format = None):
@@ -167,7 +167,7 @@ class SpectacleDumper(object):
         fp = sys.stdout
         if self.opath:
             try:
-                fp = file(self.opath, 'w')
+                fp = open(self.opath, 'w')
             except IOError:
                 logger.warning('Cannot open file %s for writing' % self.opath)
                 # print out

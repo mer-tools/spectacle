@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os, sys
 from distutils.core import setup
@@ -11,7 +11,7 @@ except ImportError:
 if 'install' in sys.argv and \
    'MAKEFLAGS' not in os.environ and \
    'RPM_BUILD_ROOT' not in os.environ:
-        repl = raw_input('WARNING: Please use `make install` for installation, continue(y/N)? ')
+        repl = input('WARNING: Please use `make install` for installation, continue(y/N)? ')
         if repl != 'y':
             sys.exit(1)
 
@@ -27,7 +27,7 @@ try:
     ver_file.write("VERSION = \"%s\"\n" % version)
     ver_file.close()
 except IOError:
-    print 'WARNING: Cannot write version number file'
+    print('WARNING: Cannot write version number file')
 
 setup(name='spectacle',
       version = version,

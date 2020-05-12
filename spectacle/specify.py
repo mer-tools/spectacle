@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/python3
 # vim: ai ts=4 sts=4 et sw=4
 
 #    Copyright (c) 2009 Intel Corporation
@@ -29,10 +29,10 @@ import tarfile
 import yaml
 
 # internal modules
-import __version__
-import spec
-import logger
-from vercmp import FairVersion as _V
+from . import __version__
+from . import spec
+from . import logger
+from .vercmp import FairVersion as _V
 
 USER_CONFIG = '~/.spectacle/spectacle.conf'
 
@@ -209,7 +209,7 @@ ARCHS = {'ix86': '%{ix86}',
 CONFIGURES = ('configure', 'reconfigure', 'autogen', 'cmake', 'none')
 
 # Different options for "Builder" yaml key.
-BUILDERS = ('make', 'single-make', 'python', 'perl', 'qmake', 'qmake5', 'qtc', 'qtc5', 'cmake', 'none')
+BUILDERS = ('make', 'single-make', 'python', 'python3', 'perl', 'qmake', 'qmake5', 'qtc', 'qtc5', 'cmake', 'none')
 
 # Paths that should be replaced with macros when seen in %files.
 # NOTE: Order of this list matters!
@@ -231,7 +231,7 @@ PATHMACROS = (('/usr/bin',     '%{_bindir}'),
 
 # Function to read config file to parser
 def read_config_file(configfile,config_parser = None):
-    from ConfigParser import SafeConfigParser
+    from configparser import SafeConfigParser
     configfile = os.path.expanduser(configfile)
 
     if not os.path.exists(configfile):
@@ -383,7 +383,7 @@ class RPMWriter():
         self.extras_filelist = []
 
         try:
-            self.stream = file(yaml_fpath, 'r')
+            self.stream = open(yaml_fpath, 'r')
         except IOError:
             logger.error('Cannot read file: %s' % yaml_fpath)
         
@@ -392,7 +392,7 @@ class RPMWriter():
     def dump(self):
         # debugging
         import pprint
-        pprint.pprint(yaml.dump(yaml.load(self.stream)))
+        pprint.pprint(yaml.dump(yaml.load(self.stream, Loader=yaml.FullLoader)))
 
     def _check_dup_files(self, files):
         # try to remove duplicate '%defattr' in files list
@@ -504,7 +504,7 @@ class RPMWriter():
         def _check_empty_keys(metadata):
             """ return the empty keys """
             keys = []
-            for key in metadata.keys():
+            for key in list(metadata.keys()):
                 if metadata[key] is None:
                     keys.append(key)
                     del metadata[key]
@@ -530,7 +530,7 @@ class RPMWriter():
             if not subpkg:
                 # main package
                 all_keys = list(LIST_KEYS + STR_KEYS + BOOL_KEYS + ('Date', 'MyVersion'))
-                all_keys += RENAMED_KEYS.keys()
+                all_keys += list(RENAMED_KEYS.keys())
                 all_keys.append('SubPackages')
                 for key in SUBONLY_KEYS:
                     all_keys.remove(key)
@@ -557,7 +557,7 @@ class RPMWriter():
                     logger.warning('"%s" found in sub-pkg: %s, please consider to move it to main package' %(key, subpkg))
 
         def _check_key_group(metadata):
-            if metadata.has_key("Group"):
+            if "Group" in metadata:
                 warn = True
                 try:
                     for line in open("/usr/share/spectacle/GROUPS"):
@@ -573,7 +573,7 @@ class RPMWriter():
         def _check_key_license(metadata):
             # warning for gplv3
             gpl3_re = re.compile('L?GPL\s*v3', re.I)
-            if metadata.has_key("License"):
+            if "License" in metadata:
                 if gpl3_re.search(metadata['License']):
                     logger.warning('GPLv3 related license might be unacceptable.')
 
@@ -590,7 +590,7 @@ class RPMWriter():
             for row in pkgcfg:
                 pc = re.search('pkgconfig\(([^)]+)\)', row[1])
                 m = pc.group(1)
-                if self.packages.has_key(row[0]):
+                if row[0] in self.packages:
                     ll = self.packages[row[0]]
                     ll.append(m)
                     self.packages[row[0]] = ll
@@ -629,7 +629,7 @@ class RPMWriter():
 
         def _check_strkey(metadata, key):
             """ sub-routine for STR typed keys checking """
-            if key in metadata and not isinstance(metadata[key], str) and not isinstance(metadata[key], unicode):
+            if key in metadata and not isinstance(metadata[key], str):
                 return False
             return True
 
@@ -816,7 +816,7 @@ class RPMWriter():
                 _check_arched_keys(sp)
 
         # checking for proposal pkgconfig requires
-        if self.metadata.has_key("PkgBR"):
+        if "PkgBR" in self.metadata:
             _check_pkgconfig()
             pcbr = []
             br = []
@@ -828,7 +828,7 @@ class RPMWriter():
                         px = px[len(prefix):]
 
                 pl = self.packages
-                if pl.has_key(px):
+                if px in pl:
                     if len(pl[px]) == 1:
                         pcbr.append(pl[px][0])
                     else:
@@ -840,7 +840,7 @@ class RPMWriter():
                     br.append(p)
 
             if len(pcbr) > 0:
-                if self.metadata.has_key('PkgConfigBR'):
+                if 'PkgConfigBR' in self.metadata:
                     pcbr.extend(self.metadata['PkgConfigBR'])
                 logger.info("""Proposal (multiple values skipped, please insert them manually):
 PkgConfigBR:
@@ -985,7 +985,7 @@ PkgBR:
                     from urlgrabber.progress import text_progress_meter
                     try:
                         urlgrabber.urlgrab(target, f_name, progress_obj = text_progress_meter())
-                    except urlgrabber.grabber.URLGrabError, e:
+                    except urlgrabber.grabber.URLGrabError as e:
                         if e.errno == 14: # HTTPError
                             logger.warning('Invalid source URL \'%s\'' % (target))
                             # In error case the file most probably would not be valid,
@@ -1076,7 +1076,7 @@ PkgBR:
         comments = []
 
         comment = ''
-        for line in file(SERIES_PATH):
+        for line in open(SERIES_PATH):
             if not line.strip():
                 continue
             if line.startswith('#'):
@@ -1134,13 +1134,13 @@ PkgBR:
                           },
         }
 
-        for key,reqs in auto_requires.iteritems():
+        for key,reqs in auto_requires.items():
             if extra[key]:
-                for req,items in reqs.iteritems():
+                for req,items in reqs.items():
                     if req in metadata:
                         for i in items:
                             # e.g. GConf2 >= 0.14
-                            yaml_reqs = map(lambda s: s.split()[0], metadata[req])
+                            yaml_reqs = [s.split()[0] for s in metadata[req]]
                             if i in yaml_reqs:
                                 if i in metadata[req]:
                                     logger.warning('duplicate item: %s for %s in package %s' % (i,req,pkg_name))
@@ -1156,15 +1156,15 @@ PkgBR:
         # to regard all numbers as plain string
         def _no_number(self, node):
             return str(self.construct_scalar(node))
-        yaml.Loader.add_constructor(u'tag:yaml.org,2002:int', _no_number)
-        yaml.Loader.add_constructor(u'tag:yaml.org,2002:float', _no_number)
+        yaml.add_constructor('tag:yaml.org,2002:int', _no_number)
+        yaml.add_constructor('tag:yaml.org,2002:float', _no_number)
 
         # loading data from YAML
         try:
-            self.metadata.update(yaml.load(self.stream))
-        except yaml.scanner.ScannerError, e:
+            self.metadata.update(yaml.load(self.stream, Loader=yaml.FullLoader))
+        except yaml.scanner.ScannerError as e:
             logger.error('syntax error found in yaml: %s' % str(e))
-        except yaml.parser.ParserError, e:
+        except yaml.parser.ParserError as e:
             logger.error('syntax error found in yaml: %s' % str(e))
         except ValueError:
             logger.error('Please check if the input file is in YAML format')
@@ -1212,7 +1212,7 @@ PkgBR:
             count = len(self.metadata['Sources'])
             for extra_src in self.metadata['ExtraSources']:
                 try:
-                    file, path = map(str.strip, extra_src.split(';'))
+                    file, path = list(map(str.strip, extra_src.split(';')))
                 except:
                     file = extra_src.strip()
                     path = ''
@@ -1241,7 +1241,7 @@ PkgBR:
             macros_parsed = {}
             for macro in self.metadata['Macros']:
                 try:
-                    macro_name, macro_value = map(str.strip, macro.split(';'))
+                    macro_name, macro_value = list(map(str.strip, macro.split(';')))
                 except:
                     logger.error('Invalid Macros entry "%s", should be "name;value"' % macro)
                 macros_parsed[macro_name] = macro_value
@@ -1251,7 +1251,7 @@ PkgBR:
             macros_parsed = {}
             for macro in self.metadata['Macros2']:
                 try:
-                    macro_name, macro_value = map(str.strip, macro.split(';'))
+                    macro_name, macro_value = list(map(str.strip, macro.split(';')))
                 except:
                     logger.error('Invalid Macros2 entry "%s", should be "name;value"' % macro)
                 macros_parsed[macro_name] = macro_value
@@ -1268,8 +1268,8 @@ PkgBR:
                     self.metadata['Patches'].append(patch)
                     self.metadata['PatchOpts'].append('-p1')
                 elif isinstance(patch, dict):
-                    self.metadata['Patches'].append(patch.keys()[0])
-                    self.metadata['PatchOpts'].append(patch.values()[0])
+                    self.metadata['Patches'].append(list(patch.keys())[0])
+                    self.metadata['PatchOpts'].append(list(patch.values())[0])
                 elif isinstance(patch, list):
                     self.metadata['Patches'].append(patch[0])
                     self.metadata['PatchOpts'].append(' '.join(patch[1:]))
@@ -1317,15 +1317,15 @@ PkgBR:
             for sp in self.metadata["SubPackages"]:
                 self.extra['subpkgs'][sp['Name']] = copy.deepcopy(self.extra_per_pkg)
         if "AutoSubPackages" in self.metadata:
-            if not self.metadata.has_key('SubPackages'):
+            if 'SubPackages' not in self.metadata:
                 self.metadata['SubPackages'] = []
             for asp in self.metadata["AutoSubPackages"]:
                 self.extra['subpkgs'][asp] = copy.deepcopy(self.extra_per_pkg)
-                if self.asp_templates.has_key(asp):
+                if asp in self.asp_templates:
                     self.metadata['SubPackages'].append(self.asp_templates[asp])
                     # By default if the LocaleFilesPkgName isn't defined and we have
                     # lang subpackage the .lang file is assigned to lang package.
-                    if asp == "lang" and not self.metadata.has_key('LocaleFilesPkgName'):
+                    if asp == "lang" and 'LocaleFilesPkgName' not in self.metadata:
                         self.metadata['LocaleFilesPkgName'] = asp
                 else:
                     unknown_asp_tmp = copy.deepcopy(self.asp_templates['unknown'])
@@ -1345,7 +1345,7 @@ PkgBR:
         if 'LocaleName' not in self.metadata and 'NoAutoLocale' not in self.metadata:
             # If LocaleName or NoAutoLocale isn't set lets search if there is 'intltool' build requirement 
             # and set LocaleName to Name.
-            if self.metadata.has_key("PkgBR"):
+            if "PkgBR" in self.metadata:
                 for br in self.metadata['PkgBR']:
                     if br == 'intltool':
                         self.metadata['LocaleName'] = self.metadata['Name']
@@ -1383,7 +1383,7 @@ PkgBR:
             else:
                 py_path = '%{python_sitearch}'
 
-        for pkg_name,v in files.iteritems():
+        for pkg_name,v in files.items():
             pkg_meta = self._lookup_pkgmeta(pkg_name)
 
             if pkg_name == 'main':
@@ -1490,7 +1490,7 @@ PkgBR:
         check = {}          # extra headers
 
         line_num = 0
-        for i in file(spec_fpath):
+        for i in open(spec_fpath):
             line_num += 1
             i = i.strip()
             if line_num < 4:
@@ -1759,7 +1759,7 @@ PkgBR:
                                       }]).respond()
 
         file = open(specfile, "w")
-        file.write(spec_content.encode('utf-8'))
+        file.write(spec_content)
         file.close()
 
 def generate_rpm(yaml_fpath, clean_old = False, extra_content = None, spec_fpath=None, download_new=True, skip_scm=False):

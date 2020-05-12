@@ -1,5 +1,6 @@
 --- output.2.o	2012-07-02 15:35:02.751573632 +0300
 +++ output.2	2012-07-02 15:35:02.869573635 +0300
-@@ -1 +1,2 @@
-+[33mWarning:[0m Please remove empty keys in main package: Patches, URL, Check
+@@ -1 +2,3 @@
++[33mWarning:[0m Please remove empty keys in main package: URL, Patches, Check
++[33mWarning:[0m You should consider adding URL to the main package that points to website or git tree of the package.
  [33mWarning:[0m NEW spec file created: output.spec, maybe customized spec content is needed!

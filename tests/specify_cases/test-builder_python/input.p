@@ -5,7 +5,7 @@
  
  Configure: none
 -Builder: none
-+Builder: python
++Builder: python3
  
  SubPackages:
      - Name: devel

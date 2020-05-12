@@ -1,6 +1,17 @@
---- output.orig.spec	2013-04-10 13:35:16.823402537 +0000
-+++ output.spec	2013-04-10 13:35:23.188450600 +0000
-@@ -41,7 +41,9 @@ This package contains development files 
+--- output.orig.spec
++++ output.spec
+@@ -8,6 +8,10 @@
+ # >> macros
+ # << macros
+ 
++%{!?qtc_qmake:%define qtc_qmake %qmake}
++%{!?qtc_qmake5:%define qtc_qmake5 %qmake5}
++%{!?qtc_make:%define qtc_make make}
++%{?qtc_builddir:%define _builddir %qtc_builddir}
+ Summary:    Sample package for spectacle testings
+ Version:    1.0
+ Release:    1
+@@ -41,7 +45,9 @@
  # >> build pre
  # << build pre
  
@@ -10,11 +21,11 @@
  
  # >> build post
  # << build post
-@@ -50,6 +52,7 @@ This package contains development files 
+@@ -50,6 +56,7 @@
  rm -rf %{buildroot}
  # >> install pre
  # << install pre
-+%qmake_install
++%qmake5_install
  
  # >> install post
  # << install post

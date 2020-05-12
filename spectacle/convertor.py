@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/python3
 # vim: ai ts=4 sts=4 et sw=4
 
 #    Copyright (c) 2009 Intel Corporation
@@ -19,7 +19,7 @@
 import sys
 
 # internal module
-import logger
+from . import logger
 
 ORDER_ENTRIES = ['Name',
                  'AsWholeName',
@@ -102,7 +102,7 @@ class Convertor(object):
         # else: ignore
 
     def _replace_keys(self, dict):
-        for k,v in self.cv_table.iteritems():
+        for k,v in self.cv_table.items():
             if k in dict:
                 dict[v] = dict[k]
                 del dict[k]
@@ -168,7 +168,7 @@ class Convertor(object):
         else:
             extra = {}
 
-        for k, v in dict.iteritems():
+        for k, v in dict.items():
             logger.warning('un-ordered entry: %s' % k)
             items.append((k, v))
 

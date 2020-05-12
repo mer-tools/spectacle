@@ -1,5 +1,5 @@
 # ex: set tabstop=4 noexpandtab: 
-PYTHON=python
+PYTHON=python3
 CHEETAH=cheetah
 TEMPLATES=$(wildcard *.tmpl)
 TEMPLATE_MODS=$(patsubst %.tmpl,%.py,$(TEMPLATES))
@@ -8,7 +8,7 @@ TEMPLATE_MODS=$(patsubst %.tmpl,%.py,$(TEMPLATES))
 all: $(TEMPLATE_MODS)
 
 %.py: %.tmpl
-	$(CHEETAH) compile --settings='useStackFrames=False' $<
+	$(CHEETAH) compile --shbang="#!/usr/bin/env $(PYTHON)" --settings='useStackFrames=False' $<
 	cp $@ __init__.py
 
 clean:

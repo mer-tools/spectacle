@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/python3
 # vim: ai ts=4 sts=4 et sw=4
 
 #    Copyright (c) 2009 Intel Corporation
@@ -35,10 +35,10 @@ class TestSpecifyKeys(unittest.TestCase):
             case = os.path.basename(case)[5:]
             newmethod = """
 def test_%s(self):
-    print "case %s ok"
+    print("case %s ok")
     self.assertTrue(self._compare_out_file("%s"))
 """ % (case, case, case)
-            exec newmethod in locals()
+            exec(newmethod, locals())
 
     def _compare_out_file(self, case):
         prep_working_env(self.cases_dir, case, self.work_dir)

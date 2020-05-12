@@ -39,7 +39,7 @@ import string
 import sys
 import warnings
 
-import StringIO
+import io
 import UserDict
 
 def function_deprecated_by(func):
@@ -67,7 +67,7 @@ class TagSectionWrapper(object, UserDict.DictMixin):
         self.__section = section
 
     def keys(self):
-        return self.__section.keys()
+        return list(self.__section.keys())
 
     def __getitem__(self, key):
         s = self.__section.find_raw(key)
@@ -156,7 +156,7 @@ class Deb822Dict(object, UserDict.DictMixin):
         if _dict is not None:
             # _dict may be a dict or a list of two-sized tuples
             if hasattr(_dict, 'items'):
-                items = _dict.items()
+                items = list(_dict.items())
             else:
                 items = list(_dict)
 
@@ -172,9 +172,9 @@ class Deb822Dict(object, UserDict.DictMixin):
         if _parsed is not None:
             self.__parsed = _parsed
             if _fields is None:
-                self.__keys.extend([ _strI(k) for k in self.__parsed.keys() ])
+                self.__keys.extend([ _strI(k) for k in list(self.__parsed.keys()) ])
             else:
-                self.__keys.extend([ _strI(f) for f in _fields if self.__parsed.has_key(f) ])
+                self.__keys.extend([ _strI(f) for f in _fields if f in self.__parsed ])
         
     ### BEGIN DictMixin methods
 
@@ -197,7 +197,7 @@ class Deb822Dict(object, UserDict.DictMixin):
             # Always return unicode objects instead of strings
             try:
                 value = value.decode(self.encoding)
-            except UnicodeDecodeError, e:
+            except UnicodeDecodeError as e:
                 # Evidently, the value wasn't encoded with the encoding the
                 # user specified.
                 warnings.warn('decoding from %s failed; attempting to detect '
@@ -227,11 +227,11 @@ class Deb822Dict(object, UserDict.DictMixin):
     ### END DictMixin methods
 
     def __repr__(self):
-        return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in self.items()])
+        return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in list(self.items())])
 
     def __eq__(self, other):
-        mykeys = self.keys(); mykeys.sort()
-        otherkeys = other.keys(); otherkeys.sort()
+        mykeys = list(self.keys()); mykeys.sort()
+        otherkeys = list(other.keys()); otherkeys.sort()
         if not mykeys == otherkeys:
             return False
 
@@ -328,7 +328,7 @@ class Deb822(Deb822Dict):
 
         wanted_field = lambda f: fields is None or f in fields
 
-        if isinstance(sequence, basestring):
+        if isinstance(sequence, str):
             sequence = sequence.splitlines()
 
         curkey = None
@@ -383,7 +383,7 @@ class Deb822(Deb822Dict):
         this can be overridden in subclasses (e.g. _multivalued) that can take
         special values.
         """
-        return unicode(self[key])
+        return str(self[key])
 
     def dump(self, fd=None, encoding=None):
         """Dump the the contents in the original format
@@ -397,7 +397,7 @@ class Deb822(Deb822Dict):
         """
 
         if fd is None:
-            fd = StringIO.StringIO()
+            fd = io.StringIO()
             return_string = True
         else:
             return_string = False
@@ -407,7 +407,7 @@ class Deb822(Deb822Dict):
             # was explicitly specified
             encoding = self.encoding
 
-        for key in self.iterkeys():
+        for key in self.keys():
             value = self.get_as_string(key)
             if not value or value[0] == '\n':
                 # Avoid trailing whitespace after "Field:" if it's on its own
@@ -586,7 +586,7 @@ class Deb822(Deb822Dict):
         # _gpg_multivalued.__init__) which is small compared to Packages or
         # Sources which contain no signature
         if not hasattr(self, 'raw_text'):
-            raise ValueError, "original text cannot be found"
+            raise ValueError("original text cannot be found")
 
         if self.gpg_info is None:
             self.gpg_info = GpgInfo.from_sequence(self.raw_text)
@@ -609,7 +609,7 @@ class GpgInfo(dict):
 
     def valid(self):
         """Is the signature valid?"""
-        return self.has_key('GOODSIG') or self.has_key('VALIDSIG')
+        return 'GOODSIG' in self or 'VALIDSIG' in self
     
 # XXX implement as a property?
 # XXX handle utf-8 %-encoding
@@ -626,9 +626,9 @@ class GpgInfo(dict):
 
         n = GpgInfo()
 
-        if isinstance(out, basestring):
+        if isinstance(out, str):
             out = out.split('\n')
-        if isinstance(err, basestring):
+        if isinstance(err, str):
             err = err.split('\n')
 
         n.out = out
@@ -671,13 +671,13 @@ class GpgInfo(dict):
         [args.extend(["--keyring", k]) for k in keyrings if os.path.isfile(k) and os.access(k, os.R_OK)]
         
         if "--keyring" not in args:
-            raise IOError, "cannot access any of the given keyrings"
+            raise IOError("cannot access any of the given keyrings")
 
         import subprocess
         p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # XXX what to do with exit code?
 
-        if isinstance(sequence, basestring):
+        if isinstance(sequence, str):
             (out, err) = p.communicate(sequence)
         else:
             (out, err) = p.communicate("\n".join(sequence))
@@ -738,14 +738,13 @@ class PkgRelation(object):
                     d['arch'] = parse_archs(parts['archs'])
                 return d
             else:
-                print >> sys.stderr, \
-                        'deb822.py: WARNING: cannot parse package' \
-                        ' relationship "%s", returning it raw' % raw
+                print('deb822.py: WARNING: cannot parse package' \
+                        ' relationship "%s", returning it raw' % raw, file=sys.stderr)
                 return { 'name': raw, 'version': None, 'arch': None }
 
         tl_deps = cls.__comma_sep_RE.split(raw.strip()) # top-level deps
-        cnf = map(cls.__pipe_sep_RE.split, tl_deps)
-        return map(lambda or_deps: map(parse_rel, or_deps), cnf)
+        cnf = list(map(cls.__pipe_sep_RE.split, tl_deps))
+        return [list(map(parse_rel, or_deps)) for or_deps in cnf]
 
     @staticmethod
     def str(rels):
@@ -763,14 +762,14 @@ class PkgRelation(object):
 
         def pp_atomic_dep(dep):
             s = dep['name']
-            if dep.has_key('version') and dep['version'] is not None:
+            if 'version' in dep and dep['version'] is not None:
                 s += ' (%s %s)' % dep['version']
-            if dep.has_key('arch') and dep['arch'] is not None:
+            if 'arch' in dep and dep['arch'] is not None:
                 s += ' [%s]' % string.join(map(pp_arch, dep['arch']))
             return s
 
-        pp_or_dep = lambda deps: string.join(map(pp_atomic_dep, deps), ' | ')
-        return string.join(map(pp_or_dep, rels), ', ')
+        pp_or_dep = lambda deps: string.join(list(map(pp_atomic_dep, deps)), ' | ')
+        return string.join(list(map(pp_or_dep, rels)), ', ')
 
 
 class _lowercase_dict(dict):
@@ -811,7 +810,7 @@ class _PkgRelationMixin(object):
             # name) of Deb822 objects on the dictionary returned by the
             # relations property.
             keyname = name.lower()
-            if self.has_key(name):
+            if name in self:
                 self.__relations[keyname] = None   # lazy value
                     # all lazy values will be expanded before setting
                     # __parsed_relations to True
@@ -862,8 +861,7 @@ class _PkgRelationMixin(object):
             [ {'name': 'procps', 'arch': (false, 'hurd-i386')} ] ]
         """
         if not self.__parsed_relations:
-            lazy_rels = filter(lambda n: self.__relations[n] is None,
-                    self.__relations.keys())
+            lazy_rels = [n for n in list(self.__relations.keys()) if self.__relations[n] is None]
             for n in lazy_rels:
                 self.__relations[n] = PkgRelation.parse_relations(self[n])
             self.__parsed_relations = True
@@ -881,7 +879,7 @@ class _multivalued(Deb822):
     def __init__(self, *args, **kwargs):
         Deb822.__init__(self, *args, **kwargs)
 
-        for field, fields in self._multivalued_fields.items():
+        for field, fields in list(self._multivalued_fields.items()):
             try:
                 contents = self[field]
             except KeyError:
@@ -894,13 +892,13 @@ class _multivalued(Deb822):
                 self[field] = Deb822Dict()
                 updater_method = self[field].update
 
-            for line in filter(None, contents.splitlines()):
-                updater_method(Deb822Dict(zip(fields, line.split())))
+            for line in [_f for _f in contents.splitlines() if _f]:
+                updater_method(Deb822Dict(list(zip(fields, line.split()))))
 
     def get_as_string(self, key):
         keyl = key.lower()
         if keyl in self._multivalued_fields:
-            fd = StringIO.StringIO()
+            fd = io.StringIO()
             if hasattr(self[key], 'keys'): # single-line
                 array = [ self[key] ]
             else: # multi-line
@@ -949,7 +947,7 @@ class _gpg_multivalued(_multivalued):
             sequence = kwargs.get("sequence", None)
 
         if sequence is not None:
-            if isinstance(sequence, basestring):
+            if isinstance(sequence, str):
                 self.raw_text = sequence
             elif hasattr(sequence, "items"):
                 # sequence is actually a dict(-like) object, so we don't have
@@ -963,7 +961,7 @@ class _gpg_multivalued(_multivalued):
                     # Empty input
                     gpg_pre_lines = lines = gpg_post_lines = []
                 if gpg_pre_lines and gpg_post_lines:
-                    raw_text = StringIO.StringIO()
+                    raw_text = io.StringIO()
                     raw_text.write("\n".join(gpg_pre_lines))
                     raw_text.write("\n\n")
                     raw_text.write("\n".join(lines))
