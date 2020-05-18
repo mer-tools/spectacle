@@ -857,11 +857,15 @@ $str_newline.join($extra.content.postun[$sp.Name])
 #else
 %files
 #end if
-%defattr(-,root,root,-)
 #if "Files" in $metadata:
+#if not '%defattr' in $metadata.Files[0]
+%defattr(-,root,root,-)
+#end if
 #for $f in $metadata.Files
 $arch_line($f)
 #end for
+#else
+%defattr(-,root,root,-)
 #end if
 # >> files
 #if "files" in $extra.content and "main" in $extra.content.files
@@ -885,11 +889,15 @@ $str_newline.join($extra.content.files.main)
 #else
 %files $pkg_name
 #end if
-%defattr(-,root,root,-)
 #if "Files" in $sp:
+#if not '%defattr' in $sp.Files[0]
+%defattr(-,root,root,-)
+#end if
 #for $f in $sp.Files
 $arch_line($f)
 #end for
+#else
+%defattr(-,root,root,-)
 #end if
 # >> files $sp.Name
 #if "files" in $extra.content and $sp.Name in $extra.content.files
