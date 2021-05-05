@@ -159,13 +159,13 @@ All available directives for spectacle are listed as the following:
 * Macros2: **list** of **string**
 
 * Configure: **string**, valid values: **autogen**, **configure**,
-  **reconfigure**, **none**
+  **reconfigure**, **cmake**, **none**
   **If not specified, the default value "configure" will be used**
 
 * ConfigOptions: **list**, extra options for ``Configure``
 
 * Builder: **string**, valid values: **make**, **single-make**,
-  **python**, **perl**, **qmake**, **none**
+  **python**, **python3**, **perl**, **qmake**, **qmake5**, **qtc**, **qtc5**, **cmake**, **none**
   **If not specified, the deault value "make" will be used. If do not want a
   automatic builder, please use "none".**
 
